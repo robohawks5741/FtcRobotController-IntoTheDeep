@@ -11,7 +11,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import org.firstinspires.ftc.teamcode.subsystems.dualMotor;
 
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -20,13 +22,22 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 public class main extends LinearOpMode {
 
-    private DcMotorEx lift;
+    private DcMotorEx lift, leftRotate, rightRotate;
     private Servo rotate, left, right;
     @Override
     public void runOpMode() throws InterruptedException {
         lift = hardwareMap.get(DcMotorEx.class, "lift");
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftRotate = hardwareMap.get(DcMotorEx.class, "leftRotate");
+        leftRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        rightRotate = hardwareMap.get(DcMotorEx.class, "rightRotate");
+        rightRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rotate = hardwareMap.get(Servo.class, "rotate");
         left = hardwareMap.get(Servo.class, "left");
@@ -37,6 +48,17 @@ public class main extends LinearOpMode {
         left.setPosition(0.0);
         right.setPosition(0.36);
         rotate.setPosition(0.5);
+
+        dualMotor rotateArm;
+
+        try {
+            rotateArm = new dualMotor(leftRotate, rightRotate);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        int rotatePos = 0;
+        boolean pressed = false;
         waitForStart();
 
         while (opModeIsActive()) {
@@ -51,29 +73,35 @@ public class main extends LinearOpMode {
             drive.updatePoseEstimate();
 
             //Lift
-            if(gamepad1.left_trigger > 0.1){
-                rotate.setPosition(0);
-                lift.setTargetPosition(2000);
-                lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                lift.setPower(1);
-            } else if (gamepad1.right_trigger > 0.1){
-                rotate.setPosition(0.5);
-                lift.setTargetPosition(0);
-                lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                lift.setPower(1);
+            if((gamepad1.left_trigger > 0.1) && !pressed){
+                pressed = true;
+                rotatePos = 890;
+
+            } else if ((gamepad1.right_trigger > 0.1) && !pressed){
+                pressed = true;
+                rotatePos = 0;
+
+            } else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)){
+                pressed = false;
             }
 
-            //Claw
-            if(gamepad1.left_bumper){
-                //Open
-                left.setPosition(0.0);
-                right.setPosition(0.36);
-            } else if (gamepad1.right_bumper){
-                //Close
-                left.setPosition(0.29);
-                right.setPosition(0.07);
+            try {
+                rotateArm.setTargetPosition(rotatePos);
+                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rotateArm.setPower(1);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
+            rightRotate.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightRotate.setPower(1);
 
+            telemetry.addData("rotate pos", rotatePos);
+            telemetry.addData("left motor", leftRotate.getCurrentPosition());
+            telemetry.addData("right motor", rightRotate.getCurrentPosition());
+
+
+            telemetry.addData("left motor target", leftRotate.getTargetPosition());
+            telemetry.addData("right motor target", rightRotate.getCurrentPosition());
 
 
             telemetry.addData("lift", lift.getCurrentPosition());

@@ -17,11 +17,14 @@ import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 public class Utilities {
-    private static final int MAX_MOTOR_CURRENT = 20;
+    private static final double MAX_MOTOR_CURRENT = 20;
     public void checkPower(DcMotorEx motor) {
         double power = motor.getPower();
         if(motor.getCurrent(CurrentUnit.AMPS) > MAX_MOTOR_CURRENT) {
             motor.setPower(power * MAX_MOTOR_CURRENT / motor.getCurrent(CurrentUnit.AMPS));
+        }
+        else if(motor.getCurrent(CurrentUnit.AMPS) > MAX_MOTOR_CURRENT * 3 / 4) {
+            motor.setPower(1);
         }
     }
 }

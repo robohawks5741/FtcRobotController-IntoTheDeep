@@ -37,6 +37,15 @@ public class DualMotor {
         Kd = 0;
         PID = new PIDController(Kp, Ki, Kd);
     }
+    /**
+     * Constructs a DcMotorPair containing and controlling at least one motor, with constants for PID control.
+     * @param motor1 The first motor to be controlled by this pair
+     * @param motor2 The second motor to be controlled by this pair
+     * @param K_P The PID constant for proportional
+     * @param K_I The PID constant for integral
+     * @param K_D The PID constant for derivative
+     * @throws Exception Thrown when no motors are provided
+     */
     public DualMotor(DcMotorEx motor1, DcMotorEx motor2, double K_P, double K_I, double K_D) throws Exception {
         this.motor1 = motor1;
         this.motor2 = motor2;
@@ -64,6 +73,13 @@ public class DualMotor {
         Kd = 0;
         PID = new PIDController(Kp, Ki, Kd);
     }
+    /**
+     * Constructs a DcMotorPair controlling one motor, with constants for PID control.
+     * @param motor1 - The DcMotor to be controlled by this motor pair.
+     * @param K_P The PID constant for proportional
+     * @param K_I The PID constant for integral
+     * @param K_D The PID constant for derivative
+     */
     public DualMotor(DcMotor motor1, double K_P, double K_I, double K_D) {
         this.motor1 = motor1;
         isSingleMotor = true;
@@ -172,6 +188,7 @@ public class DualMotor {
      *                       motor's target position to.
      */
     public void setTargetPosition(int targetPosition) {
+        PID.reset();
         if(motor1 != null)
             motor1.setTargetPosition(targetPosition);
         if(motor2 != null) {
@@ -186,9 +203,6 @@ public class DualMotor {
      * @throws Exception Thrown when no motors were found in the current pair.
      */
     public int getCurrentPosition() throws Exception {
-        if(motor1 != null && motor2 != null) {
-            return motor1.getCurrentPosition();
-        }
         if(motor1 != null)
             return motor1.getCurrentPosition();
         else if(motor2 != null)
@@ -197,4 +211,33 @@ public class DualMotor {
             throw new Exception(noMotorEx);
     }
 
+    /**
+     * Gets the target position of the first motor if there are two motors,
+     * otherwise, the target position of the single motor
+     * @return The target position of the motor(s) in encoder ticks
+     * @throws Exception Thrown when no motors are found in the current pair
+     */
+    public int getTargetPosition() throws Exception {
+        if(motor1 != null)
+            return motor1.getTargetPosition();
+        else if(motor2 != null)
+            return motor2.getTargetPosition();
+        else
+            throw new Exception(noMotorEx);
+    }
+
+    /**
+     * Gets the motor power given by the PID algorithm to reach the
+     * target position based on the current position
+     * @return The determined power of the motor, between -1.0 and 1.0
+     * @throws Exception Thrown when no motors are found in the current pair
+     */
+    public double getPIDPower() throws Exception {
+        try {
+            return PID.PIDControl(getTargetPosition(), getCurrentPosition());
+        }
+        catch(Exception e) {
+            throw new Exception(noMotorEx);
+        }
+    }
 }

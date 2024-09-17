@@ -76,24 +76,29 @@ public class main extends LinearOpMode {
             if((gamepad1.left_trigger > 0.1) && !pressed){
                 pressed = true;
                 rotatePos = 890;
-
+                try {
+                    rotateArm.setTargetPosition(rotatePos);
+                    rotateArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             } else if ((gamepad1.right_trigger > 0.1) && !pressed){
                 pressed = true;
                 rotatePos = 0;
-
+                try {
+                    rotateArm.setTargetPosition(rotatePos);
+                    rotateArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             } else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)){
                 pressed = false;
             }
-
             try {
-                rotateArm.setTargetPosition(rotatePos);
-                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(1);
+                rotateArm.setPower(rotateArm.getPIDPower());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            rightRotate.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightRotate.setPower(1);
 
             telemetry.addData("rotate pos", rotatePos);
             telemetry.addData("left motor", leftRotate.getCurrentPosition());

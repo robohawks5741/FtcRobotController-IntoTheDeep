@@ -81,6 +81,9 @@ public class main extends LinearOpMode {
                 pressed = true;
                 rotatePos = 0;
 
+            }else if ((gamepad1.dpad_right == true) && !pressed) {
+                pressed = true;
+                rotatePos = 120;
             } else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)){
                 pressed = false;
             }
@@ -92,8 +95,7 @@ public class main extends LinearOpMode {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            rightRotate.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightRotate.setPower(1);
+
 
             telemetry.addData("rotate pos", rotatePos);
             telemetry.addData("left motor", leftRotate.getCurrentPosition());

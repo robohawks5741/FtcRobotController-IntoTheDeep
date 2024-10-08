@@ -11,9 +11,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.subsystems.dualMotor;
+import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -49,10 +48,10 @@ public class main extends LinearOpMode {
         right.setPosition(0.36);
         rotate.setPosition(0.5);
 
-        dualMotor rotateArm;
+        DualMotor rotateArm;
 
         try {
-            rotateArm = new dualMotor(leftRotate, rightRotate);
+            rotateArm = new DualMotor(leftRotate, rightRotate);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

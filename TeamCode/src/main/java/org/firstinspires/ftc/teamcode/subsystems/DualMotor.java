@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
  *
  */
 
-public class dualMotor {
+public class DualMotor {
     private String noMotorEx = "Ninevolt: No motors remaining!";
     private DcMotor motor1;
     private DcMotor motor2;
@@ -21,7 +21,7 @@ public class dualMotor {
      * @param motor2 The second motor to be controlled by this pair
      * @throws Exception Thrown when no motors are provided
      */
-    public dualMotor(DcMotorEx motor1, DcMotorEx motor2) throws Exception {
+    public DualMotor(DcMotorEx motor1, DcMotorEx motor2) throws Exception {
         this.motor1 = motor1;
         this.motor2 = motor2;
         if (motor1 == null ^ motor2 == null) {
@@ -35,7 +35,7 @@ public class dualMotor {
      * Constructs a DcMotorPair controlling one motor.
      * @param motor1 - The DcMotor to be controlled by this motor pair.
      */
-    public dualMotor(DcMotor motor1) {
+    public DualMotor(DcMotor motor1) {
         this.motor1 = motor1;
         isSingleMotor = true;
     }

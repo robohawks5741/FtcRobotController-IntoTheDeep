@@ -19,8 +19,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @TeleOp(name = "#Main")
 
-public class main extends LinearOpMode {
-
+public class TeleOp1 extends LinearOpMode {
     private DcMotorEx lift, leftRotate, rightRotate;
     private Servo rotate, left, right;
     @Override

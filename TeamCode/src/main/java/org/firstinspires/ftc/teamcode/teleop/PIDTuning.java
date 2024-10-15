@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
 
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -12,22 +13,28 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@TeleOp(name = "#Main")
+@TeleOp(name = "Tuning")
 
-public class main extends LinearOpMode {
-
+public class PIDTuning extends LinearOpMode {
     private DcMotorEx lift, leftRotate, rightRotate;
     private Servo rotate, left, right;
+    /*public double armKp = 0.05;
+    public double armKi = 0;
+    public double armKd = 0;*/
+    private double startTime = -1;
     @Override
     public void runOpMode() throws InterruptedException {
         lift = hardwareMap.get(DcMotorEx.class, "lift");
         lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ElapsedTime timer = new ElapsedTime();
 
         leftRotate = hardwareMap.get(DcMotorEx.class, "leftRotate");
         leftRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -45,13 +52,14 @@ public class main extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
         left.setPosition(0.0);
-        right.setPosition(0.36);
+        right.setPosition(0.0);
         rotate.setPosition(0.5);
 
         DualMotor rotateArm;
 
         try {
-            rotateArm = new DualMotor(leftRotate, rightRotate);
+            rotateArm = new DualMotor(leftRotate, rightRotate, MecanumDrive.PARAMS.armKp, MecanumDrive.PARAMS.armKi,
+                    MecanumDrive.PARAMS.armKd);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -59,7 +67,13 @@ public class main extends LinearOpMode {
         int rotatePos = 0;
         boolean pressed = false;
         waitForStart();
-
+        rotatePos = -880;
+        try {
+            rotateArm.setTargetPosition(rotatePos);
+            rotateArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         while (opModeIsActive()) {
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
@@ -70,32 +84,46 @@ public class main extends LinearOpMode {
             ));
 
             drive.updatePoseEstimate();
-
             //Lift
-            if((gamepad1.left_trigger > 0.1) && !pressed){
-                pressed = true;
-                rotatePos = 890;
-
-            } else if ((gamepad1.right_trigger > 0.1) && !pressed){
-                pressed = true;
-                rotatePos = 0;
-
-            }else if ((gamepad1.dpad_right == true) && !pressed) {
-                pressed = true;
-                rotatePos = 120;
-            } else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)){
-                pressed = false;
-            }
 
             try {
-                rotateArm.setTargetPosition(rotatePos);
-                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(1);
+                //Purely for constant power to oppose gravity
+                rotateArm.setPower(MecanumDrive.PARAMS.armBasePower);
+                //overall PID power
+                /*
+                if(rotatePos == 0) {
+                    rotateArm.setPower(rotateArm.getPIDPower() - MecanumDrive.PARAMS.armBasePower);
+                }
+                else {
+                    rotateArm.setPower(rotateArm.getPIDPower() + MecanumDrive.PARAMS.armBasePower);
+                }
+                 */
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
-
+            try {
+                if (rotateArm.getCurrentPosition() > -5 && rotatePos == 0) {
+                    if(startTime == -1) {
+                        startTime = timer.milliseconds();
+                    }
+                    if(timer.milliseconds() > startTime + 1000) {
+                        rotatePos = -880;
+                        rotateArm.setTargetPosition(rotatePos);
+                        startTime = -1;
+                    }
+                } else if (rotateArm.getCurrentPosition() < -875 && rotatePos == -880) {
+                    if(startTime == -1) {
+                        startTime = timer.milliseconds();
+                    }
+                    if(timer.milliseconds() > startTime + 1000) {
+                        rotatePos = 0;
+                        rotateArm.setTargetPosition(rotatePos);
+                        startTime = -1;
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             telemetry.addData("rotate pos", rotatePos);
             telemetry.addData("left motor", leftRotate.getCurrentPosition());
             telemetry.addData("right motor", rightRotate.getCurrentPosition());
@@ -121,5 +149,4 @@ public class main extends LinearOpMode {
         }
 
     }
-
 }

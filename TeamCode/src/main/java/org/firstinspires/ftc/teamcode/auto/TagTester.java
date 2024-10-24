@@ -25,7 +25,7 @@ public class TagTester extends LinearOpMode
     // Lens intrinsics
     // UNITS ARE PIXELS
     // NOTE: this calibration is for the C920 webcam at 800x448.
-    // You will need to do your own calibration for other confiurations!
+    // You will need to do your own calibration for other configurations!
     double fx = 909.781;
     double fy = 909.781;
     double cx = 627.946;

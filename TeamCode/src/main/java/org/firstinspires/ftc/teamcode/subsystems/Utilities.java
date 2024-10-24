@@ -18,13 +18,17 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 public class Utilities {
     private static final double MAX_MOTOR_CURRENT = 20;
-    public void checkPower(DcMotorEx motor) {
+    public double checkPower(DcMotorEx motor) {
         double power = motor.getPower();
         if(motor.getCurrent(CurrentUnit.AMPS) > MAX_MOTOR_CURRENT) {
-            motor.setPower(power * MAX_MOTOR_CURRENT / motor.getCurrent(CurrentUnit.AMPS));
+            return power * MAX_MOTOR_CURRENT / motor.getCurrent(CurrentUnit.AMPS);
         }
-        else if(motor.getCurrent(CurrentUnit.AMPS) > MAX_MOTOR_CURRENT * 3 / 4) {
-            motor.setPower(1);
+        else if(motor.getCurrent(CurrentUnit.AMPS) > MAX_MOTOR_CURRENT * 3 / 4 && !motor.getMode().equals("RUN_WITHOUT_ENCODER")) {
+            return 1;
         }
+        return power;
     }
+    /*public double checkPower(DualMotor motor) {
+        if()
+    }*/
 }

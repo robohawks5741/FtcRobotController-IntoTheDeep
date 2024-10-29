@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
  */
 
 public class DualMotor {
-    private String noMotorEx = "Ninevolt: No motors remaining!";
+    private static String noMotorEx = "Ninevolt: No motors remaining!";
     private DcMotor motor1;
     private DcMotor motor2;
     private boolean isSingleMotor = false;

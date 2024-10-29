@@ -106,7 +106,7 @@ public class DualMotor {
         if(motor1 != null)
             motor1.setPower(power);
         if(motor2 != null)
-            motor2.setPower(power);
+            motor2.setPower(-power);
     }
 
     /**
@@ -140,7 +140,7 @@ public class DualMotor {
      */
     public void setTargetPosition(int targetPosition) {
         if(motor1 != null)
-            motor1.setTargetPosition(targetPosition);
+            motor1.setTargetPosition(-targetPosition);
         if(motor2 != null) {
             motor2.setTargetPosition(targetPosition);
         }

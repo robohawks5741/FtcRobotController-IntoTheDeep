@@ -44,18 +44,17 @@ public class main extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
 
-<<<<<<< Updated upstream
         DualMotor rotateArm;
 
         try {
             rotateArm = new DualMotor(leftRotate, rightRotate);
-=======
+
         dualMotor rotateArm;
         try {
             rotateArm = new dualMotor(rightRotate, leftRotate);
             rightRotate.setDirection(DcMotorSimple.Direction.FORWARD);
          //   leftRotate.setDirection(DcMotorSimple.Direction.REVERSE);
->>>>>>> Stashed changes
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

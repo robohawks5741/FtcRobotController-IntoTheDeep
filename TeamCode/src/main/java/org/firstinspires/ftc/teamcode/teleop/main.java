@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
@@ -46,12 +47,8 @@ public class main extends LinearOpMode {
 
         DualMotor rotateArm;
 
-        try {
-            rotateArm = new DualMotor(leftRotate, rightRotate);
-
-        dualMotor rotateArm;
-        try {
-            rotateArm = new dualMotor(rightRotate, leftRotate);
+      try {
+            rotateArm = new DualMotor(rightRotate, leftRotate);
             rightRotate.setDirection(DcMotorSimple.Direction.FORWARD);
          //   leftRotate.setDirection(DcMotorSimple.Direction.REVERSE);
 

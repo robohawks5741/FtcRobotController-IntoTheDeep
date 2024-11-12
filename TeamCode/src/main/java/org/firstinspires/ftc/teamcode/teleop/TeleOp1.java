@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
@@ -21,7 +22,8 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 public class TeleOp1 extends LinearOpMode {
     private DcMotorEx lift, leftRotate, rightRotate;
-    private Servo rotate, left, right;
+    private Servo claw;
+
     @Override
     public void runOpMode() throws InterruptedException {
         lift = hardwareMap.get(DcMotorEx.class, "lift");
@@ -37,25 +39,23 @@ public class TeleOp1 extends LinearOpMode {
         rightRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rotate = hardwareMap.get(Servo.class, "rotate");
-        left = hardwareMap.get(Servo.class, "left");
-        right = hardwareMap.get(Servo.class, "right");
+        claw = hardwareMap.get(Servo.class, "claw");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
-        left.setPosition(0.0);
-        right.setPosition(0.36);
-        rotate.setPosition(0.5);
 
         DualMotor rotateArm;
 
-        try {
-            rotateArm = new DualMotor(leftRotate, rightRotate);
+      try {
+            rotateArm = new DualMotor(rightRotate, leftRotate);
+            rightRotate.setDirection(DcMotorSimple.Direction.FORWARD);
+         //   leftRotate.setDirection(DcMotorSimple.Direction.REVERSE);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        int rotatePos = 0;
+        int rotatePos = 14;
         boolean pressed = false;
         waitForStart();
 
@@ -71,54 +71,68 @@ public class TeleOp1 extends LinearOpMode {
             drive.updatePoseEstimate();
 
             //Lift
-            if((gamepad1.left_trigger > 0.1) && !pressed){
+            if ((gamepad1.left_trigger > 0.1) && !pressed) {
                 pressed = true;
-                rotatePos = 890;
+                rotatePos = 540;
 
-            } else if ((gamepad1.right_trigger > 0.1) && !pressed){
+            } else if ((gamepad1.right_trigger > 0.1) && !pressed) {
                 pressed = true;
-                rotatePos = 0;
+                rotatePos = 30;
 
-            }else if ((gamepad1.dpad_right == true) && !pressed) {
-                pressed = true;
-                rotatePos = 120;
-            } else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)){
+            } else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
                 pressed = false;
             }
 
-            try {
+            try{
                 rotateArm.setTargetPosition(rotatePos);
                 rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(1);
-            } catch (Exception e) {
+                if(rotatePos <= Math.abs(leftRotate.getCurrentPosition())){
+                    rotateArm.setPower(0.2);
+                } else{
+                    rotateArm.setPower(1);
+                }
+            } catch(Exception e) {
                 throw new RuntimeException(e);
             }
+            if (gamepad1.y) {
+                lift.setTargetPosition(-1650);
+                lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                lift.setPower(1);
+            }else if (gamepad1.a) {
+                lift.setTargetPosition(0);
+                lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                lift.setPower(1);
+            }
+
+            if(gamepad1.left_bumper){
+                claw.setPosition(0);
+            } else if(gamepad1.right_bumper){
+                claw.setPosition(0.25);
+            }
+
+                telemetry.addData("rotate pos", rotatePos);
+                telemetry.addData("left motor", leftRotate.getCurrentPosition());
+                telemetry.addData("right motor", rightRotate.getCurrentPosition());
 
 
-            telemetry.addData("rotate pos", rotatePos);
-            telemetry.addData("left motor", leftRotate.getCurrentPosition());
-            telemetry.addData("right motor", rightRotate.getCurrentPosition());
+                telemetry.addData("left motor target", leftRotate.getTargetPosition());
+                telemetry.addData("right motor target", rightRotate.getTargetPosition());
 
 
-            telemetry.addData("left motor target", leftRotate.getTargetPosition());
-            telemetry.addData("right motor target", rightRotate.getCurrentPosition());
+                telemetry.addData("lift", lift.getCurrentPosition());
 
+                telemetry.addData("x", drive.pose.position.x);
+                telemetry.addData("y", drive.pose.position.y);
+                telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
+                telemetry.update();
 
-            telemetry.addData("lift", lift.getCurrentPosition());
-            telemetry.addData("right", right.getPosition());
-            telemetry.addData("left", left.getPosition());
-            telemetry.addData("Rotate", rotate.getPosition());
-            telemetry.addData("x", drive.pose.position.x);
-            telemetry.addData("y", drive.pose.position.y);
-            telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
-            telemetry.update();
+                TelemetryPacket packet = new TelemetryPacket();
+                packet.fieldOverlay().setStroke("#3F51B5");
+                Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
+                FtcDashboard.getInstance().sendTelemetryPacket(packet);
+            }
 
-            TelemetryPacket packet = new TelemetryPacket();
-            packet.fieldOverlay().setStroke("#3F51B5");
-            Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
-            FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }
 
     }
 
-}

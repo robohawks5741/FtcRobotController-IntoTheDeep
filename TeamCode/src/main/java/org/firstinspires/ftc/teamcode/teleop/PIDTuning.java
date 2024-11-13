@@ -45,15 +45,12 @@ public class PIDTuning extends LinearOpMode {
         rightRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rotate = hardwareMap.get(Servo.class, "rotate");
+        /*rotate = hardwareMap.get(Servo.class, "rotate");
         left = hardwareMap.get(Servo.class, "left");
-        right = hardwareMap.get(Servo.class, "right");
+        right = hardwareMap.get(Servo.class, "right");*/
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
-        left.setPosition(0.0);
-        right.setPosition(0.0);
-        rotate.setPosition(0.5);
 
         DualMotor rotateArm;
 
@@ -74,6 +71,7 @@ public class PIDTuning extends LinearOpMode {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        waitForStart();
         while (opModeIsActive()) {
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
@@ -84,23 +82,31 @@ public class PIDTuning extends LinearOpMode {
             ));
 
             drive.updatePoseEstimate();
+            try{
+                rotateArm.setTargetPosition(0);
+                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rotateArm.setPower(0);
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
             //Lift
-
+            /*
             try {
                 //Purely for constant power to oppose gravity
                 rotateArm.setPower(MecanumDrive.PARAMS.armBasePower);
                 //overall PID power
-                /*
+
                 if(rotatePos == 0) {
                     rotateArm.setPower(rotateArm.getPIDPower() - MecanumDrive.PARAMS.armBasePower);
                 }
                 else {
                     rotateArm.setPower(rotateArm.getPIDPower() + MecanumDrive.PARAMS.armBasePower);
                 }
-                 */
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
-            }
+            }*/
+            /*
             try {
                 if (rotateArm.getCurrentPosition() > -5 && rotatePos == 0) {
                     if(startTime == -1) {
@@ -124,6 +130,31 @@ public class PIDTuning extends LinearOpMode {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            */
+            if ((gamepad1.left_trigger > 0.1) && !pressed) {
+                pressed = true;
+                rotatePos = 540;
+
+            } else if ((gamepad1.right_trigger > 0.1) && !pressed) {
+                pressed = true;
+                rotatePos = 30;
+
+            } else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
+                pressed = false;
+            }
+/*
+            try{
+                rotateArm.setTargetPosition(rotatePos);
+                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                if(rotatePos <= Math.abs(leftRotate.getCurrentPosition())){
+                    rotateArm.setPower(0.2);
+                } else{
+                    rotateArm.setPower(1);
+                }
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+            */
             telemetry.addData("rotate pos", rotatePos);
             telemetry.addData("left motor", leftRotate.getCurrentPosition());
             telemetry.addData("right motor", rightRotate.getCurrentPosition());
@@ -134,9 +165,9 @@ public class PIDTuning extends LinearOpMode {
 
 
             telemetry.addData("lift", lift.getCurrentPosition());
-            telemetry.addData("right", right.getPosition());
-            telemetry.addData("left", left.getPosition());
-            telemetry.addData("Rotate", rotate.getPosition());
+            //telemetry.addData("right", right.getPosition());
+            //telemetry.addData("left", left.getPosition());
+            //telemetry.addData("Rotate", rotate.getPosition());
             telemetry.addData("x", drive.pose.position.x);
             telemetry.addData("y", drive.pose.position.y);
             telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
@@ -146,6 +177,8 @@ public class PIDTuning extends LinearOpMode {
             packet.fieldOverlay().setStroke("#3F51B5");
             Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
             FtcDashboard.getInstance().sendTelemetryPacket(packet);
+
+
         }
 
     }

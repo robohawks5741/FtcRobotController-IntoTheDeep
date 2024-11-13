@@ -39,7 +39,7 @@ public class TeleOp1 extends LinearOpMode {
         rightRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        claw = hardwareMap.get(Servo.class, "claw");
+        //claw = hardwareMap.get(Servo.class, "claw");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
@@ -104,11 +104,11 @@ public class TeleOp1 extends LinearOpMode {
                 lift.setPower(1);
             }
 
-            if(gamepad1.left_bumper){
+            /*if(gamepad1.left_bumper){
                 claw.setPosition(0);
             } else if(gamepad1.right_bumper){
                 claw.setPosition(0.25);
-            }
+            }*/
 
                 telemetry.addData("rotate pos", rotatePos);
                 telemetry.addData("left motor", leftRotate.getCurrentPosition());

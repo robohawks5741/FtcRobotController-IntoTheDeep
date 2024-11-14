@@ -190,9 +190,9 @@ public class DualMotor {
     public void setTargetPosition(int targetPosition) {
         PID.reset();
         if(motor1 != null)
-            motor1.setTargetPosition(-targetPosition);
+            motor1.setTargetPosition(targetPosition);
         if(motor2 != null) {
-            motor2.setTargetPosition(targetPosition);
+            motor2.setTargetPosition(-targetPosition);
         }
     }
 

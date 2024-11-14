@@ -54,17 +54,17 @@ public class TeleOp1 extends LinearOpMode {
             throw new RuntimeException(e);
         }
 
-        int rotatePos = 14;
+        int rotatePos = 0;
         boolean pressed = false;
         waitForStart();
 
         while (opModeIsActive()) {
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
-                            -gamepad1.left_stick_y,
-                            -gamepad1.left_stick_x
+                            -gamepad1.left_stick_y * 0.5,
+                            -gamepad1.left_stick_x * 0.5
                     ),
-                    -gamepad1.right_stick_x
+                    -gamepad1.right_stick_x * 0.35
             ));
 
             drive.updatePoseEstimate();
@@ -76,32 +76,32 @@ public class TeleOp1 extends LinearOpMode {
 
             } else if ((gamepad1.right_trigger > 0.1) && !pressed) {
                 pressed = true;
-                rotatePos = 30;
+                rotatePos = 0;
 
             } else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
                 pressed = false;
             }
 
             try{
-             //   rotateArm.setTargetPosition(rotatePos);
-             //   rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-               /* if(rotatePos <= Math.abs(leftRotate.getCurrentPosition())){
+                rotateArm.setTargetPosition(rotatePos);
+                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                if(rotatePos <= Math.abs(leftRotate.getCurrentPosition())){
                     rotateArm.setPower(0.2);
                 } else{
-                    rotateArm.setPower(1);
-                }*/
+                    rotateArm.setPower(0.5);
+                }
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }
-            if (gamepad1.y) {
-                lift.setTargetPosition(-1650);
+         /*   if (gamepad1.y) {
+                lift.setTargetPosition(-1720);
                 lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 lift.setPower(1);
             }else if (gamepad1.a) {
                 lift.setTargetPosition(0);
                 lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 lift.setPower(1);
-            }
+            }*/
 
             if(gamepad1.left_bumper){
                 claw.setPosition(0);

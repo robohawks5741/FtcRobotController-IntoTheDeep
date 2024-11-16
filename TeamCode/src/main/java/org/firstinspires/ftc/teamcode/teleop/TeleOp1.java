@@ -84,8 +84,41 @@ public class TeleOp1 extends LinearOpMode {
                 pressed = true;
                 rotatePos = 0;
 
-            } else if (gamepad1.x){
-                rotatePos = 200;
+            } else if (gamepad1.dpad_left && !pressed){
+                //Pick up and get out
+                pressed = true;
+                rotatePos = 100;
+                rotateArm.setTargetPosition(rotatePos);
+                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rotateArm.setPower(1.0);
+                pullArm.setTargetPosition(-1720);
+                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                pullArm.setPower(1);
+
+            }else if(gamepad1.dpad_up && !pressed){
+                //Turn up
+                rotatePos = 540;
+                rotateArm.setTargetPosition(rotatePos);
+                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rotateArm.setPower(1.0);
+                pullArm.setTargetPosition(0);
+                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                pullArm.setPower(1);
+
+            } else if(gamepad1.dpad_down){
+                //Turn down
+                pressed = true;
+                rotatePos = 0;
+                rotateArm.setTargetPosition(rotatePos);
+                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rotateArm.setPower(1.0);
+                claw.setPosition(0.25);
+                pullArm.setTargetPosition(0);
+                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                pullArm.setPower(1);
+
+
+
             }else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
                 pressed = false;
             }
@@ -118,9 +151,10 @@ public class TeleOp1 extends LinearOpMode {
             }
 
                 telemetry.addData("rotate pos", rotatePos);
-                telemetry.addData("left motor", leftRotate.getCurrentPosition());
-                telemetry.addData("right motor", rightRotate.getCurrentPosition());
-
+                telemetry.addData("lift top current", liftTop.getCurrentPosition());
+                telemetry.addData("lift bottom current", liftBot.getCurrentPosition());
+            telemetry.addData("lift top target", liftTop.getTargetPosition());
+            telemetry.addData("lift bottom target", liftBot.getTargetPosition());
 
                 telemetry.addData("left motor target", leftRotate.getTargetPosition());
                 telemetry.addData("right motor target", rightRotate.getTargetPosition());

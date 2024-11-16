@@ -21,14 +21,18 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @TeleOp(name = "#Main")
 
 public class TeleOp1 extends LinearOpMode {
-    private DcMotorEx lift, leftRotate, rightRotate;
+    private DcMotorEx liftBot, liftTop, leftRotate, rightRotate;
     private Servo claw;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        lift = hardwareMap.get(DcMotorEx.class, "lift");
-        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftBot = hardwareMap.get(DcMotorEx.class, "liftBot");
+        liftBot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftBot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        liftTop = hardwareMap.get(DcMotorEx.class, "liftTop");
+        liftTop.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftTop.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftRotate = hardwareMap.get(DcMotorEx.class, "leftRotate");
         leftRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -45,9 +49,11 @@ public class TeleOp1 extends LinearOpMode {
 
 
         DualMotor rotateArm;
+        DualMotor pullArm;
 
       try {
             rotateArm = new DualMotor(rightRotate, leftRotate);
+            pullArm = new DualMotor(liftBot, liftTop);
             rotateArm.setPower(0);
 
         } catch (Exception e) {
@@ -61,10 +67,10 @@ public class TeleOp1 extends LinearOpMode {
         while (opModeIsActive()) {
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
-                            -gamepad1.left_stick_y * 0.5,
-                            -gamepad1.left_stick_x * 0.5
+                            -gamepad1.left_stick_y,
+                            -gamepad1.left_stick_x
                     ),
-                    -gamepad1.right_stick_x * 0.35
+                    -gamepad1.right_stick_x * 0.8
             ));
 
             drive.updatePoseEstimate();
@@ -78,7 +84,9 @@ public class TeleOp1 extends LinearOpMode {
                 pressed = true;
                 rotatePos = 0;
 
-            } else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
+            } else if (gamepad1.x){
+                rotatePos = 200;
+            }else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
                 pressed = false;
             }
 
@@ -88,20 +96,20 @@ public class TeleOp1 extends LinearOpMode {
                 if(rotatePos <= Math.abs(leftRotate.getCurrentPosition())){
                     rotateArm.setPower(0.2);
                 } else{
-                    rotateArm.setPower(0.5);
+                    rotateArm.setPower(1.0);
                 }
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }
-         /*   if (gamepad1.y) {
-                lift.setTargetPosition(-1720);
-                lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                lift.setPower(1);
-            }else if (gamepad1.a) {
-                lift.setTargetPosition(0);
-                lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                lift.setPower(1);
-            }*/
+            if (gamepad1.a) {
+                pullArm.setTargetPosition(-1720);
+                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                pullArm.setPower(1);
+            }else if (gamepad1.y) {
+                pullArm.setTargetPosition(0);
+                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                pullArm.setPower(1);
+            }
 
             if(gamepad1.left_bumper){
                 claw.setPosition(0);
@@ -117,8 +125,11 @@ public class TeleOp1 extends LinearOpMode {
                 telemetry.addData("left motor target", leftRotate.getTargetPosition());
                 telemetry.addData("right motor target", rightRotate.getTargetPosition());
 
-
-                telemetry.addData("lift", lift.getCurrentPosition());
+                try {
+                    telemetry.addData("lift", pullArm.getCurrentPosition());
+                } catch(Exception e) {
+                    throw new RuntimeException(e);
+                }
 
                 telemetry.addData("x", drive.pose.position.x);
                 telemetry.addData("y", drive.pose.position.y);

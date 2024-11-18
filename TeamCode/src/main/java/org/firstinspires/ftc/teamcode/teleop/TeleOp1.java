@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
 import org.firstinspires.ftc.teamcode.Drawing;
@@ -61,28 +63,33 @@ public class TeleOp1 extends LinearOpMode {
         }
 
         int rotatePos = 0;
+        int armPos = 0;
         boolean pressed = false;
         waitForStart();
 
         while (opModeIsActive()) {
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
-                            -gamepad1.left_stick_y,
-                            -gamepad1.left_stick_x
+                            -gamepad1.left_stick_y * 0.7,
+                            -gamepad1.left_stick_x * 0.7
                     ),
-                    -gamepad1.right_stick_x * 0.8
+                    -gamepad1.right_stick_x * 0.55
             ));
 
             drive.updatePoseEstimate();
-
+            //rotatePos = 760;
             //Lift
             if ((gamepad1.left_trigger > 0.1) && !pressed) {
-                pressed = true;
-                rotatePos = 540;
+                sleep(0);
+                if (armPos< 74){
+                    armPos++;
+                }
 
             } else if ((gamepad1.right_trigger > 0.1) && !pressed) {
-                pressed = true;
-                rotatePos = 0;
+                sleep(0);
+                if (armPos>0){
+                    armPos--;
+                }
 
             } else if (gamepad1.dpad_left && !pressed){
                 //Pick up and get out
@@ -90,7 +97,7 @@ public class TeleOp1 extends LinearOpMode {
                 rotatePos = 100;
                 rotateArm.setTargetPosition(rotatePos);
                 rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(1.0);
+                rotateArm.setPower(0.55);
                 pullArm.setTargetPosition(-1720);
                 pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 pullArm.setPower(1);
@@ -100,7 +107,7 @@ public class TeleOp1 extends LinearOpMode {
                 rotatePos = 540;
                 rotateArm.setTargetPosition(rotatePos);
                 rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(1.0);
+                rotateArm.setPower(0.55);
                 pullArm.setTargetPosition(0);
                 pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 pullArm.setPower(1);
@@ -111,7 +118,7 @@ public class TeleOp1 extends LinearOpMode {
                 rotatePos = 0;
                 rotateArm.setTargetPosition(rotatePos);
                 rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(1.0);
+                rotateArm.setPower(0.55);
                 claw.setPosition(0.25);
                 pullArm.setTargetPosition(0);
                 pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -127,17 +134,21 @@ public class TeleOp1 extends LinearOpMode {
                 rotateArm.setTargetPosition(rotatePos);
                 rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 if(rotatePos <= Math.abs(leftRotate.getCurrentPosition())){
-                    rotateArm.setPower(0.2);
+                    rotateArm.setPower(0.2); //0.2
                 } else{
-                    rotateArm.setPower(1.0);
+                    rotateArm.setPower(0.45);//0.45
                 }
+
+           /*     pullArm.setTargetPosition(armPos*-23);
+                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                pullArm.setPower(1);*/
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }
             if (gamepad1.a) {
-                pullArm.setTargetPosition(-1720);
+                pullArm.setTargetPosition(-1710);
                 pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                pullArm.setPower(1);
+                pullArm.setPower(0.55);
             }else if (gamepad1.y) {
                 pullArm.setTargetPosition(0);
                 pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -150,33 +161,39 @@ public class TeleOp1 extends LinearOpMode {
                 claw.setPosition(0.25);
             }
 
-                telemetry.addData("rotate pos", rotatePos);
-                telemetry.addData("lift top current", liftTop.getCurrentPosition());
-                telemetry.addData("lift bottom current", liftBot.getCurrentPosition());
+            telemetry.addData("Arm Pos", armPos);
+            telemetry.addData("rotate pos", rotatePos);
+            telemetry.addData("lift top position", liftTop.getCurrentPosition());
+            telemetry.addData("lift bottom position", liftBot.getCurrentPosition());
             telemetry.addData("lift top target", liftTop.getTargetPosition());
             telemetry.addData("lift bottom target", liftBot.getTargetPosition());
+            telemetry.addData("lift top current", liftTop.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("lift bottom current", liftBot.getCurrent(CurrentUnit.AMPS));
 
-                telemetry.addData("left motor target", leftRotate.getTargetPosition());
-                telemetry.addData("right motor target", rightRotate.getTargetPosition());
+            telemetry.addData("left motor target", leftRotate.getTargetPosition());
+            telemetry.addData("right motor target", rightRotate.getTargetPosition());
+            telemetry.addData("left motor position", leftRotate.getCurrentPosition());
+            telemetry.addData("right motor position", rightRotate.getCurrentPosition());
 
-                try {
-                    telemetry.addData("lift", pullArm.getCurrentPosition());
-                } catch(Exception e) {
-                    throw new RuntimeException(e);
-                }
 
-                telemetry.addData("x", drive.pose.position.x);
-                telemetry.addData("y", drive.pose.position.y);
-                telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
-                telemetry.update();
-
-                TelemetryPacket packet = new TelemetryPacket();
-                packet.fieldOverlay().setStroke("#3F51B5");
-                Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
-                FtcDashboard.getInstance().sendTelemetryPacket(packet);
+            try {
+                telemetry.addData("lift", pullArm.getCurrentPosition());
+            } catch(Exception e) {
+                throw new RuntimeException(e);
             }
 
+            telemetry.addData("x", drive.pose.position.x);
+            telemetry.addData("y", drive.pose.position.y);
+            telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
+            telemetry.update();
+
+            TelemetryPacket packet = new TelemetryPacket();
+            packet.fieldOverlay().setStroke("#3F51B5");
+            Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
+            FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }
 
     }
+
+}
 

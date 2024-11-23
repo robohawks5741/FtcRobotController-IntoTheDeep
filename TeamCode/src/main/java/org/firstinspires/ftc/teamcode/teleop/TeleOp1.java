@@ -9,11 +9,13 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
@@ -25,7 +27,21 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 public class TeleOp1 extends LinearOpMode {
     private DcMotorEx liftBot, liftTop, leftRotate, rightRotate;
     private Servo claw;
-
+    private AnalogInput potentiometer;
+    private final int ARM_HORIZONTAL_TICKS = 100;
+    private final int ARM_FRONT_PLACING_TICKS = 540;
+    private final int ARM_GROUND_TICKS = 0;
+    private final int LIFT_RETRACTED_TICKS = -1720;
+    //placeholder value
+    private final int LIFT_ROTATABLE = -1000;
+    private final int LIFT_EXTENDED_TICKS = 0;
+    private final double CLAW_OPEN = 0.25;
+    private final double CLAW_CLOSED = 0;
+    private int rotatePos;
+    private int liftPos;
+    int rotateStage = 0;
+    DualMotor rotateArm;
+    DualMotor pullArm;
     @Override
     public void runOpMode() throws InterruptedException {
         liftBot = hardwareMap.get(DcMotorEx.class, "liftBot");
@@ -49,9 +65,8 @@ public class TeleOp1 extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
+        potentiometer = hardwareMap.analogInput.get("potentiometer");
 
-        DualMotor rotateArm;
-        DualMotor pullArm;
 
       try {
             rotateArm = new DualMotor(rightRotate, leftRotate);
@@ -62,7 +77,8 @@ public class TeleOp1 extends LinearOpMode {
             throw new RuntimeException(e);
         }
 
-        int rotatePos = 0;
+        rotatePos = 0;
+        liftPos = 0;
         int armPos = 0;
         boolean pressed = false;
         waitForStart();
@@ -94,50 +110,55 @@ public class TeleOp1 extends LinearOpMode {
             } else if (gamepad1.dpad_left && !pressed){
                 //Pick up and get out
                 pressed = true;
-                rotatePos = 100;
-                rotateArm.setTargetPosition(rotatePos);
-                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(0.55);
-                pullArm.setTargetPosition(-1720);
-                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                pullArm.setPower(1);
+                rotateStage = 0;
+                rotatePos = ARM_HORIZONTAL_TICKS;
+                liftPos = LIFT_RETRACTED_TICKS;
 
             }else if(gamepad1.dpad_up && !pressed){
                 //Turn up
-                rotatePos = 540;
-                rotateArm.setTargetPosition(rotatePos);
-                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(0.55);
-                pullArm.setTargetPosition(0);
-                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                pullArm.setPower(1);
+                if(rotateStage == 0) {
+                    rotateStage = 1;
+                }
 
             } else if(gamepad1.dpad_down){
                 //Turn down
                 pressed = true;
-                rotatePos = 0;
-                rotateArm.setTargetPosition(rotatePos);
-                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(0.55);
-                claw.setPosition(0.25);
-                pullArm.setTargetPosition(0);
-                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                pullArm.setPower(1);
-
-
+                rotateStage = 0;
+                rotatePos = ARM_GROUND_TICKS;
+                //open/close claw
+                openClaw();
+                liftPos = LIFT_EXTENDED_TICKS;
 
             }else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
                 pressed = false;
             }
 
-            try{
-                rotateArm.setTargetPosition(rotatePos);
-                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                if(rotatePos <= Math.abs(leftRotate.getCurrentPosition())){
-                    rotateArm.setPower(0.2); //0.2
-                } else{
-                    rotateArm.setPower(0.45);//0.45
+            if (gamepad1.a) {
+                liftPos = LIFT_RETRACTED_TICKS;
+            }else if (gamepad1.y) {
+                liftPos = LIFT_EXTENDED_TICKS;
+            }
+            if(rotateStage == 1) {
+                liftPos = LIFT_RETRACTED_TICKS;
+                try {
+                    if (pullArm.getCurrentPosition() > LIFT_ROTATABLE) {
+                        rotateStage++;
+                    }
+                } catch(Exception e) {
+                    throw new RuntimeException(e);
                 }
+            }
+            try {
+                if (rotateStage == 2 && rotateArm.getCurrentPosition() > ARM_FRONT_PLACING_TICKS) {
+                    rotatePos = ARM_FRONT_PLACING_TICKS;
+                }
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+                //Update arm pos
+            try{
+                updateArm();
+                updateLift();
 
            /*     pullArm.setTargetPosition(armPos*-23);
                 pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -145,20 +166,12 @@ public class TeleOp1 extends LinearOpMode {
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }
-            if (gamepad1.a) {
-                pullArm.setTargetPosition(-1710);
-                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                pullArm.setPower(0.55);
-            }else if (gamepad1.y) {
-                pullArm.setTargetPosition(0);
-                pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                pullArm.setPower(1);
-            }
+
 
             if(gamepad1.left_bumper){
-                claw.setPosition(0);
+                closeClaw();
             } else if(gamepad1.right_bumper){
-                claw.setPosition(0.25);
+                openClaw();
             }
 
             telemetry.addData("Arm Pos", armPos);
@@ -185,6 +198,18 @@ public class TeleOp1 extends LinearOpMode {
             telemetry.addData("x", drive.pose.position.x);
             telemetry.addData("y", drive.pose.position.y);
             telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
+
+            telemetry.addData("potentiometer max output", potentiometer.getMaxVoltage());
+            telemetry.addData("potentiometer output", potentiometer.getVoltage());
+            double v = potentiometer.getVoltage();
+            telemetry.addData("angle(simple calc)", v * 81.8);
+            //I think this one is right:
+            telemetry.addData("angle(complicated calc with -)", (270 * v + 445.5 - Math.sqrt(Math.pow(270 * v +
+                        v + 445.5, 2) - 4 * v * (-36450 * v + 120285))) / (2 * v));
+            //but im trying this one too
+            telemetry.addData("angle(complicated calc with +)", (270 * v + 445.5 + Math.sqrt(Math.pow(270 * v +
+                        v + 445.5, 2) - 4 * v * (-36450 * v + 120285))) / (2 * v));
+
             telemetry.update();
 
             TelemetryPacket packet = new TelemetryPacket();
@@ -192,8 +217,26 @@ public class TeleOp1 extends LinearOpMode {
             Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
             FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }
-
     }
-
+    public void updateArm() {
+        rotateArm.setTargetPosition(rotatePos);
+        rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if(rotatePos <= Math.abs(leftRotate.getCurrentPosition())){
+            rotateArm.setPower(0.2); //0.2
+        } else{
+            rotateArm.setPower(0.45);//0.45
+        }
+    }
+    public void updateLift() {
+        pullArm.setTargetPosition(liftPos);
+        pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        pullArm.setPower(1);
+    }
+    public void openClaw() {
+        claw.setPosition(CLAW_OPEN);
+    }
+    public void closeClaw() {
+        claw.setPosition(CLAW_CLOSED);
+    }
 }
 

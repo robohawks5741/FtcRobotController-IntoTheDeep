@@ -28,12 +28,19 @@ public class PIDTuning extends LinearOpMode {
     /*public double armKp = 0.05;
     public double armKi = 0;
     public double armKd = 0;*/
+
+
+
+    private final double horizontalTicks = 135;
+    private final double verticalTicks = 695;
+    private final double RADS_PER_TICK = Math.PI / 2 / (verticalTicks - horizontalTicks); //=0.002805
+
     private double startTime = -1;
     @Override
     public void runOpMode() throws InterruptedException {
-        lift = hardwareMap.get(DcMotorEx.class, "lift");
-        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //lift = hardwareMap.get(DcMotorEx.class, "lift");
+        //lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ElapsedTime timer = new ElapsedTime();
 
         leftRotate = hardwareMap.get(DcMotorEx.class, "leftRotate");
@@ -82,11 +89,14 @@ public class PIDTuning extends LinearOpMode {
             ));
 
             drive.updatePoseEstimate();
-            try{
-                rotateArm.setTargetPosition(0);
-                rotateArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rotateArm.setPower(0);
-            } catch(Exception e) {
+            try {
+                rotateArm.setTargetPosition(450);
+                rotateArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                //These signs are a mess, definitely need to work on making them more uniform
+                rotateArm.setPower(clamp(-rotateArm.getPIDPower() - MecanumDrive.PARAMS.armBasePower *
+                            Math.cos(RADS_PER_TICK * (horizontalTicks -
+                                    rotateArm.getCurrentPosition())), -1, 1));
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             //Lift
@@ -160,17 +170,25 @@ public class PIDTuning extends LinearOpMode {
             telemetry.addData("right motor", rightRotate.getCurrentPosition());
 
 
+
             telemetry.addData("left motor target", leftRotate.getTargetPosition());
-            telemetry.addData("right motor target", rightRotate.getCurrentPosition());
+            telemetry.addData("right motor target", rightRotate.getTargetPosition());
+            try {
+                telemetry.addData("rotate arm pos", rotateArm.getCurrentPosition());
+                telemetry.addData("PID power", -rotateArm.getPIDPower());
+                telemetry.addData("rotate arm target", rotateArm.getTargetPosition());
+                telemetry.addData("error", rotateArm.getTargetPosition() - rotateArm.getCurrentPosition());
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
 
-
-            telemetry.addData("lift", lift.getCurrentPosition());
+            //telemetry.addData("lift", lift.getCurrentPosition());
             //telemetry.addData("right", right.getPosition());
             //telemetry.addData("left", left.getPosition());
             //telemetry.addData("Rotate", rotate.getPosition());
-            telemetry.addData("x", drive.pose.position.x);
-            telemetry.addData("y", drive.pose.position.y);
-            telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
+            //telemetry.addData("x", drive.pose.position.x);
+            //telemetry.addData("y", drive.pose.position.y);
+            //telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
             telemetry.update();
 
             TelemetryPacket packet = new TelemetryPacket();
@@ -182,4 +200,14 @@ public class PIDTuning extends LinearOpMode {
         }
 
     }
+    public static double clamp(double input, double min, double max){
+        if(input > max) {
+            return max;
+        }
+        if(input < min) {
+            return min;
+        }
+        return input;
+    }
+
 }

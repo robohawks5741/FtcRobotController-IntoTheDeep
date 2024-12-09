@@ -28,6 +28,7 @@ public class TeleOp1 extends LinearOpMode {
     private DcMotorEx liftBot, liftTop, leftRotate, rightRotate;
     private Servo claw;
     private AnalogInput potentiometer;
+    private AnalogInput encoder;
     private final int ARM_HORIZONTAL_TICKS = 100;
     private final int ARM_FRONT_PLACING_TICKS = 540;
     private final int ARM_GROUND_TICKS = 0;
@@ -64,8 +65,8 @@ public class TeleOp1 extends LinearOpMode {
         claw = hardwareMap.get(Servo.class, "claw");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
-
-        potentiometer = hardwareMap.analogInput.get("potentiometer");
+        encoder = hardwareMap.analogInput.get("encoder");
+        //potentiometer = hardwareMap.analogInput.get("potentiometer");
 
 
       try {
@@ -198,7 +199,8 @@ public class TeleOp1 extends LinearOpMode {
             telemetry.addData("x", drive.pose.position.x);
             telemetry.addData("y", drive.pose.position.y);
             telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
-
+            telemetry.addData("encoder position(deg)", encoder.getVoltage() * 360 / 3.2);
+/*
             telemetry.addData("potentiometer max output", potentiometer.getMaxVoltage());
             telemetry.addData("potentiometer output", potentiometer.getVoltage());
             double v = potentiometer.getVoltage();
@@ -209,7 +211,7 @@ public class TeleOp1 extends LinearOpMode {
             //but im trying this one too
             telemetry.addData("angle(complicated calc with +)", (270 * v + 445.5 + Math.sqrt(Math.pow(270 * v +
                         v + 445.5, 2) - 4 * v * (-36450 * v + 120285))) / (2 * v));
-
+*/
             telemetry.update();
 
             TelemetryPacket packet = new TelemetryPacket();

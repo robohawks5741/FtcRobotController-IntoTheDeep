@@ -204,7 +204,8 @@ public class DualMotor {
      */
     public int getCurrentPosition() throws Exception {
         if(motor1 != null)
-            return motor1.getCurrentPosition();
+            //sign weirdness again
+            return -motor1.getCurrentPosition();
         else if(motor2 != null)
             return motor2.getCurrentPosition();
         else

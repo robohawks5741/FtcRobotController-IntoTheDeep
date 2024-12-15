@@ -34,7 +34,7 @@ public class TeleOp1 extends LinearOpMode {
     private final int ARM_GROUND_TICKS = 0;
     private final int LIFT_RETRACTED_TICKS = -1720;
     //placeholder value
-    private final int LIFT_ROTATABLE = -1000;
+    private final int LIFT_ROTATABLE = 1000;
     private final int LIFT_EXTENDED_TICKS = 0;
     private final double CLAW_OPEN = 0.25;
     private final double CLAW_CLOSED = 0;
@@ -98,7 +98,7 @@ public class TeleOp1 extends LinearOpMode {
             //Lift
             if ((gamepad1.left_trigger > 0.1) && !pressed) {
                 sleep(0);
-                if (armPos< 74){
+                if (armPos < 74){
                     armPos++;
                 }
 
@@ -115,7 +115,7 @@ public class TeleOp1 extends LinearOpMode {
                 rotatePos = ARM_HORIZONTAL_TICKS;
                 liftPos = LIFT_RETRACTED_TICKS;
 
-            }else if(gamepad1.dpad_up && !pressed){
+            } else if(gamepad1.dpad_up && !pressed){
                 //Turn up
                 if(rotateStage == 0) {
                     rotateStage = 1;
@@ -142,7 +142,7 @@ public class TeleOp1 extends LinearOpMode {
             if(rotateStage == 1) {
                 liftPos = LIFT_RETRACTED_TICKS;
                 try {
-                    if (pullArm.getCurrentPosition() > LIFT_ROTATABLE) {
+                    if (Math.abs(pullArm.getCurrentPosition()) > LIFT_ROTATABLE) {
                         rotateStage++;
                     }
                 } catch(Exception e) {
@@ -150,14 +150,15 @@ public class TeleOp1 extends LinearOpMode {
                 }
             }
             try {
-                if (rotateStage == 2 && rotateArm.getCurrentPosition() > ARM_FRONT_PLACING_TICKS) {
+                if (rotateStage == 2) {
                     rotatePos = ARM_FRONT_PLACING_TICKS;
+                    liftPos = LIFT_EXTENDED_TICKS;
                 }
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }
                 //Update arm pos
-            try{
+            try {
                 updateArm();
                 updateLift();
 
@@ -183,7 +184,7 @@ public class TeleOp1 extends LinearOpMode {
             telemetry.addData("lift bottom target", liftBot.getTargetPosition());
             telemetry.addData("lift top current", liftTop.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("lift bottom current", liftBot.getCurrent(CurrentUnit.AMPS));
-
+            telemetry.addData("rotate stage", rotateStage);
             telemetry.addData("left motor target", leftRotate.getTargetPosition());
             telemetry.addData("right motor target", rightRotate.getTargetPosition());
             telemetry.addData("left motor position", leftRotate.getCurrentPosition());

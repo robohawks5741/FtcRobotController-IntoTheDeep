@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
 import org.firstinspires.ftc.teamcode.Drawing;
@@ -42,9 +43,9 @@ public class PIDTuning extends LinearOpMode {
     private final int ARM_FRONT_PLACING_TICKS = 540;
     private final int ARM_GROUND_TICKS = 0;
     private double startTime = -1;
-    private final double ARM_FRONT_PLACING_VOLTS = HORIZONTAL_VOLTS + VOLTS_PER_TICK *
+    private final double ARM_FRONT_PLACING_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);
-    private final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS + VOLTS_PER_TICK *
+    private final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);
     private AnalogInput encoder;
 
@@ -73,11 +74,12 @@ public class PIDTuning extends LinearOpMode {
 
         DualMotor rotateArm;
 
+
         try {
             rotateArm = new DualMotor(leftRotate, rightRotate,
-                    MecanumDrive.PARAMS.armKp * VOLTS_PER_TICK,
-                    MecanumDrive.PARAMS.armKi * VOLTS_PER_TICK,
-                    MecanumDrive.PARAMS.armKd * VOLTS_PER_TICK);
+                    MecanumDrive.PARAMS.armKp / VOLTS_PER_TICK,
+                    MecanumDrive.PARAMS.armKi / VOLTS_PER_TICK,
+                    MecanumDrive.PARAMS.armKd / VOLTS_PER_TICK);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -103,12 +105,15 @@ public class PIDTuning extends LinearOpMode {
             ));
 
             drive.updatePoseEstimate();
+            double frictionOffset;
+            double target = HORIZONTAL_VOLTS;
             try {
-                rotateArm.setTargetPosition((int)(ARM_FRONT_PLACING_VOLTS / VOLTS_PER_TICK));
+                rotateArm.setTargetPosition((int)(target / VOLTS_PER_TICK));
                 rotateArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                /*rotateArm.setPower(clamp(rotateArm.getPIDPower(0,0) +
-                        MecanumDrive.PARAMS.armBasePower * Math.cos(RADS_PER_TICK * (horizontalTicks -
-                                rotateArm.getCurrentPosition())), -1, 1));*/
+                frictionOffset = (target > encoder.getVoltage())?-MecanumDrive.PARAMS.frictionOffsetPower:MecanumDrive.PARAMS.frictionOffsetPower;
+                rotateArm.setPower(clamp(/*rotateArm.getPIDPower(-target, -encoder.getVoltage()) +*/
+                        MecanumDrive.PARAMS.armBasePower * Math.cos(RADS_PER_VOLT * (HORIZONTAL_VOLTS -
+                                encoder.getVoltage())) /*+ frictionOffset*/, -1, 1));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -182,16 +187,19 @@ public class PIDTuning extends LinearOpMode {
             telemetry.addData("left motor", leftRotate.getCurrentPosition());
             telemetry.addData("right motor", rightRotate.getCurrentPosition());
 
-
-
-            telemetry.addData("left motor target", leftRotate.getTargetPosition());
-            telemetry.addData("right motor target", rightRotate.getTargetPosition());
-            telemetry.addData("current angle", Math.toDegrees(encoder.getVoltage() * RADS_PER_VOLT - HORIZONTAL_VOLTS));
+            telemetry.addData("current angle", Math.toDegrees((-encoder.getVoltage() + HORIZONTAL_VOLTS) * RADS_PER_VOLT));
             try {
-                telemetry.addData("rotate arm pos", rotateArm.getCurrentPosition());
-                telemetry.addData("PID power", -rotateArm.getPIDPower());
-                telemetry.addData("rotate arm target", rotateArm.getTargetPosition());
-                telemetry.addData("error", rotateArm.getTargetPosition() - rotateArm.getCurrentPosition());
+                telemetry.addData("PID power", clamp(rotateArm.getPIDPower(-target, -encoder.getVoltage()) +
+                        MecanumDrive.PARAMS.armBasePower * Math.cos(RADS_PER_VOLT * (target -
+                                encoder.getVoltage())) + frictionOffset, -1, 1));
+                telemetry.addData("voltage", encoder.getVoltage());
+                telemetry.addData("target voltage", HORIZONTAL_VOLTS);
+                telemetry.addData("base power", MecanumDrive.PARAMS.armBasePower *
+                                    Math.cos(RADS_PER_VOLT * (target - encoder.getVoltage())));
+                telemetry.addData("error", rotateArm.PID.getError());
+                telemetry.addData("last error", rotateArm.PID.getLastError());
+                telemetry.addData("derivative term", rotateArm.PID.getDerivativeTerm());
+                telemetry.addData("Friction offset", frictionOffset);
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }

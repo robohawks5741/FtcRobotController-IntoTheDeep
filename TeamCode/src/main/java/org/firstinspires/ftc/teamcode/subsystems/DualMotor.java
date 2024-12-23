@@ -14,7 +14,7 @@ public class DualMotor {
     private DcMotor motor1;
     private DcMotor motor2;
     private boolean isSingleMotor = false;
-    private PIDController PID;
+    public PIDController PID;
     private double Kp, Ki, Kd;
 
     /**
@@ -249,5 +249,4 @@ public class DualMotor {
             throw new Exception(noMotorEx);
         }
     }
-}
 }

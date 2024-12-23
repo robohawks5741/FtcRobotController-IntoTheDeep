@@ -7,6 +7,9 @@ public class PIDController {
     private double Kp, Ki, Kd;
     private double integralSum = 0;
     private double lastError = 0;
+    private double derivative;
+    private double error;
+    private double placeholder = 0;
     ElapsedTime timer = new ElapsedTime();
 
     /**
@@ -28,9 +31,10 @@ public class PIDController {
      * @return the desired power, between -1.0 and 1.0
      */
     public double PIDControl(double reference, double state) {
-        double error = reference - state;
+        placeholder = lastError;
+        error = reference - state;
         integralSum += error * timer.seconds();
-        double derivative = (error - lastError) / timer.seconds();
+        derivative = (error - lastError) / timer.seconds();
         lastError = error;
         timer.reset();
         return error * Kp + derivative * Kd + integralSum * Ki;
@@ -42,5 +46,14 @@ public class PIDController {
     public void reset() {
         integralSum = 0;
         lastError = 0;
+    }
+    public double getError() {
+        return error;
+    }
+    public double getLastError() {
+        return placeholder;
+    }
+    public double getDerivativeTerm() {
+        return timer.seconds();
     }
 }

@@ -153,9 +153,9 @@ public class DualMotor {
      */
     public void setPower(double power) {
         if(motor1 != null)
-            motor1.setPower(power);
+            motor1.setPower(-power);
         if(motor2 != null)
-            motor2.setPower(-power);
+            motor2.setPower(power);
     }
 
     /**
@@ -190,9 +190,9 @@ public class DualMotor {
     public void setTargetPosition(int targetPosition) {
         PID.reset();
         if(motor1 != null)
-            motor1.setTargetPosition(targetPosition);
+            motor1.setTargetPosition(-targetPosition);
         if(motor2 != null) {
-            motor2.setTargetPosition(-targetPosition);
+            motor2.setTargetPosition(targetPosition);
         }
     }
 
@@ -220,7 +220,7 @@ public class DualMotor {
      */
     public int getTargetPosition() throws Exception {
         if(motor1 != null)
-            return motor1.getTargetPosition();
+            return -motor1.getTargetPosition();
         else if(motor2 != null)
             return motor2.getTargetPosition();
         else
@@ -241,4 +241,13 @@ public class DualMotor {
             throw new Exception(noMotorEx);
         }
     }
+    public double getPIDPower(double target, double state) throws Exception {
+        try {
+            return PID.PIDControl(target, state);
+        }
+        catch(Exception e) {
+            throw new Exception(noMotorEx);
+        }
+    }
+}
 }

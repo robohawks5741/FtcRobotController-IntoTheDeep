@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -34,15 +35,26 @@ public class PIDTuning extends LinearOpMode {
     private final double horizontalTicks = 135;
     private final double verticalTicks = 695;
     private final double RADS_PER_TICK = Math.PI / 2 / (verticalTicks - horizontalTicks); //=0.002805
-
+    private final double RADS_PER_VOLT  = Math.PI * 2 / 3.22;
+    private final double VOLTS_PER_TICK = RADS_PER_TICK / RADS_PER_VOLT;
+    private final double HORIZONTAL_VOLTS = 1.455;
+    private final int ARM_HORIZONTAL_TICKS = 100;
+    private final int ARM_FRONT_PLACING_TICKS = 540;
+    private final int ARM_GROUND_TICKS = 0;
     private double startTime = -1;
+    private final double ARM_FRONT_PLACING_VOLTS = HORIZONTAL_VOLTS + VOLTS_PER_TICK *
+            (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);
+    private final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS + VOLTS_PER_TICK *
+            (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);
+    private AnalogInput encoder;
+
     @Override
     public void runOpMode() throws InterruptedException {
         //lift = hardwareMap.get(DcMotorEx.class, "lift");
         //lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ElapsedTime timer = new ElapsedTime();
-
+        encoder = hardwareMap.get(AnalogInput.class, "encoder");
         leftRotate = hardwareMap.get(DcMotorEx.class, "leftRotate");
         leftRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRotate.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -62,8 +74,10 @@ public class PIDTuning extends LinearOpMode {
         DualMotor rotateArm;
 
         try {
-            rotateArm = new DualMotor(leftRotate, rightRotate, MecanumDrive.PARAMS.armKp, MecanumDrive.PARAMS.armKi,
-                    MecanumDrive.PARAMS.armKd);
+            rotateArm = new DualMotor(leftRotate, rightRotate,
+                    MecanumDrive.PARAMS.armKp * VOLTS_PER_TICK,
+                    MecanumDrive.PARAMS.armKi * VOLTS_PER_TICK,
+                    MecanumDrive.PARAMS.armKd * VOLTS_PER_TICK);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -71,7 +85,7 @@ public class PIDTuning extends LinearOpMode {
         int rotatePos = 0;
         boolean pressed = false;
         waitForStart();
-        rotatePos = -880;
+        rotatePos = 880;
         try {
             rotateArm.setTargetPosition(rotatePos);
             rotateArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -90,12 +104,11 @@ public class PIDTuning extends LinearOpMode {
 
             drive.updatePoseEstimate();
             try {
-                rotateArm.setTargetPosition(450);
+                rotateArm.setTargetPosition((int)(ARM_FRONT_PLACING_VOLTS / VOLTS_PER_TICK));
                 rotateArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                //These signs are a mess, definitely need to work on making them more uniform
-                rotateArm.setPower(clamp(-rotateArm.getPIDPower() - MecanumDrive.PARAMS.armBasePower *
-                            Math.cos(RADS_PER_TICK * (horizontalTicks -
-                                    rotateArm.getCurrentPosition())), -1, 1));
+                /*rotateArm.setPower(clamp(rotateArm.getPIDPower(0,0) +
+                        MecanumDrive.PARAMS.armBasePower * Math.cos(RADS_PER_TICK * (horizontalTicks -
+                                rotateArm.getCurrentPosition())), -1, 1));*/
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -173,6 +186,7 @@ public class PIDTuning extends LinearOpMode {
 
             telemetry.addData("left motor target", leftRotate.getTargetPosition());
             telemetry.addData("right motor target", rightRotate.getTargetPosition());
+            telemetry.addData("current angle", Math.toDegrees(encoder.getVoltage() * RADS_PER_VOLT - HORIZONTAL_VOLTS));
             try {
                 telemetry.addData("rotate arm pos", rotateArm.getCurrentPosition());
                 telemetry.addData("PID power", -rotateArm.getPIDPower());

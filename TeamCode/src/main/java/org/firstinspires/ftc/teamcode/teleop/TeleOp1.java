@@ -32,7 +32,7 @@ public class TeleOp1 extends LinearOpMode {
     private final int ARM_HORIZONTAL_TICKS = 100;
     private final int ARM_FRONT_PLACING_TICKS = 540;
     private final int ARM_GROUND_TICKS = 0;
-    private final int LIFT_RETRACTED_TICKS = -1720;
+    private final int LIFT_RETRACTED_TICKS = 1720;
     //placeholder value
     private final int LIFT_ROTATABLE = 1000;
     private final int LIFT_EXTENDED_TICKS = 0;

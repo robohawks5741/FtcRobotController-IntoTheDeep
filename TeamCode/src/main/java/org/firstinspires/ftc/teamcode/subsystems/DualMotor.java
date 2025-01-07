@@ -249,4 +249,13 @@ public class DualMotor {
             throw new Exception(noMotorEx);
         }
     }
+    public void setKp(double Kp) {
+        PID.setKp(Kp);
+    }
+    public void setKi(double Ki) {
+        PID.setKi(Kp);
+    }
+    public void setKd(double Kd) {
+        PID.setKd(Kd);
+    }
 }

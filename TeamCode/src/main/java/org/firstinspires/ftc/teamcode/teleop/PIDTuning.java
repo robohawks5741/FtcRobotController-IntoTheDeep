@@ -27,10 +27,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 public class PIDTuning extends LinearOpMode {
     private DcMotorEx lift, leftRotate, rightRotate;
     private Servo rotate, left, right;
-    /*public double armKp = 0.05;
-    public double armKi = 0;
-    public double armKd = 0;*/
-
+    private DualMotor rotateArm;
 
 
     private final double horizontalTicks = 135;
@@ -72,14 +69,14 @@ public class PIDTuning extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
 
-        DualMotor rotateArm;
+
 
 
         try {
             rotateArm = new DualMotor(leftRotate, rightRotate,
-                    MecanumDrive.PARAMS.armKp / VOLTS_PER_TICK,
-                    MecanumDrive.PARAMS.armKi / VOLTS_PER_TICK,
-                    MecanumDrive.PARAMS.armKd / VOLTS_PER_TICK);
+                    MecanumDrive.PARAMS.armUpKp / VOLTS_PER_TICK,
+                    MecanumDrive.PARAMS.armUpKi / VOLTS_PER_TICK,
+                    MecanumDrive.PARAMS.armUpKd / VOLTS_PER_TICK);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -107,11 +104,12 @@ public class PIDTuning extends LinearOpMode {
             drive.updatePoseEstimate();
             double frictionOffset;
             double target = HORIZONTAL_VOLTS;
+            setDirectionDown();
             try {
                 rotateArm.setTargetPosition((int)(target / VOLTS_PER_TICK));
                 rotateArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 frictionOffset = (target > encoder.getVoltage())?-MecanumDrive.PARAMS.frictionOffsetPower:MecanumDrive.PARAMS.frictionOffsetPower;
-                rotateArm.setPower(clamp(/*rotateArm.getPIDPower(-target, -encoder.getVoltage()) +*/
+                rotateArm.setPower(clamp(rotateArm.getPIDPower(-target, -encoder.getVoltage()) +
                         MecanumDrive.PARAMS.armBasePower * Math.cos(RADS_PER_VOLT * (HORIZONTAL_VOLTS -
                                 encoder.getVoltage())) /*+ frictionOffset*/, -1, 1));
             } catch (Exception e) {
@@ -231,5 +229,14 @@ public class PIDTuning extends LinearOpMode {
         }
         return input;
     }
-
+    public void setDirectionUp() {
+        rotateArm.setKp(MecanumDrive.PARAMS.armUpKp);
+        rotateArm.setKi(MecanumDrive.PARAMS.armUpKi);
+        rotateArm.setKd(MecanumDrive.PARAMS.armUpKd);
+    }
+    public void setDirectionDown() {
+        rotateArm.setKp(MecanumDrive.PARAMS.armDownKp);
+        rotateArm.setKi(MecanumDrive.PARAMS.armDownKi);
+        rotateArm.setKd(MecanumDrive.PARAMS.armDownKd);
+    }
 }

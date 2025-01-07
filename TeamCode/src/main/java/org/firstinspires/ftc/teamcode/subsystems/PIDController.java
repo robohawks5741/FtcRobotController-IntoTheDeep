@@ -24,6 +24,15 @@ public class PIDController {
         Kd = K_D;
     }
 
+    public void setKp(double K_P) {
+        Kp = K_P;
+    }
+    public void setKi(double K_I) {
+        Ki = K_I;
+    }
+    public void setKd(double K_D) {
+        Kd = K_D;
+    }
     /**
      * Calculates the power to reach the reference using PID algorithm
      * @param reference the target position for the motor

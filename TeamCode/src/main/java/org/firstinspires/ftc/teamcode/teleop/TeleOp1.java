@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.BotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
 import org.firstinspires.ftc.teamcode.Drawing;
@@ -29,15 +30,7 @@ public class TeleOp1 extends LinearOpMode {
     private Servo claw;
     private AnalogInput potentiometer;
     private AnalogInput encoder;
-    private final int ARM_HORIZONTAL_TICKS = 100;
-    private final int ARM_FRONT_PLACING_TICKS = 540;
-    private final int ARM_GROUND_TICKS = 0;
-    private final int LIFT_RETRACTED_TICKS = 1720;
-    //placeholder value
-    private final int LIFT_ROTATABLE = 1000;
-    private final int LIFT_EXTENDED_TICKS = 0;
-    private final double CLAW_OPEN = 0.25;
-    private final double CLAW_CLOSED = 0;
+
     private int rotatePos;
     private int liftPos;
     int rotateStage = 0;
@@ -112,8 +105,8 @@ public class TeleOp1 extends LinearOpMode {
                 //Pick up and get out
                 pressed = true;
                 rotateStage = 0;
-                rotatePos = ARM_HORIZONTAL_TICKS;
-                liftPos = LIFT_RETRACTED_TICKS;
+                rotatePos = BotConstants.ARM_HORIZONTAL_TICKS;
+                liftPos = BotConstants.LIFT_RETRACTED_TICKS;
 
             } else if(gamepad1.dpad_up && !pressed){
                 //Turn up
@@ -125,24 +118,24 @@ public class TeleOp1 extends LinearOpMode {
                 //Turn down
                 pressed = true;
                 rotateStage = 0;
-                rotatePos = ARM_GROUND_TICKS;
+                rotatePos = BotConstants.ARM_GROUND_TICKS;
                 //open/close claw
                 openClaw();
-                liftPos = LIFT_EXTENDED_TICKS;
+                liftPos = BotConstants.LIFT_EXTENDED_TICKS;
 
             }else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
                 pressed = false;
             }
 
             if (gamepad1.a) {
-                liftPos = LIFT_RETRACTED_TICKS;
+                liftPos = BotConstants.LIFT_RETRACTED_TICKS;
             }else if (gamepad1.y) {
-                liftPos = LIFT_EXTENDED_TICKS;
+                liftPos = BotConstants.LIFT_EXTENDED_TICKS;
             }
             if(rotateStage == 1) {
-                liftPos = LIFT_RETRACTED_TICKS;
+                liftPos = BotConstants.LIFT_RETRACTED_TICKS;
                 try {
-                    if (Math.abs(pullArm.getCurrentPosition()) > LIFT_ROTATABLE) {
+                    if (Math.abs(pullArm.getCurrentPosition()) > BotConstants.LIFT_ROTATABLE) {
                         rotateStage++;
                     }
                 } catch(Exception e) {
@@ -151,8 +144,8 @@ public class TeleOp1 extends LinearOpMode {
             }
             try {
                 if (rotateStage == 2) {
-                    rotatePos = ARM_FRONT_PLACING_TICKS;
-                    liftPos = LIFT_EXTENDED_TICKS;
+                    rotatePos = BotConstants.ARM_FRONT_PLACING_TICKS;
+                    liftPos = BotConstants.LIFT_EXTENDED_TICKS;
                 }
             } catch(Exception e) {
                 throw new RuntimeException(e);
@@ -236,10 +229,10 @@ public class TeleOp1 extends LinearOpMode {
         pullArm.setPower(1);
     }
     public void openClaw() {
-        claw.setPosition(CLAW_OPEN);
+        claw.setPosition(BotConstants.CLAW_OPEN);
     }
     public void closeClaw() {
-        claw.setPosition(CLAW_CLOSED);
+        claw.setPosition(BotConstants.CLAW_CLOSED);
     }
 }
 

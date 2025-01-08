@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.checkerframework.checker.units.qual.A;
+import org.firstinspires.ftc.teamcode.BotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
 import org.firstinspires.ftc.teamcode.Drawing;
@@ -30,20 +31,8 @@ public class PIDTuning extends LinearOpMode {
     private DualMotor rotateArm;
 
 
-    private final double horizontalTicks = 135;
-    private final double verticalTicks = 695;
-    private final double RADS_PER_TICK = Math.PI / 2 / (verticalTicks - horizontalTicks); //=0.002805
-    private final double RADS_PER_VOLT  = Math.PI * 2 / 3.22;
-    private final double VOLTS_PER_TICK = RADS_PER_TICK / RADS_PER_VOLT;
-    private final double HORIZONTAL_VOLTS = 1.455;
-    private final int ARM_HORIZONTAL_TICKS = 100;
-    private final int ARM_FRONT_PLACING_TICKS = 540;
-    private final int ARM_GROUND_TICKS = 0;
+
     private double startTime = -1;
-    private final double ARM_FRONT_PLACING_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
-            (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);
-    private final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
-            (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);
     private AnalogInput encoder;
 
     @Override
@@ -74,9 +63,9 @@ public class PIDTuning extends LinearOpMode {
 
         try {
             rotateArm = new DualMotor(leftRotate, rightRotate,
-                    MecanumDrive.PARAMS.armUpKp / VOLTS_PER_TICK,
-                    MecanumDrive.PARAMS.armUpKi / VOLTS_PER_TICK,
-                    MecanumDrive.PARAMS.armUpKd / VOLTS_PER_TICK);
+                    BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
+                    BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK,
+                    BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -103,14 +92,14 @@ public class PIDTuning extends LinearOpMode {
 
             drive.updatePoseEstimate();
             double frictionOffset;
-            double target = HORIZONTAL_VOLTS;
+            double target = BotConstants.HORIZONTAL_VOLTS;
             setDirectionDown();
             try {
-                rotateArm.setTargetPosition((int)(target / VOLTS_PER_TICK));
+                rotateArm.setTargetPosition((int)(target / BotConstants.VOLTS_PER_TICK));
                 rotateArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                frictionOffset = (target > encoder.getVoltage())?-MecanumDrive.PARAMS.frictionOffsetPower:MecanumDrive.PARAMS.frictionOffsetPower;
+                frictionOffset = (target > encoder.getVoltage())?-BotConstants.frictionOffsetPower:BotConstants.frictionOffsetPower;
                 rotateArm.setPower(clamp(rotateArm.getPIDPower(-target, -encoder.getVoltage()) +
-                        MecanumDrive.PARAMS.armBasePower * Math.cos(RADS_PER_VOLT * (HORIZONTAL_VOLTS -
+                        BotConstants.armBasePower * Math.cos(BotConstants.RADS_PER_VOLT * (BotConstants.HORIZONTAL_VOLTS -
                                 encoder.getVoltage())) /*+ frictionOffset*/, -1, 1));
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -119,14 +108,14 @@ public class PIDTuning extends LinearOpMode {
             /*
             try {
                 //Purely for constant power to oppose gravity
-                rotateArm.setPower(MecanumDrive.PARAMS.armBasePower);
+                rotateArm.setPower(BotConstants.armBasePower);
                 //overall PID power
 
                 if(rotatePos == 0) {
-                    rotateArm.setPower(rotateArm.getPIDPower() - MecanumDrive.PARAMS.armBasePower);
+                    rotateArm.setPower(rotateArm.getPIDPower() - BotConstants.armBasePower);
                 }
                 else {
-                    rotateArm.setPower(rotateArm.getPIDPower() + MecanumDrive.PARAMS.armBasePower);
+                    rotateArm.setPower(rotateArm.getPIDPower() + BotConstants.armBasePower);
                 }
 
             } catch (Exception e) {
@@ -185,15 +174,15 @@ public class PIDTuning extends LinearOpMode {
             telemetry.addData("left motor", leftRotate.getCurrentPosition());
             telemetry.addData("right motor", rightRotate.getCurrentPosition());
 
-            telemetry.addData("current angle", Math.toDegrees((-encoder.getVoltage() + HORIZONTAL_VOLTS) * RADS_PER_VOLT));
+            telemetry.addData("current angle", Math.toDegrees((-encoder.getVoltage() + BotConstants.HORIZONTAL_VOLTS) * BotConstants.RADS_PER_VOLT));
             try {
                 telemetry.addData("PID power", clamp(rotateArm.getPIDPower(-target, -encoder.getVoltage()) +
-                        MecanumDrive.PARAMS.armBasePower * Math.cos(RADS_PER_VOLT * (target -
+                        BotConstants.armBasePower * Math.cos(BotConstants.RADS_PER_VOLT * (target -
                                 encoder.getVoltage())) + frictionOffset, -1, 1));
                 telemetry.addData("voltage", encoder.getVoltage());
-                telemetry.addData("target voltage", HORIZONTAL_VOLTS);
-                telemetry.addData("base power", MecanumDrive.PARAMS.armBasePower *
-                                    Math.cos(RADS_PER_VOLT * (target - encoder.getVoltage())));
+                telemetry.addData("target voltage", BotConstants.HORIZONTAL_VOLTS);
+                telemetry.addData("base power", BotConstants.armBasePower *
+                                    Math.cos(BotConstants.RADS_PER_VOLT * (target - encoder.getVoltage())));
                 telemetry.addData("error", rotateArm.PID.getError());
                 telemetry.addData("last error", rotateArm.PID.getLastError());
                 telemetry.addData("derivative term", rotateArm.PID.getDerivativeTerm());
@@ -230,13 +219,13 @@ public class PIDTuning extends LinearOpMode {
         return input;
     }
     public void setDirectionUp() {
-        rotateArm.setKp(MecanumDrive.PARAMS.armUpKp);
-        rotateArm.setKi(MecanumDrive.PARAMS.armUpKi);
-        rotateArm.setKd(MecanumDrive.PARAMS.armUpKd);
+        rotateArm.setKp(BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK);
+        rotateArm.setKi(BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK);
+        rotateArm.setKd(BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
     }
     public void setDirectionDown() {
-        rotateArm.setKp(MecanumDrive.PARAMS.armDownKp);
-        rotateArm.setKi(MecanumDrive.PARAMS.armDownKi);
-        rotateArm.setKd(MecanumDrive.PARAMS.armDownKd);
+        rotateArm.setKp(BotConstants.armDownKp / BotConstants.VOLTS_PER_TICK);
+        rotateArm.setKi(BotConstants.armDownKi / BotConstants.VOLTS_PER_TICK);
+        rotateArm.setKd(BotConstants.armDownKd / BotConstants.VOLTS_PER_TICK);
     }
 }

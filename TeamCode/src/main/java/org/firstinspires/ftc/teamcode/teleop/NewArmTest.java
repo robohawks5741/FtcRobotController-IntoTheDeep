@@ -30,12 +30,14 @@ public class NewArmTest extends LinearOpMode {
     private double liftTargetVoltage;
     private double startingRotateVoltage;
     private double startingLiftVoltage;
+    private Servo claw;
     @Override
     public void runOpMode() throws InterruptedException {
         frontRotate = hardwareMap.get(DcMotorEx.class, "frontRotate");
         backRotate = hardwareMap.get(DcMotorEx.class, "frontRotate");
         frontLift = hardwareMap.get(DcMotorEx.class, "liftFront");
         backLift = hardwareMap.get(DcMotorEx.class, "liftBack");
+        claw = hardwareMap.get(Servo.class, "claw");
         try {
             rotate = new DualMotor(backRotate, frontRotate,
                     MecanumDrive.PARAMS.kp / BotConstants.VOLTS_PER_TICK,
@@ -65,12 +67,12 @@ public class NewArmTest extends LinearOpMode {
                     -gamepad1.right_stick_x * 0.55
             ));
 
-            /*if (gamepad1.dpad_left && !pressed){
+            if (gamepad1.dpad_left && !pressed){
                 //Pick up and get out
                 pressed = true;
                 rotateStage = 0;
                 rotatePos = BotConstants.ARM_HORIZONTAL_TICKS;
-                //liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
+                liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
 
             } else if(gamepad1.dpad_up && !pressed){
                 //Turn up
@@ -84,23 +86,25 @@ public class NewArmTest extends LinearOpMode {
                 rotateStage = 0;
                 rotateTargetVoltage = normalizeRotateVoltage(BotConstants.ARM_GROUND_VOLTS);
                 //open/close claw
-                //liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                openClaw();
+                liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
 
             }else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
                 pressed = false;
             }
 
             if (gamepad1.a) {
-                //liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
+                liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
             }else if (gamepad1.y) {
-                //liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
             }
             if(rotateStage == 1) {
-                //liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
+                liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
                 try {
-                    /*if (Math.abs(liftEncoder.getVoltage()) > BotConstants.LIFT_ROTATABLE_VOLTS) {
+                    //sign needs to be checked
+                    if (liftEncoder.getVoltage() > BotConstants.LIFT_ROTATABLE_VOLTS) {
                         rotateStage++;
-                    }*//*
+                    }
                 } catch(Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -108,27 +112,19 @@ public class NewArmTest extends LinearOpMode {
             try {
                 if (rotateStage == 2) {
                     rotateTargetVoltage = BotConstants.ARM_FRONT_PLACING_VOLTS;
-                    //liftPos = BotConstants.LIFT_EXTENDED_VOLTS;
+                    liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
                 }
             } catch(Exception e) {
                 throw new RuntimeException(e);
-            }*/
-            //Update arm pos
-            rotateTargetVoltage = normalizeRotateVoltage(BotConstants.HORIZONTAL_VOLTS);
-            rotate.setTargetPosition((int)((startingRotateVoltage
-                    - rotateTargetVoltage) / BotConstants.VOLTS_PER_TICK));
-            rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            try {
-                power = -rotate.getPIDPower(rotateTargetVoltage, normalizeRotateVoltage(rotateEncoder.getVoltage()))
-                        + BotConstants.armBasePower * Math.cos(getAngle());
-                rotate.setPower(clamp(power, -1, 1));
-            } catch(Exception e) {
-                throw new RuntimeException(e);
             }
+            //Update arm pos
 
+            rotatePos = -(int)((rotateTargetVoltage - startingRotateVoltage) / BotConstants.VOLTS_PER_TICK);
+            //this sign needs to be checked
+            liftPos = (int)((liftTargetVoltage - startingLiftVoltage) / BotConstants.VOLTS_PER_TICK);
             try {
-                //updateRotate();
-                //updateLift();
+                power = updateRotate();
+                updateLift();
                 /*pullArm.setTargetPosition(armPos*-23);
                 pullArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 pullArm.setPower(1);*/
@@ -136,10 +132,13 @@ public class NewArmTest extends LinearOpMode {
                 throw new RuntimeException(e);
             }
 
-            
-            rotatePos = -(int)((rotateTargetVoltage - startingRotateVoltage) / BotConstants.VOLTS_PER_TICK);
-            liftPos = (int)((liftTargetVoltage - startingLiftVoltage) / BotConstants.VOLTS_PER_TICK);
-            //positive is clockwise when back is to the right
+
+            if(gamepad1.left_bumper){
+                closeClaw();
+            } else if(gamepad1.right_bumper){
+                openClaw();
+            }
+            //positive ticks for rotate is clockwise when back is to the right
             try {
                 telemetry.addData("target", rotateTargetVoltage);
                 telemetry.addData("angle", getAngle());
@@ -156,35 +155,23 @@ public class NewArmTest extends LinearOpMode {
         }
     }
     //these updates aren't used right now/need to be rewritten for PID
-    public void updateRotate() {
-        if(Math.abs(rotateTargetVoltage - rotateEncoder.getVoltage()) > 0.25) {
-            rotate.setTargetPosition(rotatePos);
-            rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            if(rotateTargetVoltage < normalizeRotateVoltage(rotateEncoder.getVoltage())) {
-                rotate.setPower(0.4);
-            }
-            else {
-                rotate.setPower(-0.2);
-            }
-        }
-        else if(Math.abs(rotateTargetVoltage - rotateEncoder.getVoltage()) > 0.15) {
-            rotate.setTargetPosition(rotatePos);
-            rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            if(rotateTargetVoltage < normalizeRotateVoltage(rotateEncoder.getVoltage())) {
-                rotate.setPower(0.2);
-            }
-            else {
-                rotate.setPower(-0.2);
-            }
-        }
-        else {
-            rotate.setPower(0);
+    public double updateRotate() {
+        rotate.setTargetPosition((int)((startingRotateVoltage
+                - rotateTargetVoltage) / BotConstants.VOLTS_PER_TICK));
+        rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        try {
+            double power = -rotate.getPIDPower(rotateTargetVoltage, normalizeRotateVoltage(rotateEncoder.getVoltage()))
+                    + BotConstants.armBasePower * Math.cos(getAngle());
+            rotate.setPower(clamp(power, -1, 1));
+            return power;
+        } catch(Exception e) {
+            throw new RuntimeException(e);
         }
     }
     public void updateLift() {
-        lift.setTargetPosition(liftPos - (rotatePos - BotConstants.ARM_HORIZONTAL_TICKS));
-        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        lift.setPower(0.15);
+        lift.setTargetPosition(liftPos + (int)((rotateEncoder.getVoltage() - startingRotateVoltage) / BotConstants.VOLTS_PER_TICK));
+        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lift.setPower(0.5);
     }
     //makes sure voltage is a single continuous scale rather than having a jump from 0 to 3.2
     public double normalizeRotateVoltage(double v) {
@@ -205,5 +192,11 @@ public class NewArmTest extends LinearOpMode {
     //I think the sign of this might be wrong but it doesn't really matter for now because it's used for cosine
     public double getAngle() {
         return (rotateEncoder.getVoltage() - BotConstants.HORIZONTAL_VOLTS) * BotConstants.RADS_PER_VOLT;
+    }
+    public void openClaw() {
+        claw.setPosition(BotConstants.CLAW_OPEN);
+    }
+    public void closeClaw() {
+        claw.setPosition(BotConstants.CLAW_CLOSED);
     }
 }

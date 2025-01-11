@@ -21,6 +21,10 @@ public final class BotConstants {
     public static final double armUpKi = 0.0001;
     public static final double armUpKd = 0.00001;
     public static final double armBasePower = 0.4;
+    //placeholder--needs to be set-voltages are measured from horizontal position
+    public static final double LIFT_ROTATABLE_VOLTS = 0;
+    public static final double LIFT_EXTENDED_VOLTS = 0;
+    public static final double LIFT_RETRACTED_VOLTS = 0;
 
     //not currently in use
     public static final double armDownKp = 0.0003;

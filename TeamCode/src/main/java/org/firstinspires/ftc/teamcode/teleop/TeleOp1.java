@@ -135,9 +135,7 @@ public class TeleOp1 extends LinearOpMode {
             if(rotateStage == 1) {
                 liftPos = BotConstants.LIFT_RETRACTED_TICKS;
                 try {
-                    if (Math.abs(pullArm.getCurrentPosition()) > BotConstants.LIFT_ROTATABLE) {
-                        rotateStage++;
-                    }
+
                 } catch(Exception e) {
                     throw new RuntimeException(e);
                 }

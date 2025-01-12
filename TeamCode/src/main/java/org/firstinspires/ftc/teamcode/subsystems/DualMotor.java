@@ -16,6 +16,7 @@ public class DualMotor {
     private boolean isSingleMotor = false;
     public PIDController PID;
     private double Kp, Ki, Kd;
+    private boolean sameSign;
 
     /**
      * Constructs a DcMotorPair containing and controlling at least one motor.
@@ -36,6 +37,7 @@ public class DualMotor {
         Ki = 0;
         Kd = 0;
         PID = new PIDController(Kp, Ki, Kd);
+        sameSign = false;
     }
     /**
      * Constructs a DcMotorPair containing and controlling at least one motor, with constants for PID control.
@@ -58,6 +60,7 @@ public class DualMotor {
         Ki = K_I;
         Kd = K_D;
         PID = new PIDController(Kp, Ki, Kd);
+        sameSign = false;
     }
 
     /**
@@ -72,6 +75,7 @@ public class DualMotor {
         Ki = 0;
         Kd = 0;
         PID = new PIDController(Kp, Ki, Kd);
+        sameSign = false;
     }
     /**
      * Constructs a DcMotorPair controlling one motor, with constants for PID control.
@@ -87,8 +91,39 @@ public class DualMotor {
         Ki = K_I;
         Kd = K_D;
         PID = new PIDController(Kp, Ki, Kd);
+        sameSign = false;
     }
 
+    public DualMotor(DcMotorEx motor1, DcMotorEx motor2, boolean same) throws Exception {
+        this.motor1 = motor1;
+        this.motor2 = motor2;
+        if (motor1 == null ^ motor2 == null) {
+            isSingleMotor = true;
+        } else if (motor1 == null) {
+            throw new Exception(noMotorEx);
+        }
+        //can put actual defaults for these later
+        Kp = 0;
+        Ki = 0;
+        Kd = 0;
+        PID = new PIDController(Kp, Ki, Kd);
+        sameSign = same;
+    }
+
+    public DualMotor(DcMotorEx motor1, DcMotorEx motor2, double K_P, double K_I, double K_D, boolean same) throws Exception {
+        this.motor1 = motor1;
+        this.motor2 = motor2;
+        if (motor1 == null ^ motor2 == null) {
+            isSingleMotor = true;
+        } else if (motor1 == null) {
+            throw new Exception(noMotorEx);
+        }
+        Kp = K_P;
+        Ki = K_I;
+        Kd = K_D;
+        PID = new PIDController(Kp, Ki, Kd);
+        sameSign = same;
+    }
     /**
      * Gets the first DcMotor controlled by this motor pair.
      * @return The first motor controlled by this pair.
@@ -154,8 +189,13 @@ public class DualMotor {
     public void setPower(double power) {
         if(motor1 != null)
             motor1.setPower(-power);
-        if(motor2 != null)
-            motor2.setPower(power);
+        if(motor2 != null) {
+            if (sameSign) {
+                motor2.setPower(-power);
+            } else {
+                motor2.setPower(power);
+            }
+        }
     }
 
     /**
@@ -188,12 +228,20 @@ public class DualMotor {
      *                       motor's target position to.
      */
     public void setTargetPosition(int targetPosition) {
-        PID.reset();
         if(motor1 != null)
             motor1.setTargetPosition(-targetPosition);
         if(motor2 != null) {
-            motor2.setTargetPosition(targetPosition);
+            if(sameSign) {
+                motor2.setTargetPosition(-targetPosition);
+            }
+            else {
+                motor2.setTargetPosition(targetPosition);
+            }
         }
+    }
+
+    public void resetPID() {
+        PID.reset();
     }
 
     /**

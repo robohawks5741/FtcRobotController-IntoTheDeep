@@ -284,6 +284,7 @@ public class NewArmTest extends LinearOpMode {
         }
         //Which of these if statements is incrementing/decrementing depends on the direction positive voltage
         //is on the extension, which needs to be checked
+        liftPreviousVoltage = liftEncoder.getVoltage();
     }
     //TODO: create code for moving claw along ground
 }

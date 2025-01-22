@@ -97,11 +97,19 @@ public class NewMain extends LinearOpMode {
          */
         liftEncoderRotations = 0;
         boolean pressed = false;
-        int rotateStage = 0;
+        int rotateStage;
+        if(normalizeRotateVoltage(rotateEncoder.getVoltage()) < 0.4) {
+            rotateStage = 4;
+        }
+        else {
+            rotateStage = -4;
+        }
         double rotatePower = 0;
         double liftPower = 0;
 
-
+        clawRotate.setPosition(BotConstants.servoPosInit);
+        openClaw();
+        lift.setPower(0.001);
         waitForStart();
         while(opModeIsActive()) {
             drive.setDrivePowers(new PoseVelocity2d(
@@ -120,9 +128,8 @@ public class NewMain extends LinearOpMode {
                     goingToGround = false;
                     lift.resetPID();
                 }
-                else {
+                else if(rotateStage == -4) {
                     //Pick up and get out
-                    rotateStage = 0;
                     rotateTargetVoltage = BotConstants.HORIZONTAL_VOLTS;
                     //resetting was done differently before and might have been causing some of the weird issues
                     rotate.resetPID();
@@ -133,9 +140,13 @@ public class NewMain extends LinearOpMode {
                 //Turn up
                 if(rotateStage <= 0) {
                     rotateStage = 1;
+                    clawRotate.setPosition(BotConstants.servoPosUp);
                     lift.resetPID();
                 }
-
+                else if(rotateStage == 4 && liftTargetVoltage != BotConstants.LIFT_EXTENDED_VOLTS) {
+                    liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                    lift.resetPID();
+                }
             } else if(gamepad1.dpad_down){
                 pressed = true;
                 if(rotateStage > 0) {
@@ -143,9 +154,8 @@ public class NewMain extends LinearOpMode {
                     goingToGround = true;
                     lift.resetPID();
                 }
-                else {
+                else if(rotateStage == -4){
                     //Turn down
-                    rotateStage = 0;
                     rotateTargetVoltage = BotConstants.ARM_GROUND_VOLTS;
                     rotate.resetPID();
                     //open/close claw
@@ -159,11 +169,15 @@ public class NewMain extends LinearOpMode {
             }
 
             if (gamepad1.a) {
-                liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
-                lift.resetPID();
+                if(liftTargetVoltage != BotConstants.LIFT_RETRACTED_VOLTS && (rotateStage == -4 || rotateStage == 4)) {
+                    liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
+                    lift.resetPID();
+                }
             }else if (gamepad1.y) {
-                liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
-                lift.resetPID();
+                if(liftTargetVoltage != BotConstants.LIFT_EXTENDED_VOLTS && (rotateStage == -4 || rotateStage == 4)) {
+                    liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                    lift.resetPID();
+                }
             }
 
             try {
@@ -207,7 +221,9 @@ public class NewMain extends LinearOpMode {
                     }
                 }
                 else if(rotateStage == -3) {
-                    liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                    if(goingToGround) {
+                        liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                    }
                     rotateStage--;
                 }
             } catch(Exception e) {
@@ -350,10 +366,10 @@ public class NewMain extends LinearOpMode {
     }
     //these constants need to be redetermined
     public void rotateClawUp() {
-        clawRotate.setPosition(0);
+        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos1);
     }
     public void rotateClawDown() {
-        clawRotate.setPosition(1);
+        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos2);
     }
 
     public void calculateLiftVoltage() {

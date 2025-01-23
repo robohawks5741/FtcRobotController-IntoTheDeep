@@ -19,7 +19,8 @@ public final class BotConstants {
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
-    public static final double ARM_GROUND_VOLTS = 0.955;
+    public static final double ARM_GROUND_VOLTS_EXTENDED = 0.955;
+    public static final double ARM_GROUND_VOLTS_RETRACTED = 1.085;
     public static final double ARM_UP_EXTENDABLE_VOLTS = 0.5;
     public static final double ARM_DOWN_EXTENDABLE_VOLTS = 0.3;
     public static final double MAX_VOLTAGE = 3.227;

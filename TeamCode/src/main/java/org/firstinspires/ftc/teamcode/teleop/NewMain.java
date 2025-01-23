@@ -34,10 +34,12 @@ public class NewMain extends LinearOpMode {
     private double startingRotateVoltage;
     private double startingLiftVoltage;
     private double liftPreviousVoltage;
+    private double desiredExtendedness;
     //this tracks voltage beyond the 0-3.2 scale and goes all the way to the LIFT_EXTENDED_VOLTS value
     private double liftRealVoltage;
     private DcMotorEx encoderMotor;
     private double extendedness;
+
 
     private int liftEncoderRotations;
     @Override
@@ -76,6 +78,7 @@ public class NewMain extends LinearOpMode {
         rotateTargetVoltage = startingRotateVoltage;
         liftTargetVoltage = startingLiftVoltage;
         liftPreviousVoltage = startingLiftVoltage;
+        desiredExtendedness = 1;
         frontRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -87,6 +90,7 @@ public class NewMain extends LinearOpMode {
         liftPos = BotConstants.LIFT_RETRACTED_TICKS;
         encoderMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         encoderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
 
         /*Since the encoder makes multiple full revolutions in the lift extension, it's necessary to
@@ -156,7 +160,7 @@ public class NewMain extends LinearOpMode {
                 }
                 else if(rotateStage == -4){
                     //Turn down
-                    rotateTargetVoltage = BotConstants.ARM_GROUND_VOLTS;
+                    rotateTargetVoltage = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
                     rotate.resetPID();
                     //open/close claw
                     //openClaw();
@@ -168,12 +172,12 @@ public class NewMain extends LinearOpMode {
                 pressed = false;
             }
 
-            if (gamepad1.a) {
+            if (gamepad1.a && !(rotateStage == -4 && goingToGround)) {
                 if(liftTargetVoltage != BotConstants.LIFT_RETRACTED_VOLTS && (rotateStage == -4 || rotateStage == 4)) {
                     liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
                     lift.resetPID();
                 }
-            }else if (gamepad1.y) {
+            }else if (gamepad1.y && !(rotateStage == -4 && goingToGround)) {
                 if(liftTargetVoltage != BotConstants.LIFT_EXTENDED_VOLTS && (rotateStage == -4 || rotateStage == 4)) {
                     liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
                     lift.resetPID();
@@ -214,7 +218,7 @@ public class NewMain extends LinearOpMode {
                     }
                 }
                 else if(rotateStage == -2) {
-                    rotateTargetVoltage = goingToGround ? BotConstants.ARM_GROUND_VOLTS:BotConstants.HORIZONTAL_VOLTS;
+                    rotateTargetVoltage = goingToGround ? BotConstants.ARM_GROUND_VOLTS_EXTENDED:BotConstants.HORIZONTAL_VOLTS;
                     if(normalizeRotateVoltage(rotateEncoder.getVoltage()) > BotConstants.ARM_DOWN_EXTENDABLE_VOLTS) {
                         rotateStage--;
                         lift.resetPID();
@@ -223,8 +227,24 @@ public class NewMain extends LinearOpMode {
                 else if(rotateStage == -3) {
                     if(goingToGround) {
                         liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                        lift.resetPID();
+                        desiredExtendedness = 1;
                     }
+                    rotateClawDown();
                     rotateStage--;
+                }
+                else if(rotateStage == -4 && goingToGround) {
+                    if(gamepad1.a && desiredExtendedness < 1) {
+                        desiredExtendedness += .01;
+                    }
+                    if(gamepad1.x && desiredExtendedness > 0) {
+                        desiredExtendedness -= .01;
+                    }
+                    rotateTargetVoltage = (BotConstants.ARM_GROUND_VOLTS_EXTENDED -
+                            BotConstants.ARM_GROUND_VOLTS_RETRACTED) * desiredExtendedness +
+                            BotConstants.ARM_GROUND_VOLTS_EXTENDED;
+                    liftTargetVoltage = (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS) *
+                            desiredExtendedness + BotConstants.ARM_GROUND_VOLTS_EXTENDED;
                 }
             } catch(Exception e) {
                 throw new RuntimeException(e);

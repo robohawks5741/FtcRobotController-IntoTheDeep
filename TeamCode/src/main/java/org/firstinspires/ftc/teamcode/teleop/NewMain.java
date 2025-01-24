@@ -69,7 +69,7 @@ public class NewMain extends LinearOpMode {
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
-        encoderMotor = hardwareMap.get(DcMotorEx.class, "backRight");
+        encoderMotor = hardwareMap.get(DcMotorEx.class, "backLeft");
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
         rotateEncoder = hardwareMap.get(AnalogInput.class, "rotateEncoder");
         liftEncoder = hardwareMap.get(AnalogInput.class, "liftEncoder");

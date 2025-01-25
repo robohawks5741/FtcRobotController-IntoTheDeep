@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleop;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -10,17 +11,48 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.BotConstants;
-import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
-
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
-@TeleOp(name = "##Main")
-public class NewMain extends LinearOpMode {
+@TeleOp(name = "TestingTeleop")
+public class TestingMain extends LinearOpMode {
+
+    /*
+    * Gamepad 1:
+    *   Joysticks: Drive
+    *   Right Bumper: Close Claw
+    *   Left Bumper: Open Claw
+    *   Y: Get in Hang position
+    *   A: Pull hang down
+    *   Right Trigger: Place or pickup in current position and get to neutral position
+    *   Left Trigger: Get to High Placement Position
+    *   Dpad_Up: Go to low bucket position
+    *   Dpad_Left: Go to Specimin placement position
+    *   Dpad_Down: Do to neutral down placement position
+    *
+    *  Gamepad 2:
+    *  No Drive
+    *  Left Joystick runs out and in the arm
+    *
+    *  ToDo:
+    *   - Hang pid
+    *   - Hang Placement Position
+    *   - Specemin placement position
+    *   - Low Bucket Position
+    *   -
+    *
+    *   Notes:
+    * - For command based:
+    * - Have Integer positions for arm position
+    * - Have Integer positions for arm states
+    * - Have command set arm targets for extendedness and for rotation
+    * - Have arm set `
+    * - Have the placement check the arm position integer and place accordingly
+    * */
 
     private DcMotorEx frontRotate, backRotate, frontLift, backLift;
     private DualMotor rotate;
@@ -43,6 +75,11 @@ public class NewMain extends LinearOpMode {
 
 
     private int liftEncoderRotations;
+
+
+    private double rotateToPosition;
+    private double extendToPosition;
+
     @Override
     public void runOpMode() throws InterruptedException {
         frontRotate = hardwareMap.get(DcMotorEx.class, "frontRotate");

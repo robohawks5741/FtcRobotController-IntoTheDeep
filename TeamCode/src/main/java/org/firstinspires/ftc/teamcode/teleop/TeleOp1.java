@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@TeleOp(name = "#Main")
+@TeleOp(name = "oldmain")
 
 public class TeleOp1 extends LinearOpMode {
     private DcMotorEx liftBot, liftTop, leftRotate, rightRotate;

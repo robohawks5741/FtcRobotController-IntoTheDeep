@@ -284,8 +284,8 @@ public class NewMain extends LinearOpMode {
 
             try {
                 //return value is just for telemetry purposes
-                rotatePower = updateRotate();
-                liftPower = updateLift();
+                //rotatePower = updateRotate();
+                //liftPower = updateLift();
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }

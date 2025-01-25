@@ -76,10 +76,10 @@ public class TestingMain extends LinearOpMode {
 
     private int liftEncoderRotations;
 
-    private double rotateToPosition;
-    private double extendToPosition;
+    private double rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
+    private double extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
 
-    private int armPosition;
+    private int armPosition = 1;
 
     private boolean isDown; //Checks to see if the arm is down (Parallel to the ground or lower)
 
@@ -241,7 +241,7 @@ public class TestingMain extends LinearOpMode {
                 //Pull down on hang
                 pressed = true;
                 armPosition = 7;
-            } else if (!gamepad1.dpad_down && !(gamepad1.right_trigger > 0.1) && gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !(gamepad1.left_trigger > 0.1) && !gamepad1.y && !gamepad1.a && !gamepad2.dpad_down && !(gamepad2.right_trigger > 0.1) && gamepad2.dpad_right && !gamepad2.dpad_left && !gamepad2.dpad_up && !(gamepad2.left_trigger > 0.1) && !gamepad2.y && !gamepad2.a) {
+            } else if (!gamepad1.dpad_down && !(gamepad1.right_trigger > 0.1) && !gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !(gamepad1.left_trigger > 0.1) && !gamepad1.y && !gamepad1.a && !gamepad2.dpad_down && !(gamepad2.right_trigger > 0.1) && !gamepad2.dpad_right && !gamepad2.dpad_left && !gamepad2.dpad_up && !(gamepad2.left_trigger > 0.1) && !gamepad2.y && !gamepad2.a) {
                 pressed = false;
             }
 
@@ -436,6 +436,7 @@ public class TestingMain extends LinearOpMode {
                 telemetry.addData("armPosition", armPosition);
                 telemetry.addData("isIn", isIn);
                 telemetry.addData("isDown", isDown);
+                telemetry.addData("pressed", pressed);
                 telemetry.addData("target", liftTargetVoltage);
                 telemetry.addData("Rotate Stage", rotateStage);
                 telemetry.addData("angle", getAngle());

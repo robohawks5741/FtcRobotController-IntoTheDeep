@@ -514,8 +514,8 @@ public class TestingMain extends LinearOpMode {
     }
     //makes sure voltage is a single continuous scale rather than having a jump from 0 to 3.2
     public double normalizeRotateVoltage(double v) {
-        if(v > 3) {
-            v = 0;
+        if(v > BotConstants.mod(BotConstants.ARM_VERTICAL_VOLTS - 0.2, BotConstants.MAX_VOLTAGE)) {
+            v -= BotConstants.MAX_VOLTAGE;
         }
         return v;
     }
@@ -551,8 +551,8 @@ public class TestingMain extends LinearOpMode {
 
     public void calculateLiftVoltage() {
         liftRealVoltage = startingLiftVoltage + -encoderMotor.getCurrentPosition() * BotConstants.INCREMENTAL_TO_VOLTS;
-        liftRealVoltage += normalizeRotateVoltage(rotateEncoder.getVoltage());
-        // this works bc vertical is approximately 0 volts for the rotate encoder
+        liftRealVoltage += normalizeRotateVoltage(rotateEncoder.getVoltage()) -
+                normalizeRotateVoltage(BotConstants.ARM_VERTICAL_VOLTS);
     }
     public void checkLiftEncoder() {
         //this is one idea for doing this, might need to be tweaked/reworked depending on how jumpy the encoder is

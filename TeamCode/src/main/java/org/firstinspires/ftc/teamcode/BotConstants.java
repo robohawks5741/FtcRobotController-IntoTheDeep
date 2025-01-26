@@ -18,7 +18,7 @@ public final class BotConstants {
     public static final double servoPosPlaceExtended = 0.5;
 
 
-    public static final double ARM_FRONT_PLACING_VOLTS = 0;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
+    public static final double ARM_FRONT_PLACING_VOLTS = 3.129;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
@@ -29,7 +29,7 @@ public final class BotConstants {
     public static final double MAX_VOLTAGE = 3.227;
     public static double armUpKp = 0.0065;
     public static double armUpKi = 0.00005;
-    public static double armUpKd = 0.0008;
+    public static double armUpKd = 0.0;
     public static final double armBasePower = 0.38;
     public static final double extendedIncrementalOutput = 16861;
 
@@ -50,7 +50,7 @@ public final class BotConstants {
     public static final double INCREMENTAL_TO_VOLTS = (LIFT_MAX_VOLTS - LIFT_MIN_VOLTS) / extendedIncrementalOutput;
 
     public static double liftKp = 0.001;
-    public static double liftKi = 0.0001;
+    public static double liftKi = 0.0005;
     public static double liftKd = 0.00005;
 
     //public double kp = 0.00025;
@@ -63,7 +63,7 @@ public final class BotConstants {
 
     //not currently in use
     public static double armDownKp = 0.0006; //0.0003
-    public static double armDownKi = 0.0001;
+    public static double armDownKi = 0.0005;
     public static double armDownKd = 0;
 
 

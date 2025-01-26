@@ -24,8 +24,8 @@ public class TestingMain extends LinearOpMode {
     /*
     * Gamepad 1:
     *   Joysticks: Drive
-    *   Right Bumper: Close Claw
-    *   Left Bumper: Open Claw
+    *   Left Bumper: Close Claw
+    *   Right Bumper: Open Claw
     *   Y: Get in Hang position
     *   A: Pull hang down
     *   Right Trigger: Place or pickup in current position and get to neutral position
@@ -192,9 +192,11 @@ public class TestingMain extends LinearOpMode {
                 stopClaw();
             }*/
             if(gamepad1.left_bumper){
-                openClaw();
-            } else if(gamepad1.right_bumper){
                 closeClaw();
+
+            } else if(gamepad1.right_bumper){
+                openClaw();
+
             }
             if(gamepad1.x) {
                 rotateClawUp();
@@ -217,6 +219,11 @@ public class TestingMain extends LinearOpMode {
                 //Place based on position and rotate to the neutral pos
                 pressed = true;
                 armPosition = 1;
+
+                lift.resetPID();
+                rotate.resetPID();
+                rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
+                extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
             } else if(gamepad1.dpad_right && !pressed && armPosition != 2 || gamepad2.dpad_right && !pressed && armPosition != 2){
                 //go to specimen pickup position
                 pressed = true;
@@ -233,6 +240,10 @@ public class TestingMain extends LinearOpMode {
                 //Go to high bucket position
                 pressed = true;
                 armPosition = 5;
+                lift.resetPID();
+                rotate.resetPID();
+                rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
+                extendToPosition = BotConstants.LIFT_EXTENDED_VOLTS;
             } else if(gamepad1.y && !pressed && armPosition != 6 || gamepad2.y && !pressed && armPosition != 6){
                 //Get ready to hang
                 pressed = true;
@@ -463,10 +474,10 @@ public class TestingMain extends LinearOpMode {
         }
     }
     public void handleArm(){
-        if ((isDown && armPosition > 2)&& !isIn){
+        if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 4 && !isIn){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
 
-        }else if(isDown && armPosition > 2){
+        }else if((isIn && armPosition > 2 && isDown)|| (!isDown && armPosition < 3 && isIn)){ //Waits until it is pulled in yo rotate it
             //Only activates when it is down and the target is the specimen placement, high bucket, low bucket, and hang position
             rotateTargetVoltage = rotateToPosition;
         } else {

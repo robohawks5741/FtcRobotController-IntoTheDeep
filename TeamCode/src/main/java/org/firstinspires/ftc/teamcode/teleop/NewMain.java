@@ -126,7 +126,7 @@ public class NewMain extends LinearOpMode {
             ));
             calculateLiftVoltage();
 
-            if (gamepad1.dpad_left && !pressed){
+            if (gamepad1.dpad_left && !pressed || gamepad2.dpad_left && !pressed){
                 pressed = true;
                 if(rotateStage > 0) {
                     rotateStage = -1;
@@ -139,7 +139,7 @@ public class NewMain extends LinearOpMode {
                     //Pick up and get out
                     liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
                 }
-            } else if(gamepad1.dpad_up && !pressed){
+            } else if(gamepad1.left_trigger > 0.1 && !pressed || gamepad2.left_trigger > 0.1 && !pressed){
                 //Turn up
                 if(rotateStage <= 0) {
                     rotateStage = 1;
@@ -150,13 +150,13 @@ public class NewMain extends LinearOpMode {
                     liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
                     lift.resetPID();
                 }
-            } else if(gamepad1.dpad_down){
+            } else if(gamepad1.dpad_down || gamepad2.dpad_down){
                 pressed = true;
                 if(rotateStage > 0) {
                     rotateStage = -1;
                     goingToGround = true;
                     lift.resetPID();
-                } else if(gamepad1.dpad_down){ //Go from middle to down
+                } else if(gamepad1.dpad_down || gamepad2.dpad_down){ //Go from middle to down
                     pressed = true;
                     if (rotateStage == -2){
                         goingToGround = true;
@@ -284,8 +284,8 @@ public class NewMain extends LinearOpMode {
 
             try {
                 //return value is just for telemetry purposes
-                //rotatePower = updateRotate();
-                //liftPower = updateLift();
+                rotatePower = updateRotate();
+                liftPower = updateLift();
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }
@@ -301,9 +301,11 @@ public class NewMain extends LinearOpMode {
                 stopClaw();
             }*/
             if(gamepad1.left_bumper){
-                openClaw();
-            } else if(gamepad1.right_bumper){
                 closeClaw();
+
+            } else if(gamepad1.right_bumper){
+                openClaw();
+
             }
             if(gamepad1.x) {
                 rotateClawUp();
@@ -324,7 +326,7 @@ public class NewMain extends LinearOpMode {
                 telemetry.addData("real voltage", liftRealVoltage);
                 telemetry.addData("incremental", -encoderMotor.getCurrentPosition());
                 telemetry.addData("extendedness", extendedness);
-                telemetry.addData("servo position", clawIntake.getPosition());
+                telemetry.addData("servo position", clawRotate.getPosition());
 
             } catch(Exception e) {
                 throw new RuntimeException(e);

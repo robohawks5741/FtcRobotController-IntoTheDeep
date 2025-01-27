@@ -16,24 +16,24 @@ public final class BotConstants {
     public static final double servoPosUp = 0.25;
     public static final double getServoPosPlaceRetracted = 0.4;
     public static final double servoPosPlaceExtended = 0.5;
-
-
-    public static final double ARM_FRONT_PLACING_VOLTS = 0;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
+    public static final double MAX_VOLTAGE = 3.227;
+    public static final double ARM_BACK_VOLTS = 3.214;
+    public static final double ARM_FRONT_PLACING_VOLTS = (0.013 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
-    public static final double ARM_GROUND_VOLTS_EXTENDED = 0.955;
-    public static final double ARM_GROUND_VOLTS_RETRACTED = 1.085;
-    public static final double ARM_UP_EXTENDABLE_VOLTS = 0.5;
-    public static final double ARM_DOWN_EXTENDABLE_VOLTS = 0.3;
+    public static final double ARM_GROUND_VOLTS_EXTENDED = (0.968 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+    public static final double ARM_GROUND_VOLTS_RETRACTED = (1.098 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+    public static final double ARM_UP_EXTENDABLE_VOLTS = (0.513 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+    public static final double ARM_DOWN_EXTENDABLE_VOLTS = (0.313 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
 
-    public static final double ARM_VERTICAL_VOLTS = 0;
+    public static final double ARM_VERTICAL_VOLTS = ARM_FRONT_PLACING_VOLTS;
 
     //TODO
     public static final double ARM_SPECIMEN_PLACEMENT_POSITION = 0;
 
     public  static final double ARM_SPECIMEN_PICKUP_POSITION = 0;
-    public static final double MAX_VOLTAGE = 3.227;
+
     public static double armUpKp = 0.001;
     public static double armUpKi = 0.00005;
     public static double armUpKd = 0.0;
@@ -44,19 +44,20 @@ public final class BotConstants {
     //max voltage output because of the encoder making multiple full rotations
 
     //not too sure about these values
-    public static final double LIFT_ROTATABLE_VOLTS = 3 + MAX_VOLTAGE;
     public static final double LIFT_MIN_VOLTS = 0;
-    public static final double LIFT_RETRACTED_VOLTS = 0.3;
+    public static final double LIFT_ROTATABLE_VOLTS = LIFT_MIN_VOLTS + 3 + MAX_VOLTAGE;
+
+    public static final double LIFT_RETRACTED_VOLTS = LIFT_MIN_VOLTS + .3;
 
     public static final double LIFT_SPECIMEN_PLACEMENT_POSITION = 0;
 
 
-    public static double LIFT_RETRACTED_SIDEWAYS_VOLTS = 3.5;
+    public static double LIFT_RETRACTED_SIDEWAYS_VOLTS = LIFT_MIN_VOLTS + 3.5;
 
     public static double LIFT_LOW_BUCKET = 0;
 
-    public static final double LIFT_MAX_VOLTS = 0.173 + 4 * MAX_VOLTAGE;
-    public static final double LIFT_EXTENDED_VOLTS = 0.173 + 4 * MAX_VOLTAGE;
+    public static final double LIFT_MAX_VOLTS = LIFT_MIN_VOLTS + 0.173 + 4 * MAX_VOLTAGE;
+    public static final double LIFT_EXTENDED_VOLTS = LIFT_MIN_VOLTS + 0.173 + 4 * MAX_VOLTAGE;
 
     public static final double INCREMENTAL_TO_VOLTS = (LIFT_MAX_VOLTS - LIFT_MIN_VOLTS) / extendedIncrementalOutput;
 

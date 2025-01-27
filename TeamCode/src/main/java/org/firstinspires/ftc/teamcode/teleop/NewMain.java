@@ -285,7 +285,7 @@ public class NewMain extends LinearOpMode {
             try {
                 //return value is just for telemetry purposes
                 rotatePower = updateRotate();
-                liftPower = updateLift();
+               liftPower = updateLift();
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }
@@ -399,10 +399,12 @@ public class NewMain extends LinearOpMode {
     }
     //these constants need to be redetermined
     public void rotateClawUp() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos1);
+        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos2);
+
     }
     public void rotateClawDown() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos2);
+        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos1);
+
     }
 
     public void calculateLiftVoltage() {

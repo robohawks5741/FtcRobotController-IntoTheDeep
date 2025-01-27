@@ -18,7 +18,7 @@ public final class BotConstants {
     public static final double servoPosPlaceExtended = 0.5;
 
 
-    public static final double ARM_FRONT_PLACING_VOLTS = 3.129;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
+    public static final double ARM_FRONT_PLACING_VOLTS = 0;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
@@ -26,8 +26,13 @@ public final class BotConstants {
     public static final double ARM_GROUND_VOLTS_RETRACTED = 1.085;
     public static final double ARM_UP_EXTENDABLE_VOLTS = 0.5;
     public static final double ARM_DOWN_EXTENDABLE_VOLTS = 0.3;
+
+    //TODO
+    public static final double ARM_SPECIMEN_PLACEMENT_POSITION = 0;
+
+    public  static final double ARM_SPECIMEN_PICKUP_POSITION = 0;
     public static final double MAX_VOLTAGE = 3.227;
-    public static double armUpKp = 0.0065;
+    public static double armUpKp = 0.001;
     public static double armUpKi = 0.00005;
     public static double armUpKd = 0.0;
     public static final double armBasePower = 0.38;
@@ -41,8 +46,12 @@ public final class BotConstants {
     public static final double LIFT_MIN_VOLTS = 0;
     public static final double LIFT_RETRACTED_VOLTS = 0.3;
 
-    public static final double LIFT_RETRACTED_SIDEWAYS_VOLTS = 3.0;
+    public static final double LIFT_SPECIMEN_PLACEMENT_POSITION = 0;
 
+
+    public static double LIFT_RETRACTED_SIDEWAYS_VOLTS = 3.5;
+
+    public static double LIFT_LOW_BUCKET = 0;
 
     public static final double LIFT_MAX_VOLTS = 0.173 + 4 * MAX_VOLTAGE;
     public static final double LIFT_EXTENDED_VOLTS = 0.173 + 4 * MAX_VOLTAGE;

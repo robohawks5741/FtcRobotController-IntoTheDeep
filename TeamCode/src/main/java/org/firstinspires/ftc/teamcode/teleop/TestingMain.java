@@ -88,6 +88,8 @@ public class TestingMain extends LinearOpMode {
     public double liftPower = 0;
     public double rotatePower = 0;
 
+    public int debug = 0;
+
     //negative numbers will be used for the runout positions
     //0 - Down Somewhat neutral
     //1 - parallel to ground and in (neutral pos)
@@ -228,18 +230,33 @@ public class TestingMain extends LinearOpMode {
                 //go to specimen pickup position
                 pressed = true;
                 armPosition = 2;
+                lift.resetPID();
+                rotate.resetPID();
+                rotateToPosition = BotConstants.ARM_SPECIMEN_PICKUP_POSITION;
+                extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
             }else if(gamepad1.dpad_left && !pressed && armPosition != 3 || gamepad2.dpad_left && !pressed && armPosition != 3){
                 //Go to high specimen placement position
                 pressed = true;
                 armPosition = 3;
+
+                lift.resetPID();
+                rotate.resetPID();
+                rotateToPosition = BotConstants.ARM_SPECIMEN_PLACEMENT_POSITION;
+                extendToPosition = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
             } else if(gamepad1.dpad_up && !pressed && armPosition != 4 || gamepad2.dpad_up && !pressed && armPosition != 4){
                 //Go to low bucket position
                 pressed = true;
                 armPosition = 4;
+
+                lift.resetPID();
+                rotate.resetPID();
+                rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
+                extendToPosition = BotConstants.LIFT_LOW_BUCKET;
             } else if(gamepad1.left_trigger > 0.1 && !pressed && armPosition != 5 || gamepad2.left_trigger > 0.1 && !pressed && armPosition != 5){
                 //Go to high bucket position
                 pressed = true;
                 armPosition = 5;
+
                 lift.resetPID();
                 rotate.resetPID();
                 rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
@@ -248,10 +265,21 @@ public class TestingMain extends LinearOpMode {
                 //Get ready to hang
                 pressed = true;
                 armPosition = 6;
+
+                lift.resetPID();
+                rotate.resetPID();
+                rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
+                extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+
             } else if(gamepad1.a && !pressed && armPosition != 7 || gamepad2.a && !pressed && armPosition != 7){
                 //Pull down on hang
                 pressed = true;
                 armPosition = 7;
+                lift.resetPID();
+                rotate.resetPID();
+                rotateToPosition = BotConstants.ARM_GROUND_VOLTS_RETRACTED;
+                extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                
             } else if (!gamepad1.dpad_down && !(gamepad1.right_trigger > 0.1) && !gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !(gamepad1.left_trigger > 0.1) && !gamepad1.y && !gamepad1.a && !gamepad2.dpad_down && !(gamepad2.right_trigger > 0.1) && !gamepad2.dpad_right && !gamepad2.dpad_left && !gamepad2.dpad_up && !(gamepad2.left_trigger > 0.1) && !gamepad2.y && !gamepad2.a) {
                 pressed = false;
             }
@@ -270,159 +298,6 @@ public class TestingMain extends LinearOpMode {
                 isDown = true;
             }
 
-/*
-            if (gamepad1.dpad_left && !pressed){
-                pressed = true;
-                if(rotateStage > 0) {
-                    rotateStage = -1;
-                    goingToGround = false;
-                    lift.resetPID();
-                }
-                else if(rotateStage == -4) {
-                    goingToGround = false;
-                    rotateStage = -2;
-                    //Pick up and get out
-                    liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-                }
-            } else if(gamepad1.dpad_up && !pressed){
-                //Turn up
-                if(rotateStage <= 0) {
-                    rotateStage = 1;
-                    clawRotate.setPosition(BotConstants.servoPosUp);
-                    lift.resetPID();
-                }
-                else if(rotateStage == 4 && liftTargetVoltage != BotConstants.LIFT_EXTENDED_VOLTS) {
-                    liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
-                    lift.resetPID();
-                }
-            } else if(gamepad1.dpad_down){
-                pressed = true;
-                if(rotateStage > 0) {
-                    rotateStage = -1;
-                    goingToGround = true;
-                    lift.resetPID();
-                } else if(gamepad1.dpad_down){ //Go from middle to down
-                    pressed = true;
-                    if (rotateStage == -2){
-                        goingToGround = true;
-                    }
-                }
-
-                else if(rotateStage == -4){
-                    //Turn down
-                    rotateTargetVoltage = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
-                    rotate.resetPID();
-                    //open/close claw
-                    //openClaw();
-                    liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
-                    lift.resetPID();
-                }
-
-            }else if (!(gamepad1.left_trigger > 0.1) && !(gamepad1.right_trigger > 0.1)) {
-                pressed = false;
-            }
-
-            if (gamepad1.a && !(rotateStage == -4 && goingToGround)) {
-                if(liftTargetVoltage != BotConstants.LIFT_RETRACTED_VOLTS && (rotateStage == -4 || rotateStage == 4)) {
-                    liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
-                    lift.resetPID();
-                }
-            }else if (gamepad1.y && !(rotateStage == -4 && goingToGround)) {
-                if(liftTargetVoltage != BotConstants.LIFT_EXTENDED_VOLTS && (rotateStage == -4 || rotateStage == 4)) {
-                    liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
-                    lift.resetPID();
-                }
-            }
-
-            try {
-                if(rotateStage == 1) { //Pull the arm in
-                    liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-
-                    try {
-                        //checks the arm is retracted enough before lifting
-                        if (liftRealVoltage < BotConstants.LIFT_ROTATABLE_VOLTS) {
-                            rotateStage++;
-                            rotate.resetPID();
-
-                        }
-                    } catch(Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                else if (rotateStage == 2) {
-                    rotateTargetVoltage = BotConstants.ARM_FRONT_PLACING_VOLTS;
-                    if(normalizeRotateVoltage(rotateEncoder.getVoltage()) < BotConstants.ARM_UP_EXTENDABLE_VOLTS) {
-                        rotateStage++;
-                        lift.resetPID();
-                    }
-                }
-                else if(rotateStage == 3) {
-                    liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
-                    rotateStage++;
-                }
-                else if(rotateStage == -1) { //Pull In arm
-                    if (goingToGround){
-                        liftTargetVoltage = BotConstants.LIFT_RETRACTED_VOLTS;
-                    } else {
-                        liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-                    }
-
-                    if (liftRealVoltage < BotConstants.LIFT_ROTATABLE_VOLTS) { //If arm is below threshhold, then rotate the arm
-                        rotateStage--;
-                        rotate.resetPID();
-                    }
-                }
-                else if(rotateStage == -2) { //Rotate the arm this is the end of the sideways pos
-                    rotateTargetVoltage =  goingToGround ? BotConstants.ARM_GROUND_VOLTS_EXTENDED:BotConstants.HORIZONTAL_VOLTS;
-                    if(goingToGround && normalizeRotateVoltage(rotateEncoder.getVoltage()) > BotConstants.ARM_DOWN_EXTENDABLE_VOLTS) { //If the arm is rotated below a certain threshold, then extend again
-                        rotateStage--;
-                        lift.resetPID();
-                    }
-                }
-                else if(rotateStage == -3) { //Extend the arm and rotate the claw down
-                    rotateClawDown();
-                    liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
-                    lift.resetPID();
-                    desiredExtendedness = 1;
-                    rotateStage--;
-                }
-
-
-                else if(rotateStage == -4 && goingToGround) { //Manually Run out when arm is down
-                    if(gamepad1.a && desiredExtendedness < 1) {
-                        desiredExtendedness += .01;
-                    }
-                    if(gamepad1.x && desiredExtendedness > 0) {
-                        desiredExtendedness -= .01;
-                    }
-                    rotateTargetVoltage = (BotConstants.ARM_GROUND_VOLTS_EXTENDED -
-                            BotConstants.ARM_GROUND_VOLTS_RETRACTED) * desiredExtendedness +
-                            BotConstants.ARM_GROUND_VOLTS_EXTENDED;
-                    liftTargetVoltage = (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS) *
-                            desiredExtendedness + BotConstants.ARM_GROUND_VOLTS_EXTENDED;
-
-
-                }
-
-
-
-            } catch(Exception e) {
-                throw new RuntimeException(e);
-            }
-            */
-
-
-            //Update arm pos
-
-
-            //sample no controller code to test individual parts
-            //comment out update functions as needed
-
-
-
-
-
-
             rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
             extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)
                     / (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS);
@@ -433,9 +308,10 @@ public class TestingMain extends LinearOpMode {
             //checks whether the lift encoder voltage has ticked over one way or the other
             checkLiftEncoder();
 
+            handleArm();
             try {
                 //return value is just for telemetry purposes
-                handleArm();
+
               // rotatePower = updateRotate();
                 //liftPower = updateLift();
             } catch(Exception e) {
@@ -444,6 +320,7 @@ public class TestingMain extends LinearOpMode {
 
 
             try {
+                telemetry.addData("debug", debug);
                 telemetry.addData("armPosition", armPosition);
                 telemetry.addData("isIn", isIn);
                 telemetry.addData("isDown", isDown);
@@ -474,15 +351,31 @@ public class TestingMain extends LinearOpMode {
         }
     }
     public void handleArm(){
-        if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 4 && !isIn){ //Sees if it needs to pull in
+        if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 3 && !isIn){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+            debug = 1;
 
-        }else if((isIn && armPosition > 2 && isDown)|| (!isDown && armPosition < 3 && isIn)){ //Waits until it is pulled in yo rotate it
+        }else if((!isDown && armPosition < 3 && isIn) || (isDown && armPosition > 2 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
+            //Waits until it is pulled in yo rotate it
+            //is up, is going down, and is in
+            //is down, is going up and is in
+            //is down, is staying down
+            //is up and is staying up
             //Only activates when it is down and the target is the specimen placement, high bucket, low bucket, and hang position
             rotateTargetVoltage = rotateToPosition;
-        } else {
-            liftTargetVoltage = extendToPosition;
+            debug = 2;
+            if((armPosition < 3 && isDown) || (armPosition > 2) && !isDown){
+
+                //Is going down and is down
+                //Is going up and is up
+
+                liftTargetVoltage = extendToPosition;
+                debug = 3;
+            }
+
         }
+
+        //Update arm and rotate
         updateRotate();
         updateLift();
     }
@@ -543,10 +436,12 @@ public class TestingMain extends LinearOpMode {
     }
     //these constants need to be redetermined
     public void rotateClawUp() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos1);
+        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos2);
+
     }
     public void rotateClawDown() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos2);
+        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos1);
+
     }
 
     public void calculateLiftVoltage() {

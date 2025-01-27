@@ -27,6 +27,8 @@ public final class BotConstants {
     public static final double ARM_UP_EXTENDABLE_VOLTS = 0.5;
     public static final double ARM_DOWN_EXTENDABLE_VOLTS = 0.3;
 
+    public static final double ARM_VERTICAL_VOLTS = 0;
+
     //TODO
     public static final double ARM_SPECIMEN_PLACEMENT_POSITION = 0;
 

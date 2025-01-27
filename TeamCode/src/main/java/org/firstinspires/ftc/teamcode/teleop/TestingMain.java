@@ -407,7 +407,7 @@ public class TestingMain extends LinearOpMode {
     }
     //makes sure voltage is a single continuous scale rather than having a jump from 0 to 3.2
     public double normalizeRotateVoltage(double v) {
-        if(v > BotConstants.mod(BotConstants.ARM_VERTICAL_VOLTS - 0.2, BotConstants.MAX_VOLTAGE)) {
+        if(v > mod(BotConstants.ARM_VERTICAL_VOLTS - 0.2, BotConstants.MAX_VOLTAGE)) {
             v -= BotConstants.MAX_VOLTAGE;
         }
         return v;
@@ -468,4 +468,14 @@ public class TestingMain extends LinearOpMode {
         clawIntake.setPosition(BotConstants.CLAW_CLOSED);
     }
     //TODO: create code for moving claw along ground
+
+    public static double mod(double a, double b) {
+        while(a < 0) {
+            a += b;
+        }
+        while(a > b) {
+            a -= b;
+        }
+        return a;
+    }
 }

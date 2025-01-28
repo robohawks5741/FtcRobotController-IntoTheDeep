@@ -50,7 +50,7 @@ import java.lang.Math;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
+//stopped on angularramplogger
 @Config
 public final class MecanumDrive {
     public static class Params {
@@ -68,11 +68,11 @@ public final class MecanumDrive {
         //138290.5
         //138481.0
         //138360.5
-        public double trackWidthTicks = 0;
+        public double trackWidthTicks = 18227.460198781115;
         // feedforward parameters (in tick units)
         public double kS = 1.9983952786740677;
         public double kV = 0.00009478960668099635;
-        public double kA = 0;
+        public double kA = 0.000008;
         public double kp = 0.00025;
         public double ki = 0.000015;
         public double kd = 0.00005;
@@ -91,9 +91,9 @@ public final class MecanumDrive {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 0.0;
-        public double lateralGain = 0.0;
-        public double headingGain = 0.0; // shared with turn
+        public double axialGain = 1;
+        public double lateralGain = 2.5;
+        public double headingGain = 3.5; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;

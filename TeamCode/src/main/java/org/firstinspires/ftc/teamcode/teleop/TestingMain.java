@@ -397,7 +397,6 @@ public class TestingMain extends LinearOpMode {
         lift.setTargetPosition(liftPos);
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         try {
-            //sign needs to be checked
             liftPower = -(lift.getPIDPower(liftTargetVoltage, liftRealVoltage)
                     + BotConstants.liftBasePower * Math.sin(getAngle()));
             lift.setPower(clamp(liftPower, -1, 1));

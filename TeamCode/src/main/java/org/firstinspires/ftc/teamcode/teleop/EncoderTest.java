@@ -21,18 +21,17 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @TeleOp(name = "EncoderTest")
 
 public class EncoderTest extends LinearOpMode {
-    private AnalogInput encoder;
-    private double pos;
+    private AnalogInput rotateEncoder, liftEncoder;
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-         encoder = hardwareMap.get(AnalogInput.class, "encoder");
+        rotateEncoder = hardwareMap.get(AnalogInput.class, "rotateEncoder");
+        liftEncoder = hardwareMap.get(AnalogInput.class, "liftEncoder");
 
         waitForStart();
         while(opModeIsActive()) {
-            pos = encoder.getVoltage() / 3.3 * 360;
 
-            telemetry.addData("encoder voltage", encoder.getVoltage());
-            telemetry.addData("encoder position(deg)", pos);
+            telemetry.addData("rotate encoder voltage", rotateEncoder.getVoltage());
+            telemetry.addData("encoder position(deg)", liftEncoder.getVoltage());
 
             telemetry.update();
             TelemetryPacket packet = new TelemetryPacket();

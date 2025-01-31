@@ -37,7 +37,7 @@ public final class BotConstants {
     public static double armUpKp = 0.001;
     public static double armUpKi = 0.00005;
     public static double armUpKd = 0.0;
-    public static final double armBasePower = 0.38;
+    public static double armBasePower = -0.18;
     public static final double extendedIncrementalOutput = 16861;
 
     //placeholders--need to be set--voltages are measured from vertical position--some will be greater than
@@ -54,7 +54,7 @@ public final class BotConstants {
 
     public static double LIFT_RETRACTED_SIDEWAYS_VOLTS = LIFT_MIN_VOLTS + 3.5;
 
-    public static double LIFT_LOW_BUCKET = 0;
+    public static double LIFT_LOW_BUCKET = LIFT_MIN_VOLTS + 2.313;
 
     public static final double LIFT_MAX_VOLTS = LIFT_MIN_VOLTS + 0.173 + 4 * MAX_VOLTAGE;
     public static final double LIFT_EXTENDED_VOLTS = LIFT_MIN_VOLTS + 0.173 + 4 * MAX_VOLTAGE;

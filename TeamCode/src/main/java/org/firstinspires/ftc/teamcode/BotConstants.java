@@ -37,7 +37,7 @@ public final class BotConstants {
     public static double armUpKp = 0.001;
     public static double armUpKi = 0.00005;
     public static double armUpKd = 0.0;
-    public static final double armBasePower = 0.38;
+    public static final double armBasePower = 0.0;
     public static final double extendedIncrementalOutput = 16861;
 
     //placeholders--need to be set--voltages are measured from vertical position--some will be greater than

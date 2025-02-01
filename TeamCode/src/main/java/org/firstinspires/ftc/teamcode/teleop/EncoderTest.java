@@ -31,7 +31,7 @@ public class EncoderTest extends LinearOpMode {
         while(opModeIsActive()) {
 
             telemetry.addData("rotate encoder voltage", rotateEncoder.getVoltage());
-            telemetry.addData("encoder position(deg)", liftEncoder.getVoltage());
+            telemetry.addData("lift encoder voltage", liftEncoder.getVoltage());
 
             telemetry.update();
             TelemetryPacket packet = new TelemetryPacket();

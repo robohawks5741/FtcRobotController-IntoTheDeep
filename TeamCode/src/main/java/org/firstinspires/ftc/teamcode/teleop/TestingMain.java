@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import org.firstinspires.ftc.robotcore.external.matrices.MatrixF;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -19,6 +22,10 @@ import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -136,6 +143,9 @@ public class TestingMain extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        //TODO: set these in relation to april tag of interest
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagPipeline(tagsize, fx, fy, cx, cy);
@@ -171,12 +181,19 @@ public class TestingMain extends LinearOpMode {
                     tagOfInterest = tag;
                     tagFound = true;
                     break;
+
                 }
 
                 if(tagFound)
                 {
                     telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
                     tagToTelemetry(tagOfInterest);
+                    Orientation rot = Orientation.getOrientation(tagOfInterest.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+
+                    drive = new MecanumDrive(hardwareMap,
+                            new Pose2d(tagOfInterest.pose.x, tagOfInterest.pose.y, rot.firstAngle));
+                    telemetry.addLine("reset pose at x = " + tagOfInterest.pose.x + ", y = " + tagOfInterest.pose.y
+                    + "heading = " + rot.firstAngle);
                 }
                 else
                 {
@@ -246,6 +263,18 @@ public class TestingMain extends LinearOpMode {
         clawRotate = hardwareMap.get(Servo.class, "clawRotate");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         boolean goingToGround = false;
+        /*
+        Drive motors:
+        leftFront
+        rightFront
+        leftBack
+        rightBack
+        Expansion hub motors:
+        frontRotate
+        backRotate
+        liftBack
+        liftFront
+         */
         try {
             //when tuning, it's easier to take these from mecanumdrive instead b/c botconstants
             //doesn't show up on first dashboard for whatever reason
@@ -264,7 +293,6 @@ public class TestingMain extends LinearOpMode {
             throw new RuntimeException(e);
         }
         encoderMotor = hardwareMap.get(DcMotorEx.class, "backLeft");
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
         rotateEncoder = hardwareMap.get(AnalogInput.class, "rotateEncoder");
         liftEncoder = hardwareMap.get(AnalogInput.class, "liftEncoder");
         startingRotateVoltage = normalizeRotateVoltage(rotateEncoder.getVoltage());
@@ -294,6 +322,7 @@ public class TestingMain extends LinearOpMode {
           the difference between initializing at a position and one revolution past that position
          */
         liftEncoderRotations = 0;
+
         boolean pressed = false;
         if(normalizeRotateVoltage(rotateEncoder.getVoltage()) < 0.4) {
             rotateStage = 4;
@@ -615,10 +644,14 @@ public class TestingMain extends LinearOpMode {
     void tagToTelemetry(AprilTagDetection detection)
     {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z));
+        Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
+
 
 
     }
+
 }

@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@TeleOp(name = "##Main")
+@TeleOp(name = "OldMain")
 public class NewMain extends LinearOpMode {
 
     private DcMotorEx frontRotate, backRotate, frontLift, backLift;

@@ -53,29 +53,26 @@ public class AprilTagPipeline extends OpenCvPipeline
     Scalar green = new Scalar(0,255,0,255);
     Scalar white = new Scalar(255,255,255,255);
 
-    double fx;
-    double fy;
-    double cx;
-    double cy;
+    double fx = 909.781;
+    double fy = 909.781;
+    double cx = 627.946;
+    double cy = 354.307;
 
     // UNITS ARE METERS
-    double tagsize;
-    double tagsizeX;
-    double tagsizeY;
+    double tagsize = 0.1016;
+    double tagsizeX = 0.1016;
+    double tagsizeY = 0.1016;
+
+
+    // UNITS ARE METERS
 
     private float decimation;
     private boolean needToSetDecimation;
     private final Object decimationSync = new Object();
 
-    public AprilTagPipeline(double tagsize, double fx, double fy, double cx, double cy)
+    public AprilTagPipeline()
     {
-        this.tagsize = tagsize;
-        this.tagsizeX = tagsize;
-        this.tagsizeY = tagsize;
-        this.fx = fx;
-        this.fy = fy;
-        this.cx = cx;
-        this.cy = cy;
+
 
         constructMatrix();
 

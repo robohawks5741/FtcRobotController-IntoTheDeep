@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import org.firstinspires.ftc.robotcore.external.matrices.MatrixF;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -33,27 +30,19 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
-@TeleOp(name = "TestingTeleop")
-public class TestingMain extends LinearOpMode {
+@TeleOp(name = "##MAIN")
+public class Main extends LinearOpMode {
 
 
 
     OpenCvCamera camera;
     AprilTagPipeline aprilTagDetectionPipeline;
 
-    final double FEET_PER_METER = 3.28084;
-
     // Lens intrinsics
     // UNITS ARE PIXELS
     // NOTE: this calibration is for the C920 webcam at 800x448.
     // You will need to do your own calibration for other configurations!
-    double fx = 909.781;
-    double fy = 909.781;
-    double cx = 627.946;
-    double cy = 354.307;
 
-    // UNITS ARE METERS
-    double tagsize = 0.1016;
     AprilTagDetection tagOfInterest = null;
 
 
@@ -148,7 +137,7 @@ public class TestingMain extends LinearOpMode {
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        aprilTagDetectionPipeline = new AprilTagPipeline(tagsize, fx, fy, cx, cy);
+        aprilTagDetectionPipeline = new AprilTagPipeline();
 
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
@@ -401,6 +390,7 @@ public class TestingMain extends LinearOpMode {
                 pressed = true;
                 armPosition = 3;
 
+
                 lift.resetPID();
                 rotate.resetPID();
                 rotateToPosition = BotConstants.ARM_SPECIMEN_PLACEMENT_POSITION;
@@ -419,6 +409,9 @@ public class TestingMain extends LinearOpMode {
                 pressed = true;
                 armPosition = 5;
 
+                clawRotate.setPosition(BotConstants.servoPosUp);
+
+
                 lift.resetPID();
                 rotate.resetPID();
                 rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
@@ -436,6 +429,7 @@ public class TestingMain extends LinearOpMode {
             } else if(gamepad1.a && !pressed && armPosition != 7 || gamepad2.a && !pressed && armPosition != 7){
                 //Pull down on hang
                 pressed = true;
+                rotate.setPower(-1);
                 armPosition = 7;
                 lift.resetPID();
                 rotate.resetPID();
@@ -444,6 +438,7 @@ public class TestingMain extends LinearOpMode {
                 
             } else if (!gamepad1.dpad_down && !(gamepad1.right_trigger > 0.1) && !gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !(gamepad1.left_trigger > 0.1) && !gamepad1.y && !gamepad1.a && !gamepad2.dpad_down && !(gamepad2.right_trigger > 0.1) && !gamepad2.dpad_right && !gamepad2.dpad_left && !gamepad2.dpad_up && !(gamepad2.left_trigger > 0.1) && !gamepad2.y && !gamepad2.a) {
                 pressed = false;
+
             }
 
             //Checks to see if the arm is pulled in
@@ -460,7 +455,7 @@ public class TestingMain extends LinearOpMode {
                 isDown = true;
             }
 
-            rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
+      //      rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
             extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)
                     / (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS);
             //solves for target positions in ticks for rotate and lift based on the voltage values
@@ -487,7 +482,7 @@ public class TestingMain extends LinearOpMode {
                 telemetry.addData("isIn", isIn);
                 telemetry.addData("isDown", isDown);
                 telemetry.addData("pressed", pressed);
-                telemetry.addData("target", liftTargetVoltage);
+                telemetry.addData("target", rotateTargetVoltage);
                 telemetry.addData("Rotate Stage", rotateStage);
                 telemetry.addData("angle", getAngle());
                 telemetry.addData("rotate power", rotatePower);

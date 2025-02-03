@@ -4,7 +4,7 @@ public final class TagConstants {
     public final class TagPositions{
 
         //Tag positions are from Blue side up with 0 degrees pointing right
-        public final Pose TAG11 = new Pose(-70.72081, 47.125, 5.29);
+        public static final Pose TAG11 = new Pose(-70.72081, 47.125, 5.29);
         public final Pose TAG12 = new Pose(0, 70.616, 5.29);
         public final Pose TAG13 = new Pose(70.61631, 47.125, 5.29);
 

@@ -279,6 +279,15 @@ public class Main extends LinearOpMode {
                 rotateClawDown();
             } else if (gamepad1.right_trigger > 0.1 && !pressed && armPosition != 1 || gamepad2.right_trigger > 0.1 && !pressed && armPosition != 1){
                 //Place based on position and rotate to the neutral pos
+
+
+                if (armPosition == 3){//Specemin placement position
+                    clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_PLACEMENT_POS);
+                } else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
+                    openClaw();
+                } else if (armPosition == 0 || armPosition == 2){ //Down pos or specimen pickup pos
+                    closeClaw();
+                }
                 pressed = true;
                 armPosition = 1;
 
@@ -302,8 +311,8 @@ public class Main extends LinearOpMode {
 
                 lift.resetPID();
                 rotate.resetPID();
-                rotateToPosition = BotConstants.ARM_SPECIMEN_PLACEMENT_POSITION;
-                extendToPosition = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
+                rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
+                extendToPosition = BotConstants.LIFT_MIN_VOLTS;
             } else if(gamepad1.dpad_up && !pressed && armPosition != 4 || gamepad2.dpad_up && !pressed && armPosition != 4){
                 //Go to low bucket position
                 pressed = true;
@@ -318,7 +327,7 @@ public class Main extends LinearOpMode {
                 pressed = true;
                 armPosition = 5;
 
-                clawRotate.setPosition(BotConstants.servoPosUp);
+                clawRotate.setPosition(BotConstants.SERVO_PLACEMENT_POS);
 
 
                 lift.resetPID();
@@ -505,11 +514,11 @@ public class Main extends LinearOpMode {
     }
     //these constants need to be redetermined
     public void rotateClawUp() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos2);
+        clawRotate.setPosition(BotConstants.SERVO_TEST_POS);
 
     }
     public void rotateClawDown() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos1);
+        clawRotate.setPosition(0);
 
     }
 

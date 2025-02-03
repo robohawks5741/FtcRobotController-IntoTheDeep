@@ -12,10 +12,8 @@ public final class BotConstants {
     public static final double RADS_PER_VOLT  = Math.PI * 2 / 3.22;
     public static final double VOLTS_PER_TICK = RADS_PER_TICK / RADS_PER_VOLT;
     public static final double HORIZONTAL_VOLTS = 0.858;
-    public static final double CLAW_OPEN = 0;
-    public static final double CLAW_CLOSED = 0.25;
-    public static final double servoPosInit = 0.05;
-    public static final double servoPosUp = 0.25;
+
+
     public static final double getServoPosPlaceRetracted = 0.4;
     public static final double servoPosPlaceExtended = 0.5;
     public static final double MAX_VOLTAGE = 3.227;
@@ -97,4 +95,15 @@ public final class BotConstants {
     public static final int ARM_FRONT_PLACING_TICKS = 540;
     public static final int ARM_GROUND_TICKS = 0;
 
+    //Setvo
+    public static double SERVO_TEST_POS = 0;
+
+    public static final double SERVO_PICKUP_POS = 0;
+
+    public static final double SERVO_INNIT_POS = 0;
+    public static final double SERVO_PLACEMENT_POS = 0.5;
+
+    public static final double SERVO_SPECIMEN_PLACEMENT_POS = 0;
+    public static final double CLAW_OPEN = 0;
+    public static final double CLAW_CLOSED = 0.25;
 }

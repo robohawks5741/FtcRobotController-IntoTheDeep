@@ -374,7 +374,7 @@ public class Main extends LinearOpMode {
             //checks whether the lift encoder voltage has ticked over one way or the other
             checkLiftEncoder();
 
-        //    handleArm();
+            handleArm();
             try {
                 if (tagFound){
                     telemetry.addLine(String.format("\nDetected tag ID=%d", tagOfInterest.id));

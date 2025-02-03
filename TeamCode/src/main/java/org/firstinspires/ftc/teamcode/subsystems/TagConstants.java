@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 public final class TagConstants {
-    public final class TagPositions{
+    public static final class TagPositions{
 
         //Tag positions are from Blue side up with 0 degrees pointing right
         public final Pose TAG11 = new Pose(-70.72081, 47.125, 5.29);
@@ -14,19 +14,29 @@ public final class TagConstants {
 
 
     }
+    public static TagPositions TAG_POSITIONS = new TagPositions();
 
-     public class Pose{
+     public static class Pose{
         double x;
         double y;
         double z;
         public Pose(double x,double y,double z){
             this.x = x;
-            this.y= y;
+            this.y = y;
             this.z = z;
         }
 
         public Pose Diff(Pose other){
             return (new Pose(other.x-x, other.y-y, other.z-z));
+        }
+        public double x() {
+           return x;
+        }
+        public double y() {
+            return y;
+        }
+        public double z() {
+            return z;
         }
     }
 }

@@ -22,7 +22,7 @@ public final class BotConstants {
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
-    public static double ARM_GROUND_VOLTS_EXTENDED = (0.968 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+    public static double ARM_GROUND_VOLTS_EXTENDED = (0.88 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
     public static final double ARM_GROUND_VOLTS_RETRACTED = (1.098 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
     public static final double ARM_UP_EXTENDABLE_VOLTS = (0.513 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
     public static final double ARM_DOWN_EXTENDABLE_VOLTS = (0.313 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
@@ -37,14 +37,14 @@ public final class BotConstants {
     public static double armUpKp = 0.0015;
     public static double armUpKi = 0.00005;
     public static double armUpKd = 0.0;
-    public static double armBasePower = -0.18;
+    public static double armBasePower = 0;
     public static final double extendedIncrementalOutput = 16861;
 
     //placeholders--need to be set--voltages are measured from vertical position--some will be greater than
     //max voltage output because of the encoder making multiple full rotations
 
     //not too sure about these values
-    public static final double LIFT_MIN_VOLTS = 2.264;
+    public static final double LIFT_MIN_VOLTS = 1.936;
     public static final double LIFT_ROTATABLE_VOLTS = LIFT_MIN_VOLTS + 3 + MAX_VOLTAGE;
 
     public static final double LIFT_RETRACTED_VOLTS = LIFT_MIN_VOLTS + .3;
@@ -106,6 +106,6 @@ public final class BotConstants {
     public static  final double SERVO_PARALLEL_POS = 0.4;
 
     public static final double SERVO_SPECIMEN_PLACEMENT_POS = 0;
-    public static final double CLAW_OPEN = 0;
-    public static final double CLAW_CLOSED = 0.25;
+    public static final double CLAW_OPEN = 0.25;
+    public static final double CLAW_CLOSED = 0;
 }

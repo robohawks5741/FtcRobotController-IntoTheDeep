@@ -278,7 +278,7 @@ public class Main extends LinearOpMode {
                 rotate.resetPID();
                 rotateToPosition = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
                 extendToPosition = BotConstants.LIFT_EXTENDED_VOLTS;
-                rotateClawDown();
+                clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
             } else if (gamepad1.right_trigger > 0.1 && !pressed && armPosition != 1 || gamepad2.right_trigger > 0.1 && !pressed && armPosition != 1){
                 //Place based on position and rotate to the neutral pos
 
@@ -322,6 +322,9 @@ public class Main extends LinearOpMode {
                 //Go to low bucket position
                 pressed = true;
                 armPosition = 4;
+
+                clawRotate.setPosition(BotConstants.SERVO_PLACEMENT_POS);
+
 
                 lift.resetPID();
                 rotate.resetPID();

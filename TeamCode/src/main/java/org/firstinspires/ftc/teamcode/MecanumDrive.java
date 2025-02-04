@@ -73,10 +73,6 @@ public final class MecanumDrive {
         public double kS = 1.9983952786740677;
         public double kV = 0.00009478960668099635;
         public double kA = 0.000008;
-        public double kp = 0.00025;
-        public double ki = 0.000015;
-        public double kd = 0.00005;
-        public double basePower = 0;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;

@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -25,9 +29,16 @@ import java.util.concurrent.Executors;
 
 public class AutoSuper extends Robot {
 
+    protected Pose2d beginPose = new Pose2d(0.0, 0.0, 0.0);
+
     protected void Init(){
         lift.setPower(0.001);
         closeClaw();
         clawRotate.setPosition(BotConstants.SERVO_INIT_POS);
     }
+
+
+
+
 }
+

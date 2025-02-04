@@ -112,7 +112,7 @@ public class NewMain extends LinearOpMode {
         double rotatePower = 0;
         double liftPower = 0;
 
-        clawRotate.setPosition(BotConstants.SERVO_INNIT_POS);
+        clawRotate.setPosition(BotConstants.SERVO_INIT_POS);
         openClaw();
         lift.setPower(0.001);
         waitForStart();

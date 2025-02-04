@@ -5,7 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public final class BotConstants {
 
-    public static final double ARM_BACK_VOLTS = 0;
+    public static final double ARM_BACK_VOLTS = 0.0;
     public static final double horizontalTicks = 135;
     public static final double verticalTicks = 695;
     public static final double RADS_PER_TICK = Math.PI / 2 / (verticalTicks - horizontalTicks); //=0.002805
@@ -18,7 +18,7 @@ public final class BotConstants {
     public static final double servoPosPlaceExtended = 0.5;
     public static final double MAX_VOLTAGE = 3.227;
 
-    public static final double ARM_FRONT_PLACING_VOLTS = (0.013 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
+    public static final double ARM_FRONT_PLACING_VOLTS = (0.03 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
@@ -36,8 +36,8 @@ public final class BotConstants {
 
     public static double armUpKp = 0.0015;
     public static double armUpKi = 0.00005;
-    public static double armUpKd = 0.0;
-    public static double armBasePower = 0;
+    public static double armUpKd = 0.0002;
+    public static double armBasePower = 0.1;
     public static final double extendedIncrementalOutput = 16861;
 
     //placeholders--need to be set--voltages are measured from vertical position--some will be greater than
@@ -63,7 +63,7 @@ public final class BotConstants {
 
     public static double liftKp = 0.001;
     public static double liftKi = 0.0005;
-    public static double liftKd = 0.00005;
+    public static double liftKd = 0.0002;
 
     //public double kp = 0.00025;
     //public double ki = 0.000015;
@@ -100,7 +100,7 @@ public final class BotConstants {
 
     public static final double SERVO_PICKUP_POS = 0;
 
-    public static final double SERVO_INNIT_POS = 0.8;
+    public static final double SERVO_INIT_POS = 0.8;
     public static final double SERVO_PLACEMENT_POS = 0.5;
 
     public static  final double SERVO_PARALLEL_POS = 0.4;

@@ -14,9 +14,9 @@ public final class BotConstants {
     public static final double HORIZONTAL_VOLTS = 0.858;
 
 
-    public static final double getServoPosPlaceRetracted = 0.4;
-    public static final double servoPosPlaceExtended = 0.5;
     public static final double MAX_VOLTAGE = 3.227;
+
+
 
     public static final double ARM_FRONT_PLACING_VOLTS = (0.03 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
@@ -79,14 +79,9 @@ public final class BotConstants {
     public static double armDownKd = 0;
 
 
-    public static double armDownHangKp = 0.001; //0.0003
-    public static double armDownHangKi = 0.0001;
-    public static double armDownHangKd = 0.0001;
     public static final double frictionOffsetPower = 0.05;
     public static final int LIFT_RETRACTED_TICKS = 0;
 
-    public static final int LIFT_SIDEWAYS_TICKS = -150;
-    public static final int LIFT_ROTATABLE_TICKS = -544;
     public static final int LIFT_EXTENDED_TICKS = -2135;
 
 
@@ -95,7 +90,7 @@ public final class BotConstants {
     public static final int ARM_FRONT_PLACING_TICKS = 540;
     public static final int ARM_GROUND_TICKS = 0;
 
-    //Setvo
+    //Wrist Servo -----------------------------------------------------
     public static double SERVO_TEST_POS = 0;
 
     public static final double SERVO_PICKUP_POS = 0;
@@ -106,6 +101,8 @@ public final class BotConstants {
     public static  final double SERVO_PARALLEL_POS = 0.4;
 
     public static final double SERVO_SPECIMEN_PLACEMENT_POS = 0;
+
+    //Claw-
     public static final double CLAW_OPEN = 0.25;
     public static final double CLAW_CLOSED = 0;
 }

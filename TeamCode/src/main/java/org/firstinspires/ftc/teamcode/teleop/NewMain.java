@@ -112,7 +112,7 @@ public class NewMain extends LinearOpMode {
         double rotatePower = 0;
         double liftPower = 0;
 
-        clawRotate.setPosition(BotConstants.servoPosInit);
+        clawRotate.setPosition(BotConstants.SERVO_INNIT_POS);
         openClaw();
         lift.setPower(0.001);
         waitForStart();
@@ -143,7 +143,7 @@ public class NewMain extends LinearOpMode {
                 //Turn up
                 if(rotateStage <= 0) {
                     rotateStage = 1;
-                    clawRotate.setPosition(BotConstants.servoPosUp);
+                    clawRotate.setPosition(BotConstants.SERVO_PLACEMENT_POS);
                     lift.resetPID();
                 }
                 else if(rotateStage == 4 && liftTargetVoltage != BotConstants.LIFT_EXTENDED_VOLTS) {

@@ -220,7 +220,7 @@ public class Main extends LinearOpMode {
 
         boolean pressed = false;
 
-        clawRotate.setPosition(BotConstants.servoPosInit);
+        clawRotate.setPosition(BotConstants.SERVO_INNIT_POS);
         openClaw();
         lift.setPower(0.001);
 
@@ -281,7 +281,7 @@ public class Main extends LinearOpMode {
                 //Place based on position and rotate to the neutral pos
 
 
-                if (armPosition == 3){//Specemin placement position
+                if (armPosition == 3){//Specimen placement position
                     clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_PLACEMENT_POS);
                 } else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
                     openClaw();
@@ -295,6 +295,9 @@ public class Main extends LinearOpMode {
                 rotate.resetPID();
                 rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
+
+
             } else if(gamepad1.dpad_right && !pressed && armPosition != 2 || gamepad2.dpad_right && !pressed && armPosition != 2){
                 //go to specimen pickup position
                 pressed = true;

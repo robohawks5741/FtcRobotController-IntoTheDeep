@@ -22,7 +22,7 @@ public final class BotConstants {
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
-    public static final double ARM_GROUND_VOLTS_EXTENDED = (0.968 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+    public static double ARM_GROUND_VOLTS_EXTENDED = (0.968 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
     public static final double ARM_GROUND_VOLTS_RETRACTED = (1.098 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
     public static final double ARM_UP_EXTENDABLE_VOLTS = (0.513 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
     public static final double ARM_DOWN_EXTENDABLE_VOLTS = (0.313 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
@@ -100,8 +100,10 @@ public final class BotConstants {
 
     public static final double SERVO_PICKUP_POS = 0;
 
-    public static final double SERVO_INNIT_POS = 0;
+    public static final double SERVO_INNIT_POS = 0.8;
     public static final double SERVO_PLACEMENT_POS = 0.5;
+
+    public static  final double SERVO_PARALLEL_POS = 0.4;
 
     public static final double SERVO_SPECIMEN_PLACEMENT_POS = 0;
     public static final double CLAW_OPEN = 0;

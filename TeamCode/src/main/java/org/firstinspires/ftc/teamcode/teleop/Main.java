@@ -386,10 +386,50 @@ public class Main extends LinearOpMode {
             handleArm();
             try {
                 if (tagFound){
+                    double botX = -tagOfInterest.pose.x;
+                    double botY = -tagOfInterest.pose.y;
+                    double botZ = -tagOfInterest.pose.z;
+                    switch(tagOfInterest.id) {
+                        case 11:
+                            botX += TagConstants.TAG_POSITIONS.TAG11.x();
+                            botY += TagConstants.TAG_POSITIONS.TAG11.y();
+                            botZ += TagConstants.TAG_POSITIONS.TAG11.z();
+                            break;
+                        case 12:
+                            botX += TagConstants.TAG_POSITIONS.TAG12.x();
+                            botY += TagConstants.TAG_POSITIONS.TAG12.y();
+                            botZ += TagConstants.TAG_POSITIONS.TAG12.z();
+                            break;
+                        case 13:
+                            botX += TagConstants.TAG_POSITIONS.TAG13.x();
+                            botY += TagConstants.TAG_POSITIONS.TAG13.y();
+                            botZ += TagConstants.TAG_POSITIONS.TAG13.z();
+                            break;
+                        case 14:
+                            botX += TagConstants.TAG_POSITIONS.TAG14.x();
+                            botY += TagConstants.TAG_POSITIONS.TAG14.y();
+                            botZ += TagConstants.TAG_POSITIONS.TAG14.z();
+                            break;
+                        case 15:
+                            botX += TagConstants.TAG_POSITIONS.TAG15.x();
+                            botY += TagConstants.TAG_POSITIONS.TAG15.y();
+                            botZ += TagConstants.TAG_POSITIONS.TAG15.z();
+                            break;
+                        case 16:
+                            botX += TagConstants.TAG_POSITIONS.TAG16.x();
+                            botY += TagConstants.TAG_POSITIONS.TAG16.y();
+                            botZ += TagConstants.TAG_POSITIONS.TAG16.z();
+                            break;
+
+
+                    }
                     telemetry.addLine(String.format("\nDetected tag ID=%d", tagOfInterest.id));
                     telemetry.addLine(String.format("Translation X: %.2f feet", tagOfInterest.pose.x*3.28084));
                     telemetry.addLine(String.format("Translation Y: %.2f feet", tagOfInterest.pose.y*3.28084));
                     telemetry.addLine(String.format("Translation Z: %.2f feet", tagOfInterest.pose.z*3.28084));
+                    telemetry.addLine(String.format("Estimated X: ", botX));
+                    telemetry.addLine(String.format("Estimated Y: ", botY));
+                    telemetry.addLine(String.format("Estimated Z: ", botZ));
 
 
                     Orientation rot = Orientation.getOrientation(tagOfInterest.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);

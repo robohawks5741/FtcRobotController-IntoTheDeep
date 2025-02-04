@@ -76,9 +76,6 @@ public final class MecanumDrive {
         public double kp = 0.00025;
         public double ki = 0.000015;
         public double kd = 0.00005;
-        public double servoPos1 = 0.05;
-        public double servoPosUp = 0.25;
-        public double servoPos2 = 0.5;
         public double basePower = 0;
 
         // path profile parameters (in inches)

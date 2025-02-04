@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import org.firstinspires.ftc.robotcore.external.matrices.MatrixF;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -26,38 +23,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.teamcode.subsystems.TagConstants;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.firstinspires.ftc.teamcode.subsystems.TagConstants;
 
-@TeleOp(name = "TestingTeleop")
-public class TestingMain extends LinearOpMode {
-
-
-
-    OpenCvCamera camera;
-    AprilTagPipeline aprilTagDetectionPipeline;
-
-    final double FEET_PER_METER = 3.28084;
-
-    // Lens intrinsics
-    // UNITS ARE PIXELS
-    // NOTE: this calibration is for the C920 webcam at 800x448.
-    // You will need to do your own calibration for other configurations!
-    double fx = 909.781;
-    double fy = 909.781;
-    double cx = 627.946;
-    double cy = 354.307;
-
-    // UNITS ARE METERS
-    double tagsize = 0.1016;
-    AprilTagDetection tagOfInterest = null;
-
-
+@TeleOp(name = "##MAIN")
+public class Main extends LinearOpMode {
 
 
     /*
@@ -93,6 +70,11 @@ public class TestingMain extends LinearOpMode {
     * - Have the placement check the arm position integer and place accordingly
     * */
 
+    OpenCvCamera camera;
+    AprilTagPipeline aprilTagDetectionPipeline;
+    AprilTagDetection tagOfInterest = null;
+    boolean tagFound = false;
+
     private DcMotorEx frontRotate, backRotate, frontLift, backLift;
     private DualMotor rotate;
     private DualMotor lift;
@@ -111,10 +93,7 @@ public class TestingMain extends LinearOpMode {
     private double liftRealVoltage;
     private DcMotorEx encoderMotor;
     private double extendedness;
-
-
     private int liftEncoderRotations;
-
     private double rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
     private double extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
 
@@ -128,6 +107,7 @@ public class TestingMain extends LinearOpMode {
     public double rotatePower = 0;
 
     public int debug = 0;
+    public MecanumDrive drive;
 
     //negative numbers will be used for the runout positions
     //0 - Down Somewhat neutral
@@ -139,123 +119,22 @@ public class TestingMain extends LinearOpMode {
     //6 - hang ready position
     //7 - hang down position
 
-    private int rotateStage;
+
 
 
     @Override
     public void runOpMode() throws InterruptedException {
         //TODO: set these in relation to april tag of interest
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
-
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        aprilTagDetectionPipeline = new AprilTagPipeline(tagsize, fx, fy, cx, cy);
-
-        camera.setPipeline(aprilTagDetectionPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+         drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+        /*  while (!isStarted() && !isStopRequested()) //Init loop
         {
-            @Override
-            public void onOpened()
-            {
-                camera.startStreaming(1280,800, OpenCvCameraRotation.UPRIGHT);
-            }
 
-            @Override
-            public void onError(int errorCode)
-            {
-
-            }
-        });
-
-        telemetry.setMsTransmissionInterval(50);
-
-        while (!isStarted() && !isStopRequested())
-        {
-            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-
-            if(currentDetections.size() != 0)
-            {
-                boolean tagFound = false;
-
-                for(AprilTagDetection tag : currentDetections)
-                {
-                    tagOfInterest = tag;
-                    tagFound = true;
-                    break;
-
-                }
-
-                if(tagFound)
-                {
-                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-                    tagToTelemetry(tagOfInterest);
-                    Orientation rot = Orientation.getOrientation(tagOfInterest.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
-
-                    drive = new MecanumDrive(hardwareMap,
-                            new Pose2d(tagOfInterest.pose.x, tagOfInterest.pose.y, rot.firstAngle));
-                    telemetry.addLine("reset pose at x = " + tagOfInterest.pose.x + ", y = " + tagOfInterest.pose.y
-                    + "heading = " + rot.firstAngle);
-                }
-                else
-                {
-                    telemetry.addLine("Don't see tag of interest :(");
-
-                    if(tagOfInterest == null)
-                    {
-                        telemetry.addLine("(The tag has never been seen)");
-                    }
-                    else
-                    {
-                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                        tagToTelemetry(tagOfInterest);
-                    }
-                }
-
-            }
-            else
-            {
-                telemetry.addLine("Don't see tag of interest :(");
-
-                if(tagOfInterest == null)
-                {
-                    telemetry.addLine("(The tag has never been seen)");
-                }
-                else
-                {
-                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                    tagToTelemetry(tagOfInterest);
-                }
-
-            }
-
-            telemetry.update();
-            sleep(20);
-
-
-
-        }
+        }*/
 
         /*
          * The START command just came in: now work off the latest snapshot acquired
          * during the init loop.
          */
-
-        /* Update the telemetry */
-        if(tagOfInterest != null)
-        {
-            telemetry.addLine("Tag snapshot:\n");
-            tagToTelemetry(tagOfInterest);
-            telemetry.update();
-        }
-        else
-        {
-            telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
-            telemetry.update();
-        }
-
-
-
-
         frontRotate = hardwareMap.get(DcMotorEx.class, "frontRotate");
         backRotate = hardwareMap.get(DcMotorEx.class, "backRotate");
         frontLift = hardwareMap.get(DcMotorEx.class, "liftFront");
@@ -263,7 +142,11 @@ public class TestingMain extends LinearOpMode {
         clawIntake = hardwareMap.get(Servo.class, "clawIntake");
         clawRotate = hardwareMap.get(Servo.class, "clawRotate");
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        boolean goingToGround = false;
+
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        aprilTagDetectionPipeline = new AprilTagPipeline();
         /*
         Drive motors:
         leftFront
@@ -277,9 +160,6 @@ public class TestingMain extends LinearOpMode {
         liftFront
          */
         try {
-            //when tuning, it's easier to take these from mecanumdrive instead b/c botconstants
-            //doesn't show up on first dashboard for whatever reason
-
             //dividing by voltspertick because all the inputs are in units of volts, so the
             //pid constants need to be in units of inverse volts rather than inverse ticks
             rotate = new DualMotor(backRotate, frontRotate,
@@ -313,9 +193,6 @@ public class TestingMain extends LinearOpMode {
         liftPos = BotConstants.LIFT_RETRACTED_TICKS;
         encoderMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         encoderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-
-
         /*Since the encoder makes multiple full revolutions in the lift extension, it's necessary to
           track how many rotations it's made so far to know the actual position for PID. This requires that
           the encoder is within the closest rotation to retracted on initialization. I don't think there's
@@ -324,18 +201,38 @@ public class TestingMain extends LinearOpMode {
          */
         liftEncoderRotations = 0;
 
-        boolean pressed = false;
-        if(normalizeRotateVoltage(rotateEncoder.getVoltage()) < 0.4) {
-            rotateStage = 4;
-        }
-        else {
-            rotateStage = -4;
-        }
+        camera.setPipeline(aprilTagDetectionPipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(1280,800, OpenCvCameraRotation.UPSIDE_DOWN);
+                debug = 1;
+            }
 
+            @Override
+            public void onError(int errorCode)
+            {
+
+            }});
+
+        telemetry.setMsTransmissionInterval(50);
+
+        boolean pressed = false;
 
         clawRotate.setPosition(BotConstants.servoPosInit);
         openClaw();
         lift.setPower(0.001);
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                // Background processing
+                cameraUpdate();
+                sleep(100);
+            }
+        });
+
         waitForStart(); //-------------------------------------------------------------------------------------------------------
         while(opModeIsActive()) {
             drive.setDrivePowers(new PoseVelocity2d(
@@ -382,6 +279,15 @@ public class TestingMain extends LinearOpMode {
                 rotateClawDown();
             } else if (gamepad1.right_trigger > 0.1 && !pressed && armPosition != 1 || gamepad2.right_trigger > 0.1 && !pressed && armPosition != 1){
                 //Place based on position and rotate to the neutral pos
+
+
+                if (armPosition == 3){//Specemin placement position
+                    clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_PLACEMENT_POS);
+                } else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
+                    openClaw();
+                } else if (armPosition == 0 || armPosition == 2){ //Down pos or specimen pickup pos
+                    closeClaw();
+                }
                 pressed = true;
                 armPosition = 1;
 
@@ -402,10 +308,11 @@ public class TestingMain extends LinearOpMode {
                 pressed = true;
                 armPosition = 3;
 
+
                 lift.resetPID();
                 rotate.resetPID();
-                rotateToPosition = BotConstants.ARM_SPECIMEN_PLACEMENT_POSITION;
-                extendToPosition = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
+                rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
+                extendToPosition = BotConstants.LIFT_MIN_VOLTS;
             } else if(gamepad1.dpad_up && !pressed && armPosition != 4 || gamepad2.dpad_up && !pressed && armPosition != 4){
                 //Go to low bucket position
                 pressed = true;
@@ -419,6 +326,9 @@ public class TestingMain extends LinearOpMode {
                 //Go to high bucket position
                 pressed = true;
                 armPosition = 5;
+
+                clawRotate.setPosition(BotConstants.SERVO_PLACEMENT_POS);
+
 
                 lift.resetPID();
                 rotate.resetPID();
@@ -437,14 +347,16 @@ public class TestingMain extends LinearOpMode {
             } else if(gamepad1.a && !pressed && armPosition != 7 || gamepad2.a && !pressed && armPosition != 7){
                 //Pull down on hang
                 pressed = true;
+                rotate.setPower(-1);
                 armPosition = 7;
                 lift.resetPID();
                 rotate.resetPID();
                 rotateToPosition = BotConstants.ARM_GROUND_VOLTS_RETRACTED;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-                
+
             } else if (!gamepad1.dpad_down && !(gamepad1.right_trigger > 0.1) && !gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !(gamepad1.left_trigger > 0.1) && !gamepad1.y && !gamepad1.a && !gamepad2.dpad_down && !(gamepad2.right_trigger > 0.1) && !gamepad2.dpad_right && !gamepad2.dpad_left && !gamepad2.dpad_up && !(gamepad2.left_trigger > 0.1) && !gamepad2.y && !gamepad2.a) {
                 pressed = false;
+
             }
 
             //Checks to see if the arm is pulled in
@@ -461,7 +373,7 @@ public class TestingMain extends LinearOpMode {
                 isDown = true;
             }
 
-            rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
+      //      rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
             extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)
                     / (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS);
             //solves for target positions in ticks for rotate and lift based on the voltage values
@@ -473,23 +385,27 @@ public class TestingMain extends LinearOpMode {
 
             handleArm();
             try {
-                //return value is just for telemetry purposes
-
-              // rotatePower = updateRotate();
-                //liftPower = updateLift();
-            } catch(Exception e) {
-                throw new RuntimeException(e);
-            }
+                if (tagFound){
+                    telemetry.addLine(String.format("\nDetected tag ID=%d", tagOfInterest.id));
+                    telemetry.addLine(String.format("Translation X: %.2f feet", tagOfInterest.pose.x*3.28084));
+                    telemetry.addLine(String.format("Translation Y: %.2f feet", tagOfInterest.pose.y*3.28084));
+                    telemetry.addLine(String.format("Translation Z: %.2f feet", tagOfInterest.pose.z*3.28084));
 
 
-            try {
+                    Orientation rot = Orientation.getOrientation(tagOfInterest.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+                    telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
+
+
+
+                }
+
+
                 telemetry.addData("debug", debug);
                 telemetry.addData("armPosition", armPosition);
                 telemetry.addData("isIn", isIn);
                 telemetry.addData("isDown", isDown);
                 telemetry.addData("pressed", pressed);
-                telemetry.addData("target", liftTargetVoltage);
-                telemetry.addData("Rotate Stage", rotateStage);
+                telemetry.addData("target", rotateTargetVoltage);
                 telemetry.addData("angle", getAngle());
                 telemetry.addData("rotate power", rotatePower);
                 telemetry.addData("lift power", liftPower);
@@ -512,11 +428,13 @@ public class TestingMain extends LinearOpMode {
             Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
             FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }
+
+        executor.shutdownNow();
+
     }
     public void handleArm(){
         if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 3 && !isIn){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-            debug = 1;
 
         }else if((!isDown && armPosition < 3 && isIn) || (isDown && armPosition > 2 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
             //Waits until it is pulled in yo rotate it
@@ -526,14 +444,12 @@ public class TestingMain extends LinearOpMode {
             //is up and is staying up
             //Only activates when it is down and the target is the specimen placement, high bucket, low bucket, and hang position
             rotateTargetVoltage = rotateToPosition;
-            debug = 2;
             if((armPosition < 3 && isDown) || (armPosition > 2) && !isDown){
 
                 //Is going down and is down
                 //Is going up and is up
 
                 liftTargetVoltage = extendToPosition;
-                debug = 3;
             }
 
         }
@@ -598,11 +514,11 @@ public class TestingMain extends LinearOpMode {
     }
     //these constants need to be redetermined
     public void rotateClawUp() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos2);
+        clawRotate.setPosition(BotConstants.SERVO_TEST_POS);
 
     }
     public void rotateClawDown() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos1);
+        clawRotate.setPosition(0);
 
     }
 
@@ -641,63 +557,20 @@ public class TestingMain extends LinearOpMode {
         return a;
     }
 
+    void cameraUpdate(){
 
-    void tagToTelemetry(AprilTagDetection detection)
-    {
-        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-        double botX = -detection.pose.x;
-        double botY = -detection.pose.y;
-        double botZ = -detection.pose.z;
+        ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
-        switch(detection.id) {
-            case(11):
-                botX += TagConstants.TAG_POSITIONS.TAG11.x();
-                botY += TagConstants.TAG_POSITIONS.TAG11.y();
-                botZ += TagConstants.TAG_POSITIONS.TAG11.z();
+        if(currentDetections.size() != 0)
+        {
+            for(AprilTagDetection tag : currentDetections)
+            {
+                tagOfInterest = tag;
+                tagFound = true;
                 break;
 
-            case(12):
-                botX += TagConstants.TAG_POSITIONS.TAG12.x();
-                botY += TagConstants.TAG_POSITIONS.TAG12.y();
-                botZ += TagConstants.TAG_POSITIONS.TAG12.z();
-                break;
-
-            case(13):
-                botX += TagConstants.TAG_POSITIONS.TAG13.x();
-                botY += TagConstants.TAG_POSITIONS.TAG13.y();
-                botZ += TagConstants.TAG_POSITIONS.TAG13.z();
-                break;
-
-            case(14):
-                botX += TagConstants.TAG_POSITIONS.TAG14.x();
-                botY += TagConstants.TAG_POSITIONS.TAG14.y();
-                botZ += TagConstants.TAG_POSITIONS.TAG14.z();
-                break;
-
-            case(15):
-                botX += TagConstants.TAG_POSITIONS.TAG15.x();
-                botY += TagConstants.TAG_POSITIONS.TAG15.y();
-                botZ += TagConstants.TAG_POSITIONS.TAG15.z();
-                break;
-
-            case(16):
-                botX += TagConstants.TAG_POSITIONS.TAG16.x();
-                botY += TagConstants.TAG_POSITIONS.TAG16.y();
-                botZ += TagConstants.TAG_POSITIONS.TAG16.z();
-                break;
-        }
-
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z));
-        telemetry.addLine(String.format("Estimated X:", botX));
-        telemetry.addLine(String.format("Estimated Y:", botY));
-        telemetry.addLine(String.format("Estimated Z:", botZ));
-        Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
-        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
-
-
-
+            }
     }
+}
 
 }

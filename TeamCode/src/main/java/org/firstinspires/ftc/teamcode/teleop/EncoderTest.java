@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.BotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 
 import org.firstinspires.ftc.teamcode.Drawing;
@@ -32,6 +33,9 @@ public class EncoderTest extends LinearOpMode {
 
             telemetry.addData("rotate encoder voltage", rotateEncoder.getVoltage());
             telemetry.addData("lift encoder voltage", liftEncoder.getVoltage());
+
+            telemetry.addData("rotate relative voltage", (rotateEncoder.getVoltage()- BotConstants.ARM_BACK_VOLTS) % BotConstants.MAX_VOLTAGE);
+            telemetry.addData("lift relative voltage", (liftEncoder.getVoltage()-BotConstants.LIFT_MIN_VOLTS) % BotConstants.MAX_VOLTAGE);
 
             telemetry.update();
             TelemetryPacket packet = new TelemetryPacket();

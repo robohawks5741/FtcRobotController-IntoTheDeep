@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@TeleOp(name = "##Main")
+@TeleOp(name = "OldMain")
 public class NewMain extends LinearOpMode {
 
     private DcMotorEx frontRotate, backRotate, frontLift, backLift;
@@ -399,11 +399,11 @@ public class NewMain extends LinearOpMode {
     }
     //these constants need to be redetermined
     public void rotateClawUp() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos2);
+    //    clawRotate.setPosition(MecanumDrive.PARAMS.servoPos2);
 
     }
     public void rotateClawDown() {
-        clawRotate.setPosition(MecanumDrive.PARAMS.servoPos1);
+    //    clawRotate.setPosition(MecanumDrive.PARAMS.servoPos1);
 
     }
 

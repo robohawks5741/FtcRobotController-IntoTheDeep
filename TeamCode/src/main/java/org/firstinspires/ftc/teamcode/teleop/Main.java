@@ -107,6 +107,10 @@ public class Main extends LinearOpMode {
     public double liftPower = 0;
     public double rotatePower = 0;
 
+    private double botX;
+    private double botY;
+    private double botZ;
+
     public int debug = 0;
     public MecanumDrive drive;
 
@@ -393,12 +397,13 @@ public class Main extends LinearOpMode {
 
             handleArm();
             try {
-                double botX = -tagOfInterest.pose.x;
-                double botY = -tagOfInterest.pose.y;
-                double botZ = -tagOfInterest.pose.z;
-                if (tagFound){
 
-                    switch(tagOfInterest.id) {
+                if (tagFound){
+                     botX = -tagOfInterest.pose.x*3.28084*12;
+                     botY = -tagOfInterest.pose.y*3.28084*12;
+                     botZ = -tagOfInterest.pose.z*3.2808*12;
+
+                     switch(tagOfInterest.id) {
                         case 11:
                             botX += TagConstants.TAG_POSITIONS.TAG11.x();
                             botY += TagConstants.TAG_POSITIONS.TAG11.y();
@@ -432,13 +437,15 @@ public class Main extends LinearOpMode {
 
 
                     }
+                    drive = new MecanumDrive(hardwareMap, new Pose2d(botX, botY, 0));
+
                     telemetry.addLine(String.format("\nDetected tag ID=%d", tagOfInterest.id));
                     telemetry.addLine(String.format("Translation X: %.2f feet", tagOfInterest.pose.x*3.28084));
                     telemetry.addLine(String.format("Translation Y: %.2f feet", tagOfInterest.pose.y*3.28084));
                     telemetry.addLine(String.format("Translation Z: %.2f feet", tagOfInterest.pose.z*3.28084));
-                    telemetry.addLine(String.format("Estimated X: ", botX));
-                    telemetry.addLine(String.format("Estimated Y: ", botY));
-                    telemetry.addLine(String.format("Estimated Z: ", botZ));
+                    telemetry.addLine(String.format("Estimated X: %.2f", botX));
+                    telemetry.addLine(String.format("Estimated Y: %.2f", botY));
+                    telemetry.addLine(String.format("Estimated Z: %.2f", botZ));
 
 
                     Orientation rot = Orientation.getOrientation(tagOfInterest.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
@@ -447,8 +454,12 @@ public class Main extends LinearOpMode {
 
 
                 }
+                drive.updatePoseEstimate();
 
+                telemetry.addData("Pose X", drive.pose.position.x);
+                telemetry.addData("Pose Y", drive.pose.position.y);
 
+                telemetry.addData("tag found?",tagFound);
                 telemetry.addData("debug", debug);
                 telemetry.addData("armPosition", armPosition);
                 telemetry.addData("isIn", isIn);
@@ -610,7 +621,7 @@ public class Main extends LinearOpMode {
 
         ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
-        if(currentDetections.size() != 0)
+        if(currentDetections.size() > 0)
         {
             for(AprilTagDetection tag : currentDetections)
             {
@@ -619,7 +630,9 @@ public class Main extends LinearOpMode {
                 break;
 
             }
-    }
+        } else {
+            tagFound = false;
+        }
 }
 
 }

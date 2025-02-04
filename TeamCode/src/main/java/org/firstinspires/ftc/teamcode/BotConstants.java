@@ -63,7 +63,7 @@ public final class BotConstants {
 
     public static double liftKp = 0.001;
     public static double liftKi = 0.0005;
-    public static double liftKd = 0.0002;
+    public static double liftKd = 0.0;
 
     //public double kp = 0.00025;
     //public double ki = 0.000015;

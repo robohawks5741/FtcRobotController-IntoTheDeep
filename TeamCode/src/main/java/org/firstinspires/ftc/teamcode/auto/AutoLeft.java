@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import static com.acmerobotics.roadrunner.ftc.Actions.runBlocking;
 
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 
 
@@ -20,11 +21,13 @@ public class AutoLeft extends AutoSuper {
         init();
 
         waitForStart();
-        while (opModeIsActive()){
+        if (opModeIsActive()){
 
             runBlocking(
                     drive.actionBuilder(beginPose)
-                    .splineTo(new Vector2d(11.1396, 22.0307), Math.toRadians(-45.0))
+                    .setTangent( Math.toRadians(-45.0))
+                    .splineToLinearHeading(new Pose2d(11.1396, 22.0307,  Math.toRadians(-45.0)), 0)
+
                     .stopAndAdd(new ServoAction(clawIntake, BotConstants.CLAW_CLOSED))
                     .build()
             );

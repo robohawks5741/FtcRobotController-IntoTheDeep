@@ -164,7 +164,7 @@ public class Robot extends LinearOpMode {
         executor.submit(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 // Background processing
-                cameraUpdate();
+               // cameraUpdate();
                 sleep(100);
             }
         });

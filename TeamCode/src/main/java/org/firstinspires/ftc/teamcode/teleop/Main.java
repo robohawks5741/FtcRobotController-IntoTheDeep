@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.firstinspires.ftc.teamcode.subsystems.TagConstants;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 @TeleOp(name = "##MAIN")
 public class Main extends LinearOpMode {
@@ -202,6 +203,7 @@ public class Main extends LinearOpMode {
         liftEncoderRotations = 0;
 
         camera.setPipeline(aprilTagDetectionPipeline);
+
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened()
@@ -388,10 +390,11 @@ public class Main extends LinearOpMode {
 
             handleArm();
             try {
+                double botX = -tagOfInterest.pose.x;
+                double botY = -tagOfInterest.pose.y;
+                double botZ = -tagOfInterest.pose.z;
                 if (tagFound){
-                    double botX = -tagOfInterest.pose.x;
-                    double botY = -tagOfInterest.pose.y;
-                    double botZ = -tagOfInterest.pose.z;
+
                     switch(tagOfInterest.id) {
                         case 11:
                             botX += TagConstants.TAG_POSITIONS.TAG11.x();

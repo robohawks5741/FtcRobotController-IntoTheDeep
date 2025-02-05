@@ -126,8 +126,7 @@ public class Main extends Robot {
                 pressed = true;
                 armPosition = 0;
 
-                lift.resetPID();
-                rotate.resetPID();
+                resetPid();
                 rotateToPosition = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
                 extendToPosition = BotConstants.LIFT_EXTENDED_VOLTS;
                 clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
@@ -145,8 +144,7 @@ public class Main extends Robot {
                 pressed = true;
                 armPosition = 1;
 
-                lift.resetPID();
-                rotate.resetPID();
+                resetPid();
                 rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
                 clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
@@ -156,8 +154,7 @@ public class Main extends Robot {
                 //go to specimen pickup position
                 pressed = true;
                 armPosition = 2;
-                lift.resetPID();
-                rotate.resetPID();
+                resetPid();
                 rotateToPosition = BotConstants.ARM_SPECIMEN_PICKUP_POSITION;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
             }else if(gamepad1.dpad_left && !pressed && armPosition != 3 || gamepad2.dpad_left && !pressed && armPosition != 3){
@@ -166,8 +163,7 @@ public class Main extends Robot {
                 armPosition = 3;
 
 
-                lift.resetPID();
-                rotate.resetPID();
+                resetPid();
                 rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
                 extendToPosition = BotConstants.LIFT_MIN_VOLTS;
             } else if(gamepad1.dpad_up && !pressed && armPosition != 4 || gamepad2.dpad_up && !pressed && armPosition != 4){
@@ -178,8 +174,7 @@ public class Main extends Robot {
                 clawRotate.setPosition(BotConstants.SERVO_PLACEMENT_POS);
 
 
-                lift.resetPID();
-                rotate.resetPID();
+                resetPid();
                 rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
                 extendToPosition = BotConstants.LIFT_LOW_BUCKET;
             } else if(gamepad1.left_trigger > 0.1 && !pressed && armPosition != 5 || gamepad2.left_trigger > 0.1 && !pressed && armPosition != 5){
@@ -189,9 +184,7 @@ public class Main extends Robot {
 
                 clawRotate.setPosition(BotConstants.SERVO_PLACEMENT_POS);
 
-
-                lift.resetPID();
-                rotate.resetPID();
+                resetPid();
                 rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
                 extendToPosition = BotConstants.LIFT_EXTENDED_VOLTS;
             } else if(gamepad1.y && !pressed && armPosition != 6 || gamepad2.y && !pressed && armPosition != 6){
@@ -199,8 +192,7 @@ public class Main extends Robot {
                 pressed = true;
                 armPosition = 6;
 
-                lift.resetPID();
-                rotate.resetPID();
+                resetPid();
                 rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
 
@@ -209,8 +201,7 @@ public class Main extends Robot {
                 pressed = true;
                 rotate.setPower(-1);
                 armPosition = 7;
-                lift.resetPID();
-                rotate.resetPID();
+                resetPid();
                 rotateToPosition = BotConstants.ARM_GROUND_VOLTS_RETRACTED;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
 

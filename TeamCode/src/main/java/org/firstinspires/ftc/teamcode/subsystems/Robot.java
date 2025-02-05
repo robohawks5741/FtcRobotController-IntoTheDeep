@@ -325,6 +325,11 @@ public class Robot extends LinearOpMode {
 
     }
 
+    public void resetPid(){
+        lift.resetPID();
+        rotate.resetPID();
+    }
+
     protected void calculateLiftVoltage() {
         liftRealVoltage = startingLiftVoltage + -encoderMotor.getCurrentPosition() * BotConstants.INCREMENTAL_TO_VOLTS;
         liftRealVoltage += normalizeRotateVoltage(rotateEncoder.getVoltage()) -

@@ -23,6 +23,7 @@ public class SetArmPos implements Action {
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         try {
+            robotInstance.resetPid();
             robotInstance.pressed = true;
             robotInstance.armPosition = 5;
             robotInstance.lift.resetPID();

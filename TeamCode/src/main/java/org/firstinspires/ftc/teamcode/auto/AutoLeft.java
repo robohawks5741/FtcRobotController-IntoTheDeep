@@ -12,7 +12,9 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.BotConstants;
+import org.firstinspires.ftc.teamcode.subsystems.actions.LoopArm;
 import org.firstinspires.ftc.teamcode.subsystems.actions.ServoAction;
+import org.firstinspires.ftc.teamcode.subsystems.actions.SetArmPos;
 
 @Autonomous(name = "Auto Left")
 public class AutoLeft extends AutoSuper {
@@ -21,18 +23,19 @@ public class AutoLeft extends AutoSuper {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-        init();
+        super.init();
 
         waitForStart();
-        while (opModeIsActive()){
+        if (opModeIsActive()){
 
 
             Actions.runBlocking(new ParallelAction(
                     drive.actionBuilder(beginPose)
+                            .stopAndAdd(new SetArmPos(this, BotConstants.ARM_FRONT_PLACING_VOLTS, BotConstants.LIFT_EXTENDED_VOLTS))
                             .splineTo(new Vector2d(11.1396, 22.0307), Math.toRadians(-45.0))
-                            .stopAndAdd(new ServoAction(clawIntake, BotConstants.CLAW_CLOSED))
                             .build(),
-                    new ServoAction(clawIntake, 0)
+                    new ServoAction(clawIntake,  BotConstants.CLAW_CLOSED),
+                    new LoopArm(this)
             ));
 
 

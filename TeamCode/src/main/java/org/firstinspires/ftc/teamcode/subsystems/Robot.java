@@ -41,8 +41,8 @@ public class Robot extends LinearOpMode {
     protected boolean tagFound = false;
 
     protected DcMotorEx frontRotate, backRotate, frontLift, backLift;
-    protected DualMotor rotate;
-    protected DualMotor lift;
+    public DualMotor rotate;
+    public DualMotor lift;
     protected Servo clawIntake;
     protected Servo clawRotate;
     protected AnalogInput rotateEncoder, liftEncoder;
@@ -59,10 +59,10 @@ public class Robot extends LinearOpMode {
     protected DcMotorEx encoderMotor;
     protected double extendedness;
     protected int liftEncoderRotations;
-    protected double rotateToPosition;
-    protected double extendToPosition;
+    public double rotateToPosition;
+    public double extendToPosition;
 
-    protected int armPosition;
+    public int armPosition;
 
     protected boolean isDown; //Checks to see if the arm is down (Parallel to the ground or lower)
 
@@ -79,7 +79,7 @@ public class Robot extends LinearOpMode {
 
     protected MecanumDrive drive;
 
-    protected boolean pressed = false;
+    public boolean pressed = false;
 
     protected ExecutorService executor;
 
@@ -228,7 +228,7 @@ public class Robot extends LinearOpMode {
         }
     }
 
-    protected void handleArm() throws Exception {
+    public void handleArm() throws Exception {
         if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 3 && !isIn){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
 

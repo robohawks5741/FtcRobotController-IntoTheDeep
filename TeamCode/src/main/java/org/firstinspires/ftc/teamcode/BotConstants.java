@@ -95,10 +95,10 @@ public final class BotConstants {
 
     public static final double SERVO_PICKUP_POS = 0;
 
-    public static final double SERVO_INIT_POS = 0.8;
-    public static final double SERVO_PLACEMENT_POS = 0.5;
+    public static final double SERVO_INIT_POS = 1-0.8;
+    public static final double SERVO_PLACEMENT_POS = 1-0.5;
 
-    public static  final double SERVO_PARALLEL_POS = 0.4;
+    public static  final double SERVO_PARALLEL_POS = 1-0.4;
 
     public static final double SERVO_SPECIMEN_PLACEMENT_POS = 0;
 

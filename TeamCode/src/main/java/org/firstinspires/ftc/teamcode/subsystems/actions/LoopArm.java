@@ -8,27 +8,17 @@ import com.acmerobotics.roadrunner.Action;
 import org.firstinspires.ftc.teamcode.BotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-public class SetArmPos implements Action {
-    private Robot robotInstance;
+public class LoopArm implements Action {
+    private final Robot robotInstance;
 
-    private double arm;
-    private double lift;
-
-    public SetArmPos(Robot robotInstance, double a, double l) {
+    public LoopArm(Robot robotInstance) {
         this.robotInstance = robotInstance;
-        this.arm = a;
-        this.lift = l;
     }
 
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         try {
-            robotInstance.pressed = true;
-            robotInstance.armPosition = 5;
-            robotInstance.lift.resetPID();
-            robotInstance.rotate.resetPID();
-            robotInstance.rotateToPosition = arm;
-            robotInstance.extendToPosition = lift;
+            robotInstance.handleArm();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

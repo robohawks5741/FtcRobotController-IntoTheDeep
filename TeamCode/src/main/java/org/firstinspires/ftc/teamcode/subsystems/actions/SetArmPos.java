@@ -4,9 +4,11 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.BotConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
+
 
 public class SetArmPos implements Action {
     private Robot robotInstance;
@@ -14,10 +16,13 @@ public class SetArmPos implements Action {
     private double arm;
     private double lift;
 
-    public SetArmPos(Robot robotInstance, double a, double l) {
+    private int apos;
+
+    public SetArmPos(Robot robotInstance, double a, double l, int i) {
         this.robotInstance = robotInstance;
         this.arm = a;
         this.lift = l;
+        this.apos = i;
     }
 
     @Override
@@ -25,11 +30,9 @@ public class SetArmPos implements Action {
         try {
             robotInstance.resetPid();
             robotInstance.pressed = true;
-            robotInstance.armPosition = 5;
-            robotInstance.lift.resetPID();
-            robotInstance.rotate.resetPID();
             robotInstance.rotateToPosition = arm;
             robotInstance.extendToPosition = lift;
+            robotInstance.armPosition = apos;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

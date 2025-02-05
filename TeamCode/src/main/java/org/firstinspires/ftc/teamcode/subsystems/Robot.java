@@ -63,6 +63,8 @@ public class Robot extends LinearOpMode {
     public double extendToPosition;
 
     public int armPosition;
+    public boolean stopArm = false;
+
 
     protected boolean isDown; //Checks to see if the arm is down (Parallel to the ground or lower)
 
@@ -229,6 +231,21 @@ public class Robot extends LinearOpMode {
     }
 
     public void handleArm() throws Exception {
+        //Checks to see if the arm is pulled in
+        if (liftRealVoltage < BotConstants.LIFT_ROTATABLE_VOLTS) {
+            isIn = true;
+        } else {
+            isIn = false;
+        }
+
+        //Checks to see if the arm is down or up
+        if(normalizeRotateVoltage(rotateEncoder.getVoltage()) < BotConstants.ARM_UP_EXTENDABLE_VOLTS) {
+            isDown = false;
+        } else {
+            isDown = true;
+        }
+
+
         if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 3 && !isIn){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
 
@@ -255,6 +272,7 @@ public class Robot extends LinearOpMode {
         updateLift();
     }
     protected void updateRotate() throws Exception {
+        calculateLiftVoltage();
         double pidPower = (-rotate.getPIDPower(rotateTargetVoltage, normalizeRotateVoltage(rotateEncoder.getVoltage())));
         double gravity = BotConstants.armBasePower * Math.cos(getAngle());
         double totalPower = pidPower + gravity;

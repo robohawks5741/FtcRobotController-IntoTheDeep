@@ -106,7 +106,7 @@ public class Main extends Robot {
                     ),
                     -gamepad1.right_stick_x * 0.55
             ));
-            calculateLiftVoltage();
+         //   calculateLiftVoltage();
             if(gamepad1.left_bumper){
                 closeClaw();
 
@@ -210,19 +210,6 @@ public class Main extends Robot {
 
             }
 
-            //Checks to see if the arm is pulled in
-            if (liftRealVoltage < BotConstants.LIFT_ROTATABLE_VOLTS) {
-                isIn = true;
-            } else {
-                isIn = false;
-            }
-
-            //Checks to see if the arm is down or up
-            if(normalizeRotateVoltage(rotateEncoder.getVoltage()) < BotConstants.ARM_UP_EXTENDABLE_VOLTS) {
-                isDown = false;
-            } else {
-                isDown = true;
-            }
 
       //      rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
             extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)

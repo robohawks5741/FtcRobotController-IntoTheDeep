@@ -129,7 +129,7 @@ public class Main extends Robot {
                 resetPid();
                 rotateToPosition = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
                 extendToPosition = BotConstants.LIFT_EXTENDED_VOLTS;
-                clawRotate.setPosition(BotConstants.SERVO_DOWN_POS);
+                clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
             } else if((gamepad1.dpad_right || gamepad2.dpad_right) && !pressed && armPosition != 2) {
                 pressed = true;
                 armPosition = 2;
@@ -137,7 +137,7 @@ public class Main extends Robot {
                 resetPid();
                 rotateToPosition = BotConstants.ROTATE_SHORT_DOWN_VOLTS;
                 extendToPosition = BotConstants.LIFT_SHORT_DOWN_VOLTS;
-                clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
+                clawRotate.setPosition(BotConstants.SERVO_DOWN_POS);
             } else if (gamepad1.right_trigger > 0.1 && !pressed && armPosition != 1 || gamepad2.right_trigger > 0.1 && !pressed && armPosition != 1){
                 //Place based on position and rotate to the neutral pos
 

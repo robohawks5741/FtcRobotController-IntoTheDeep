@@ -33,9 +33,7 @@ public class AutoSuper extends Robot {
 
     protected void Init(){
 
-        lift.setPower(0.001);
-        closeClaw();
-        clawRotate.setPosition(BotConstants.SERVO_INIT_POS);
+
 
 
     }

@@ -29,6 +29,8 @@ public class Utilities {
         }
         return power;
     }
+
+
     /*public double checkPower(DualMotor motor) {
         if()
     }*/

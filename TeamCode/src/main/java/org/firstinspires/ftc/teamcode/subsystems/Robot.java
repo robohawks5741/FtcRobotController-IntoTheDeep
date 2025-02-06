@@ -64,7 +64,7 @@ public class Robot extends LinearOpMode {
 
     public int armPosition;
     public boolean stopArm = false;
-
+    protected double armTicksOffset = 0;
 
     protected boolean isDown; //Checks to see if the arm is down (Parallel to the ground or lower)
 
@@ -349,7 +349,7 @@ public class Robot extends LinearOpMode {
     }
 
     protected void calculateLiftVoltage() {
-        liftRealVoltage = startingLiftVoltage + -encoderMotor.getCurrentPosition() * BotConstants.INCREMENTAL_TO_VOLTS;
+        liftRealVoltage = startingLiftVoltage + (-encoderMotor.getCurrentPosition() - armTicksOffset) * BotConstants.INCREMENTAL_TO_VOLTS;
         liftRealVoltage += normalizeRotateVoltage(rotateEncoder.getVoltage()) -
                 normalizeRotateVoltage(BotConstants.ARM_VERTICAL_VOLTS);
     }

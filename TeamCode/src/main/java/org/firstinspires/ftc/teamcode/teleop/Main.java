@@ -77,7 +77,7 @@ public class Main extends Robot {
     //negative numbers will be used for the runout positions
     //0 - Down Somewhat neutral
     //1 - parallel to ground and in (neutral pos)
-    //2 - Specimen pickup position
+    //2 - Short sample pickup position
     //3 - Specimen placement position
     //4 - Low bucket placement
     //5 - High bucket placement
@@ -129,6 +129,14 @@ public class Main extends Robot {
                 resetPid();
                 rotateToPosition = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
                 extendToPosition = BotConstants.LIFT_EXTENDED_VOLTS;
+                clawRotate.setPosition(BotConstants.SERVO_DOWN_POS);
+            } else if((gamepad1.dpad_right || gamepad2.dpad_right) && !pressed && armPosition != 2) {
+                pressed = true;
+                armPosition = 2;
+
+                resetPid();
+                rotateToPosition = BotConstants.ROTATE_SHORT_DOWN_VOLTS;
+                extendToPosition = BotConstants.LIFT_SHORT_DOWN_VOLTS;
                 clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
             } else if (gamepad1.right_trigger > 0.1 && !pressed && armPosition != 1 || gamepad2.right_trigger > 0.1 && !pressed && armPosition != 1){
                 //Place based on position and rotate to the neutral pos
@@ -150,14 +158,14 @@ public class Main extends Robot {
                 clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
 
 
-            } else if(gamepad1.dpad_right && !pressed && armPosition != 2 || gamepad2.dpad_right && !pressed && armPosition != 2){
+            } /*else if(gamepad1.dpad_right && !pressed && armPosition != 2 || gamepad2.dpad_right && !pressed && armPosition != 2){
                 //go to specimen pickup position
                 pressed = true;
                 armPosition = 2;
                 resetPid();
                 rotateToPosition = BotConstants.ARM_SPECIMEN_PICKUP_POSITION;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-            }else if(gamepad1.dpad_left && !pressed && armPosition != 3 || gamepad2.dpad_left && !pressed && armPosition != 3){
+            }*/else if(gamepad1.dpad_left && !pressed && armPosition != 3 || gamepad2.dpad_left && !pressed && armPosition != 3){
                 //Go to high specimen placement position
                 pressed = true;
                 armPosition = 3;

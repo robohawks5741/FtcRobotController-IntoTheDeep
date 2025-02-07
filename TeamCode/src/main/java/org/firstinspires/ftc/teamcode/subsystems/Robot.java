@@ -62,7 +62,7 @@ public class Robot extends LinearOpMode {
     public double rotateToPosition;
     public double extendToPosition;
 
-    public int armPosition;
+    public double armPosition;
     public boolean stopArm = false;
     protected double armTicksOffset = 0;
 

@@ -144,23 +144,24 @@ public class Main extends Robot {
                 rotateToPosition = BotConstants.ROTATE_SHORT_DOWN_VOLTS;
                 extendToPosition = BotConstants.LIFT_SHORT_DOWN_VOLTS;
                 clawRotate.setPosition(BotConstants.SERVO_DOWN_POS);
-            } else if (gamepad1.right_trigger > 0.1 && !pressed && armPosition != 1 || gamepad2.right_trigger > 0.1 && !pressed && armPosition != 1){
+            } else if (gamepad1.right_trigger > 0.1 && !pressed || gamepad2.right_trigger > 0.1 && !pressed ){
                 //Place based on position and rotate to the neutral pos
 
 
                 if (armPosition == 3){//Specimen placement position
+                    clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_PLACEMENT_POS);
+                    resetPid();
+                    rotateToPosition = BotConstants.ROTATE_SPECIMEN_PLACEMENT;
+                    extendToPosition = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
+                    armPosition = 1.1; // Not quite down yk
 
-                    Actions.runBlocking(new ParallelAction(
-                            drive.actionBuilder(new Pose2d(0,0,0))
-                                    .stopAndAdd(new ServoAction(clawRotate,  BotConstants.SERVO_SPECIMEN_PLACEMENT_POS))
-                                    .waitSeconds(1)
-                                    .stopAndAdd(new SetArmPos(this, 0.380, BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION, 1))
-                                    .stopAndAdd(new ServoAction(clawIntake, BotConstants.CLAW_OPEN))
-                                    .stopAndAdd(new SetArmPos(this, BotConstants.HORIZONTAL_VOLTS, BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS, 1))
-                                    .build()
-                    ));
-                } else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
+                } else if (armPosition == 1.1){//Specimen place to all the way down yk
                     openClaw();
+                    resetPid();
+                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
+                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                }
+                else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
                     resetPid();
                     rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
                     extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
@@ -177,7 +178,10 @@ public class Main extends Robot {
                 }
                 clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 pressed = true;
-                armPosition = 1;
+                if (armPosition != 1.1){
+                    armPosition = 1;
+
+                }
 
 
 

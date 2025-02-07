@@ -87,7 +87,7 @@ public class AutoLeft extends AutoSuper {
 
                             //Pickup
                             .splineToLinearHeading(new Pose2d(11.28, 28.60, Math.toRadians(12)), Math.toRadians(-45.0))
-                            .stopAndAdd(new SetArmPos(this, BotConstants.AUTO_ARM_GROUND_VOLTS_EXTENDED, BotConstants.LIFT_MOSTLY_EXTENDED_VOLTS, 0))
+                            .stopAndAdd(new SetArmPos(this, BotConstants.AUTO_ARM_GROUND_VOLTS_EXTENDED, BotConstants.LIFT_DOWN_EXTENDED_VOLTS, 0))
                             .waitSeconds(1.5)
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_CLOSED))
                             .waitSeconds(0.5)
@@ -106,8 +106,8 @@ public class AutoLeft extends AutoSuper {
                             .stopAndAdd(new ServoAction(clawRotate,  BotConstants.SERVO_PARALLEL_POS))
 
                             //Pickup third
-                            .splineToLinearHeading(new Pose2d(9.40, 24.54, Math.toRadians(3.72)), Math.toRadians(-45.0))
-                            .stopAndAdd(new SetArmPos(this, BotConstants.AUTO_ARM_GROUND_VOLTS_EXTENDED, BotConstants.LIFT_MOSTLY_EXTENDED_VOLTS, 0))
+                            .splineToLinearHeading(new Pose2d(9.40, 24.54, Math.toRadians(0)), Math.toRadians(-45.0))
+                            .stopAndAdd(new SetArmPos(this, BotConstants.AUTO_ARM_GROUND_VOLTS_EXTENDED, BotConstants.LIFT_DOWN_EXTENDED_VOLTS, 0))
                             .waitSeconds(1.5)
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_CLOSED))
                             .waitSeconds(0.5)
@@ -117,7 +117,7 @@ public class AutoLeft extends AutoSuper {
                             .stopAndAdd(new SetArmPos(this, BotConstants.ARM_FRONT_PLACING_VOLTS, BotConstants.LIFT_EXTENDED_VOLTS, 5))
                             //        .splineToLinearHeading(new Pose2d(15.6, 18.4, Math.toRadians(-45.0)), 0)
                             .waitSeconds(1.5)
-                            .splineToLinearHeading(new Pose2d(placementX+3, placementY-3, Math.toRadians(-45.0)), Math.toRadians(3.72))
+                            .splineToLinearHeading(new Pose2d(placementX+3, placementY-3, Math.toRadians(-45.0)), Math.toRadians(0))
 
                             .splineToConstantHeading(new Vector2d(placementX, placementY), Math.toRadians(-45.0))                            // .splineToConstantHeading(new Vector2d(9.11, 24.03), Math.toRadians(-45.0))
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_OPEN))
@@ -127,7 +127,7 @@ public class AutoLeft extends AutoSuper {
 
                             //Pickup fourth
                             .splineToLinearHeading(new Pose2d(10.39, 25.83, Math.toRadians(-16.12)), Math.toRadians(-45.0))
-                            .stopAndAdd(new SetArmPos(this, BotConstants.AUTO_ARM_GROUND_VOLTS_EXTENDED, BotConstants.LIFT_MOSTLY_EXTENDED_VOLTS, 0))
+                            .stopAndAdd(new SetArmPos(this, BotConstants.AUTO_ARM_GROUND_VOLTS_EXTENDED, BotConstants.LIFT_DOWN_EXTENDED_VOLTS, 0))
                             .waitSeconds(1.5)
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_CLOSED))
                             .waitSeconds(0.5)

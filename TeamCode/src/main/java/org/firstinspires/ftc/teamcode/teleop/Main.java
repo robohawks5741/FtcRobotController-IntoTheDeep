@@ -3,9 +3,12 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -24,6 +27,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
+import org.firstinspires.ftc.teamcode.subsystems.actions.ServoAction;
+import org.firstinspires.ftc.teamcode.subsystems.actions.SetArmPos;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -86,7 +91,6 @@ public class Main extends Robot {
 
 
 
-
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
@@ -96,6 +100,8 @@ public class Main extends Robot {
         rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
         extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
         armPosition = 1;
+
+        resetPid();
 
         waitForStart(); //-------------------------------------------------------------------------------------------------------
         while(opModeIsActive()) {
@@ -128,7 +134,7 @@ public class Main extends Robot {
 
                 resetPid();
                 rotateToPosition = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
-                extendToPosition = BotConstants.LIFT_EXTENDED_VOLTS;
+                extendToPosition = BotConstants.LIFT_DOWN_EXTENDED_VOLTS;
                 clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
             } else if((gamepad1.dpad_right || gamepad2.dpad_right) && !pressed && armPosition != 2) {
                 pressed = true;
@@ -143,19 +149,37 @@ public class Main extends Robot {
 
 
                 if (armPosition == 3){//Specimen placement position
-                    clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_PLACEMENT_POS);
+
+                    Actions.runBlocking(new ParallelAction(
+                            drive.actionBuilder(new Pose2d(0,0,0))
+                                    .stopAndAdd(new ServoAction(clawRotate,  BotConstants.SERVO_SPECIMEN_PLACEMENT_POS))
+                                    .waitSeconds(1)
+                                    .stopAndAdd(new SetArmPos(this, 0.380, BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION, 1))
+                                    .stopAndAdd(new ServoAction(clawIntake, BotConstants.CLAW_OPEN))
+                                    .stopAndAdd(new SetArmPos(this, BotConstants.HORIZONTAL_VOLTS, BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS, 1))
+                                    .build()
+                    ));
                 } else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
                     openClaw();
+                    resetPid();
+                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
+                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+
                 } else if (armPosition == 0 || armPosition == 2){ //Down pos or specimen pickup pos
                     closeClaw();
+                    resetPid();
+                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
+                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                } else {
+                    resetPid();
+                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
+                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
                 }
+                clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 pressed = true;
                 armPosition = 1;
 
-                resetPid();
-                rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
-                extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-                clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
+
 
 
             } /*else if(gamepad1.dpad_right && !pressed && armPosition != 2 || gamepad2.dpad_right && !pressed && armPosition != 2){
@@ -169,11 +193,10 @@ public class Main extends Robot {
                 //Go to high specimen placement position
                 pressed = true;
                 armPosition = 3;
-
-
+                clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_READY_POS);
                 resetPid();
-                rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
-                extendToPosition = BotConstants.LIFT_MIN_VOLTS;
+                rotateToPosition = BotConstants.ROTATE_SPECIMEN_PLACEMENT;
+                extendToPosition = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
             } else if(gamepad1.dpad_up && !pressed && armPosition != 4 || gamepad2.dpad_up && !pressed && armPosition != 4){
                 //Go to low bucket position
                 pressed = true;
@@ -197,37 +220,39 @@ public class Main extends Robot {
                 extendToPosition = BotConstants.LIFT_EXTENDED_VOLTS;
             } else if(gamepad1.y && !pressed && armPosition != 6 || gamepad2.y && !pressed && armPosition != 6){
                 //Get ready to hang
+                hanging = false;
                 pressed = true;
                 armPosition = 6;
+                clawRotate.setPosition(BotConstants.SERVO_DOWN_POS);
 
                 resetPid();
-                rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
+                rotateToPosition = BotConstants.ARM_BACK_VOLTS;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+
 
             } else if(gamepad1.a && !pressed && armPosition != 7 || gamepad2.a && !pressed && armPosition != 7){
                 //Pull down on hang
                 pressed = true;
-                rotate.setPower(-1);
-                armPosition = 7;
+                hanging = true;
+                clawRotate.setPosition(BotConstants.SERVO_INIT_POS);
+
                 resetPid();
-                rotateToPosition = BotConstants.ARM_GROUND_VOLTS_RETRACTED;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+
+                rotate.setPower(-1);
+
 
             } else if (!gamepad1.dpad_down && !(gamepad1.right_trigger > 0.1) && !gamepad1.dpad_right && !gamepad1.dpad_left && !gamepad1.dpad_up && !(gamepad1.left_trigger > 0.1) && !gamepad1.y && !gamepad1.a && !gamepad2.dpad_down && !(gamepad2.right_trigger > 0.1) && !gamepad2.dpad_right && !gamepad2.dpad_left && !gamepad2.dpad_up && !(gamepad2.left_trigger > 0.1) && !gamepad2.y && !gamepad2.a) {
                 pressed = false;
 
+
             }
 
 
-      //      rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
-            extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)
-                    / (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS);
-            //solves for target positions in ticks for rotate and lift based on the voltage values
-            rotatePos = (int)((rotateTargetVoltage - startingRotateVoltage) / BotConstants.VOLTS_PER_TICK);
-            //this sign needs to be checked
-            liftPos = (int)((liftTargetVoltage - startingLiftVoltage) / BotConstants.VOLTS_PER_TICK);
-            //checks whether the lift encoder voltage has ticked over one way or the other
-            checkLiftEncoder();
+
+
+
+
 
             try {
                 handleArm();

@@ -66,6 +66,9 @@ public class Robot extends LinearOpMode {
     public boolean stopArm = false;
     protected double armTicksOffset = 0;
 
+    protected boolean hanging = false;
+
+
     protected boolean isDown; //Checks to see if the arm is down (Parallel to the ground or lower)
 
     protected boolean isIn; //Checks to see if the arm is pulled in below a certain intake threshold
@@ -231,6 +234,17 @@ public class Robot extends LinearOpMode {
     }
 
     public void handleArm() throws Exception {
+
+        //      rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
+        extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)
+                / (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS);
+        //solves for target positions in ticks for rotate and lift based on the voltage values
+        rotatePos = (int)((rotateTargetVoltage - startingRotateVoltage) / BotConstants.VOLTS_PER_TICK);
+        //this sign needs to be checked
+        liftPos = (int)((liftTargetVoltage - startingLiftVoltage) / BotConstants.VOLTS_PER_TICK);
+        //checks whether the lift encoder voltage has ticked over one way or the other
+        checkLiftEncoder();
+
         //Checks to see if the arm is pulled in
         if (liftRealVoltage < BotConstants.LIFT_ROTATABLE_VOLTS) {
             isIn = true;
@@ -268,7 +282,10 @@ public class Robot extends LinearOpMode {
         }
 
         //Update arm and rotate
-        updateRotate();
+        if (!hanging){
+            updateRotate();
+        }
+
         updateLift();
     }
     protected void updateRotate() throws Exception {

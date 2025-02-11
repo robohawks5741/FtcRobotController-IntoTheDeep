@@ -18,7 +18,7 @@ public final class BotConstants {
 
 
 
-    public static final double ARM_FRONT_PLACING_VOLTS = (0.118 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
+    public static final double ARM_FRONT_PLACING_VOLTS = (0.095 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
@@ -32,7 +32,8 @@ public final class BotConstants {
     public static final double ARM_VERTICAL_VOLTS = ARM_FRONT_PLACING_VOLTS;
     public static final double ROTATE_SHORT_DOWN_VOLTS = (ARM_BACK_VOLTS + 1.02) % MAX_VOLTAGE;
 
-    public static final double ROTATE_SPECIMEN_PLACEMENT = (ARM_BACK_VOLTS + 0.273) % MAX_VOLTAGE;
+    public static double ROTATE_SPECIMEN_PLACEMENT = 0.5;
+
     //TODO
 
 
@@ -67,7 +68,7 @@ public final class BotConstants {
     public static final double LIFT_SHORT_DOWN_VOLTS = LIFT_MIN_VOLTS + 0.45 + MAX_VOLTAGE;
     public static final double INCREMENTAL_TO_VOLTS = (LIFT_MAX_VOLTS - LIFT_MIN_VOLTS) / extendedIncrementalOutput;
 
-    public static double liftKp = 0.0015;
+    public static double liftKp = 0.001;
     public static double liftKi = 0.00005;
     public static double liftKd = 0.000025;
 
@@ -106,8 +107,8 @@ public final class BotConstants {
 
     public static final double SERVO_PARALLEL_POS = 0.4;
     public static final double SERVO_DOWN_POS = 1-0.96;
-    public static double SERVO_SPECIMEN_READY_POS = 0.6;
-    public static double SERVO_SPECIMEN_PLACEMENT_POS = 0.7;
+    public static double SERVO_SPECIMEN_READY_POS = 0.64;
+    public static double SERVO_SPECIMEN_PLACEMENT_POS = 0.75;
 
     //Claw-
     public static final double CLAW_OPEN = 0.25;

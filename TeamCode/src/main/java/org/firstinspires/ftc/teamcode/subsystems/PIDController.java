@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class PIDController {
     private double Kp, Ki, Kd;
-    private double integralSum = 0;
+    public double integralSum = 0;
     private double lastError = 0;
     private double derivative;
     private double error;

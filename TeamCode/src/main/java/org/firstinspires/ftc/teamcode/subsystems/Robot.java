@@ -35,7 +35,7 @@ import java.util.concurrent.Executors;
          */
 
 public class Robot extends LinearOpMode {
-    protected OpenCvCamera camera;
+ //   protected OpenCvCamera camera;
     protected AprilTagPipeline aprilTagDetectionPipeline;
     protected AprilTagDetection tagOfInterest = null;
     protected boolean tagFound = false;
@@ -86,8 +86,6 @@ public class Robot extends LinearOpMode {
 
     public boolean pressed = false;
 
-    protected ExecutorService executor;
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -101,21 +99,14 @@ public class Robot extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+   /*     int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        aprilTagDetectionPipeline = new AprilTagPipeline();
+        aprilTagDetectionPipeline = new AprilTagPipeline();*/
 
         try {
             //dividing by voltspertick because all the inputs are in units of volts, so the
             //pid constants need to be in units of inverse volts rather than inverse ticks
-            rotate = new DualMotor(backRotate, frontRotate,
-                    BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
-            lift = new DualMotor(backLift,
-                    BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
+
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -147,9 +138,9 @@ public class Robot extends LinearOpMode {
          */
         liftEncoderRotations = 0;
 
-        camera.setPipeline(aprilTagDetectionPipeline);
+     //   camera.setPipeline(aprilTagDetectionPipeline);
 
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+ /*       camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened()
             {
@@ -161,21 +152,23 @@ public class Robot extends LinearOpMode {
             public void onError(int errorCode)
             {
 
-            }});
+            }}
+
+        );*/
 
         telemetry.setMsTransmissionInterval(50);
 
-        executor = Executors.newSingleThreadExecutor(); //Camera multi-threading
+      /* executor = Executors.newSingleThreadExecutor(); //Camera multi-threading
         executor.submit(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 // Background processing
                // cameraUpdate();
                 sleep(100);
             }
-        });
+        });*/
     }
 
-    protected void cameraUpdate(){
+ /*   protected void cameraUpdate(){
 
         ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
@@ -231,11 +224,11 @@ public class Robot extends LinearOpMode {
         } else {
             tagFound = false;
         }
-    }
+    }*/
 
     public void handleArm() throws Exception {
 
-        //      rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
+        rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
         extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)
                 / (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS);
         //solves for target positions in ticks for rotate and lift based on the voltage values
@@ -280,13 +273,13 @@ public class Robot extends LinearOpMode {
             }
 
         }
+        updateLift();
+
 
         //Update arm and rotate
         if (!hanging){
             updateRotate();
         }
-
-        updateLift();
     }
     protected void updateRotate() throws Exception {
         calculateLiftVoltage();

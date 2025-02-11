@@ -13,6 +13,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.BotConstants;
+import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 import org.firstinspires.ftc.teamcode.subsystems.TagConstants;
 import org.firstinspires.ftc.teamcode.subsystems.actions.LoopArm;
 import org.firstinspires.ftc.teamcode.subsystems.actions.ServoAction;
@@ -23,8 +24,8 @@ public class AutoLeft extends AutoSuper {
 
     Thread backgroundThread;
 
-    double placementX = 9.5;
-    double placementY = 24.03;
+    double placementX = 5.58;//9.5
+    double placementY = 25.98;//24.03
 
 
     private volatile boolean isRunning = true;
@@ -35,26 +36,61 @@ public class AutoLeft extends AutoSuper {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        super.runOpMode();
-        super.init();
+       super.runOpMode();
+        isIn = true;
+        isDown = true;
         rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
         extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-        lift.setPower(0.001);
+     //   lift.setPower(0.001);
         closeClaw();
         clawRotate.setPosition(BotConstants.SERVO_INIT_POS);
+        clawIntake.setPosition(BotConstants.CLAW_CLOSED);
+
+        while (!isStarted() && !isStopRequested()){
+            telemetry.addData("Arm target", rotateTargetVoltage);
+            telemetry.addData("Rotate current output", rotateEncoder.getVoltage());
+            telemetry.addData("target", rotateTargetVoltage);
+            telemetry.addData("armPos", armPosition);
+            telemetry.addData("isin", isIn);
+            telemetry.addData("lift", liftRealVoltage);
+            telemetry.addData("rotate pos", rotateEncoder.getVoltage());
+            telemetry.addData("liftthreshold", BotConstants.LIFT_ROTATABLE_VOLTS);
+            telemetry.addData("isDown",isDown);
+            telemetry.addData("debug", debug);
+            telemetry.update();
+            telemetry.update();
+
+        }
+
+
 
         waitForStart();
+            try {
+                rotate = new DualMotor(backRotate, frontRotate,
+                        BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
+                        BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK,
+                        BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            lift = new DualMotor(backLift,
+                    BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
+                    BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
+                    BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
 
             resetPid();
 
              backgroundThread = new Thread(() -> {
                 while (!isStopRequested() && isRunning){
                     try {
+                        rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
                         handleArm();
                         telemetry.addData("target", rotateTargetVoltage);
+                        telemetry.addData("Arm I", rotate.getPid().integralSum);
                         telemetry.addData("armPos", armPosition);
                         telemetry.addData("isin", isIn);
                         telemetry.addData("lift", liftRealVoltage);
+                        telemetry.addData("rotate pos", rotateEncoder.getVoltage());
                         telemetry.addData("liftthreshold", BotConstants.LIFT_ROTATABLE_VOLTS);
                         telemetry.addData("isDown",isDown);
                         telemetry.addData("debug", debug);
@@ -65,7 +101,9 @@ public class AutoLeft extends AutoSuper {
                     }
                 }
             });
-            backgroundThread.start();
+
+
+        backgroundThread.start();
 
 
             Actions.runBlocking(new ParallelAction(
@@ -78,8 +116,8 @@ public class AutoLeft extends AutoSuper {
 
                             //Place the first
                             //  .setTangent(Math.toRadians(-45.0))
-                            .splineToLinearHeading(new Pose2d(15.6, 18.4, Math.toRadians(-45.0)), 0)
-                            .splineToConstantHeading(new Vector2d(9.11, 24.03), Math.toRadians(-45.0))
+                            .splineToLinearHeading(new Pose2d(placementX+3, placementY-3, Math.toRadians(-45.0)), Math.toRadians(0))
+                            .splineToConstantHeading(new Vector2d(placementX, placementY), Math.toRadians(-45.0))
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_OPEN))
                             .waitSeconds(0.5)
                             .stopAndAdd(new ServoAction(clawRotate,  BotConstants.SERVO_PARALLEL_POS))
@@ -126,7 +164,7 @@ public class AutoLeft extends AutoSuper {
 
 
                             //Pickup fourth
-                            .splineToLinearHeading(new Pose2d(10.39, 25.83, Math.toRadians(-16.12)), Math.toRadians(-45.0))
+                            .splineToLinearHeading(new Pose2d(10.39, 25.83, Math.toRadians(-18.12)), Math.toRadians(-45.0))
                             .stopAndAdd(new SetArmPos(this, BotConstants.AUTO_ARM_GROUND_VOLTS_EXTENDED, BotConstants.LIFT_DOWN_EXTENDED_VOLTS, 0))
                             .waitSeconds(1.5)
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_CLOSED))
@@ -137,12 +175,13 @@ public class AutoLeft extends AutoSuper {
                             .stopAndAdd(new SetArmPos(this, BotConstants.ARM_FRONT_PLACING_VOLTS, BotConstants.LIFT_EXTENDED_VOLTS, 5))
                             //        .splineToLinearHeading(new Pose2d(15.6, 18.4, Math.toRadians(-45.0)), 0)
                             .waitSeconds(1.5)
-                            .splineToLinearHeading(new Pose2d(placementX+3, placementY-3, Math.toRadians(-45.0)), Math.toRadians(-16.12))
+                            .splineToLinearHeading(new Pose2d(placementX+3, placementY-3, Math.toRadians(-45.0)), Math.toRadians(-18.12))
 
                             .splineToConstantHeading(new Vector2d(placementX, placementY), Math.toRadians(-45.0))                            // .splineToConstantHeading(new Vector2d(9.11, 24.03), Math.toRadians(-45.0))
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_OPEN))
                             .waitSeconds(0.5)
                             .stopAndAdd(new ServoAction(clawRotate,  BotConstants.SERVO_PARALLEL_POS))
+                            .splineToConstantHeading(new Vector2d(placementX+4, placementY-3), Math.toRadians(-45.0))
 
                             //Park
                             .stopAndAdd(new SetArmPos(this, BotConstants.HORIZONTAL_VOLTS, BotConstants.LIFT_RETRACTED_TICKS, 1))

@@ -100,6 +100,18 @@ public class Main extends Robot {
         rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
         extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
         armPosition = 1;
+        try {
+            rotate = new DualMotor(backRotate, frontRotate,
+                    BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
+                    BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK,
+                    BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        lift = new DualMotor(backLift,
+                BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
+                BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
+                BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
 
         resetPid();
 
@@ -120,12 +132,18 @@ public class Main extends Robot {
                 openClaw();
 
             }
-            if(gamepad1.x) {
-                rotateClawUp();
+           /* if(gamepad1.x) {
+                lift.setPower(-0.4);
+                hanging = true;
             }
             else if(gamepad1.b) {
-                rotateClawDown();
-            }
+                hanging = false;
+                encoderMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                encoderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            }*/
+
+
 
             if (gamepad1.dpad_down && !pressed && armPosition != 0 || gamepad2.dpad_down && !pressed && armPosition != 0){
                 //Rotate to the neutral down pos
@@ -160,23 +178,26 @@ public class Main extends Robot {
                     resetPid();
                     rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
                     extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                    clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 }
                 else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
                     resetPid();
                     rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
                     extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-
+                    clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 } else if (armPosition == 0 || armPosition == 2){ //Down pos or specimen pickup pos
                     closeClaw();
                     resetPid();
                     rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
                     extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                    clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 } else {
                     resetPid();
                     rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
                     extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                    clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
+
                 }
-                clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 pressed = true;
                 if (armPosition != 1.1){
                     armPosition = 1;
@@ -199,7 +220,7 @@ public class Main extends Robot {
                 armPosition = 3;
                 clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_READY_POS);
                 resetPid();
-                rotateToPosition = BotConstants.ROTATE_SPECIMEN_PLACEMENT;
+                rotateToPosition = 0.1;
                 extendToPosition = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
             } else if(gamepad1.dpad_up && !pressed && armPosition != 4 || gamepad2.dpad_up && !pressed && armPosition != 4){
                 //Go to low bucket position
@@ -295,14 +316,14 @@ public class Main extends Robot {
                 telemetry.addData("real voltage", liftRealVoltage);
                 telemetry.addData("incremental", -encoderMotor.getCurrentPosition());
                 telemetry.addData("extendedness", extendedness);
-                telemetry.addData("servo position", clawIntake.getPosition());
+                telemetry.addData("servo position", clawRotate.getPosition());
                 telemetry.update();
                 TelemetryPacket packet = new TelemetryPacket();
                 packet.fieldOverlay().setStroke("#3F51B5");
                 Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }
-        executor.shutdownNow();
+       // executor.shutdownNow();
         }
     }
 

@@ -289,6 +289,12 @@ public class DualMotor {
             throw new Exception(noMotorEx);
         }
     }
+
+    public PIDController getPid(){
+
+        return PID;
+    }
+
     public double getPIDPower(double target, double state) throws Exception {
         try {
             return PID.PIDControl(target, state);
@@ -301,7 +307,7 @@ public class DualMotor {
         PID.setKp(Kp);
     }
     public void setKi(double Ki) {
-        PID.setKi(Kp);
+        PID.setKi(Ki);
     }
     public void setKd(double Kd) {
         PID.setKd(Kd);

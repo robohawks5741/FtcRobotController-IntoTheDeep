@@ -31,13 +31,6 @@ public class AutoSuper extends Robot {
 
     protected Pose2d beginPose = new Pose2d(0.0, 0.0, 0.0);
 
-    protected void Init(){
-
-
-
-
-    }
-
 
 
 

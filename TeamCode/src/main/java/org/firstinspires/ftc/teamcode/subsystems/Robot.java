@@ -118,6 +118,7 @@ public class Robot extends LinearOpMode {
         rotateTargetVoltage = startingRotateVoltage;
         liftTargetVoltage = startingLiftVoltage;
         liftPreviousVoltage = startingLiftVoltage;
+        //currently unused
         desiredExtendedness = 1;
         frontRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -255,7 +256,6 @@ public class Robot extends LinearOpMode {
 
         if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 3 && !isIn){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-
         }else if((!isDown && armPosition < 3 && isIn) || (isDown && armPosition > 2 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
             //Waits until it is pulled in yo rotate it
             //is up, is going down, and is in
@@ -287,7 +287,7 @@ public class Robot extends LinearOpMode {
         double gravity = BotConstants.armBasePower * Math.cos(getAngle());
         double totalPower = pidPower + gravity;
         totalPower = clamp(totalPower, -1, 1);
-        double powerScale = 1 - 0.5*extendedness;
+        double powerScale = .5 + 0.5*extendedness;
         rotatePower = powerScale*totalPower;
         rotate.setPower(rotatePower);
        /* rotate.setTargetPosition(rotatePos);
@@ -334,6 +334,7 @@ public class Robot extends LinearOpMode {
     protected double getAngle() {
         return -(rotateEncoder.getVoltage() - BotConstants.HORIZONTAL_VOLTS) * BotConstants.RADS_PER_VOLT;
     }
+
     public void runClaw() {
         clawIntake.setPosition(0.5);
     }
@@ -343,14 +344,14 @@ public class Robot extends LinearOpMode {
     public void stopClaw() {
         clawIntake.setPosition(0);
     }
+
     //these constants need to be redetermined
     protected void rotateClawUp() {
         clawRotate.setPosition(BotConstants.SERVO_TEST_POS);
-
     }
+
     protected void rotateClawDown() {
         clawRotate.setPosition(0);
-
     }
 
     public void resetPid(){
@@ -363,6 +364,7 @@ public class Robot extends LinearOpMode {
         liftRealVoltage += normalizeRotateVoltage(rotateEncoder.getVoltage()) -
                 normalizeRotateVoltage(BotConstants.ARM_VERTICAL_VOLTS);
     }
+
     protected void checkLiftEncoder() {
         //this is one idea for doing this, might need to be tweaked/reworked depending on how jumpy the encoder is
         if(liftEncoder.getVoltage() < 1.5 && liftPreviousVoltage > BotConstants.MAX_VOLTAGE - 1.5) {
@@ -375,6 +377,7 @@ public class Robot extends LinearOpMode {
         //is on the extension, which needs to be checked
         liftPreviousVoltage = liftEncoder.getVoltage();
     }
+
     protected void openClaw() {
         clawIntake.setPosition(BotConstants.CLAW_OPEN);
     }

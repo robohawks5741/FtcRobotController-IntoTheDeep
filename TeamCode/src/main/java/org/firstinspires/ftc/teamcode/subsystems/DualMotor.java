@@ -291,7 +291,6 @@ public class DualMotor {
     }
 
     public PIDController getPid(){
-
         return PID;
     }
 
@@ -302,6 +301,13 @@ public class DualMotor {
         catch(Exception e) {
             throw new Exception(noMotorEx);
         }
+    }
+    public double getCurrent() {
+        double current = 0;
+        if(motor1 != null) {
+
+        }
+        return current;
     }
     public void setKp(double Kp) {
         PID.setKp(Kp);

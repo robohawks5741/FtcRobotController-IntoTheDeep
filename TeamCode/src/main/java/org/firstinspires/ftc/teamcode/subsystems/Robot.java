@@ -67,6 +67,7 @@ public class Robot extends LinearOpMode {
     protected double armTicksOffset = 0;
 
     protected boolean hanging = false;
+    protected boolean retracting = false;
 
 
     protected boolean isDown; //Checks to see if the arm is down (Parallel to the ground or lower)
@@ -120,6 +121,7 @@ public class Robot extends LinearOpMode {
         liftPreviousVoltage = startingLiftVoltage;
         //currently unused
         desiredExtendedness = 1;
+
         frontRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -256,7 +258,7 @@ public class Robot extends LinearOpMode {
 
         if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 3 && !isIn){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-        }else if((!isDown && armPosition < 3 && isIn) || (isDown && armPosition > 2 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
+        } else if((!isDown && armPosition < 3 && isIn) || (isDown && armPosition > 2 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
             //Waits until it is pulled in yo rotate it
             //is up, is going down, and is in
             //is down, is going up and is in
@@ -273,8 +275,9 @@ public class Robot extends LinearOpMode {
             }
 
         }
-        updateLift();
-
+        if(!retracting) {
+            updateLift();
+        }
 
         //Update arm and rotate
         if (!hanging){

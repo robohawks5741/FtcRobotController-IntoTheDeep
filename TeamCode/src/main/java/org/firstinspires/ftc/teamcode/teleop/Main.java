@@ -88,7 +88,7 @@ public class Main extends Robot {
     //5 - High bucket placement
     //6 - hang ready position
     //7 - hang down position
-
+    //8 - up and retracted (for resetting)
 
 
     @Override
@@ -132,16 +132,27 @@ public class Main extends Robot {
                 openClaw();
 
             }
-           /* if(gamepad1.x) {
-                lift.setPower(-0.4);
-                hanging = true;
+            if(gamepad1.x) {
+                lift.setPower(0.4);
+                retracting = true;
             }
             else if(gamepad1.b) {
-                hanging = false;
+                retracting = false;
                 encoderMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 encoderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-            }*/
+                resetPid();
+                //sets to a retracted position based on where the arm currently is
+                if(isDown) {
+                    armPosition = 1;
+                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
+                }
+                else {
+                    armPosition = 8;
+                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                    rotateToPosition = BotConstants.ARM_VERTICAL_VOLTS;
+                }
+            }
 
 
 
@@ -185,7 +196,7 @@ public class Main extends Robot {
                     rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
                     extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
-                } else if (armPosition == 0 || armPosition == 2){ //Down pos or specimen pickup pos
+                } else if (armPosition == 0 || armPosition == 2) { //Down pos or specimen pickup pos
                     closeClaw();
                     resetPid();
                     rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
@@ -214,7 +225,7 @@ public class Main extends Robot {
                 resetPid();
                 rotateToPosition = BotConstants.ARM_SPECIMEN_PICKUP_POSITION;
                 extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-            }*/else if(gamepad1.dpad_left && !pressed && armPosition != 3 || gamepad2.dpad_left && !pressed && armPosition != 3){
+            }*/else if((gamepad1.dpad_left && !pressed && armPosition != 3) || gamepad2.dpad_left && !pressed && armPosition != 3){
                 //Go to high specimen placement position
                 pressed = true;
                 armPosition = 3;

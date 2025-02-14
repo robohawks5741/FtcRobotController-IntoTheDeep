@@ -62,7 +62,7 @@ public class Robot extends LinearOpMode {
     public double rotateToPosition;
     public double extendToPosition;
 
-    public double armPosition;
+    public int armPosition;
     public boolean stopArm = false;
     protected double armTicksOffset = 0;
 
@@ -235,6 +235,7 @@ public class Robot extends LinearOpMode {
         extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)
                 / (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS);
         //solves for target positions in ticks for rotate and lift based on the voltage values
+        //these are useless i believe
         rotatePos = (int)((rotateTargetVoltage - startingRotateVoltage) / BotConstants.VOLTS_PER_TICK);
         //this sign needs to be checked
         liftPos = (int)((liftTargetVoltage - startingLiftVoltage) / BotConstants.VOLTS_PER_TICK);
@@ -256,17 +257,22 @@ public class Robot extends LinearOpMode {
         }
 
 
-        if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 3 && !isIn){ //Sees if it needs to pull in
+        if ((isDown && armPosition > 0 && !isIn) || (!isDown && armPosition < 0 && !isIn)){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-        } else if((!isDown && armPosition < 3 && isIn) || (isDown && armPosition > 2 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
+        } else if((!isDown && armPosition < 0 && isIn) || (isDown && armPosition > 0 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
             //Waits until it is pulled in yo rotate it
             //is up, is going down, and is in
             //is down, is going up and is in
             //is down, is staying down
             //is up and is staying up
             //Only activates when it is down and the target is the specimen placement, high bucket, low bucket, and hang position
-            rotateTargetVoltage = rotateToPosition;
-            if((armPosition < 3 && isDown) || (armPosition > 2) && !isDown){
+            switch(armPosition) {
+                case 1:
+                    rotateTargetVoltage = 0;
+                    break;
+
+            }
+            if((armPosition < 0 && isDown) || (armPosition > 0) && !isDown){
 
                 //Is going down and is down
                 //Is going up and is up

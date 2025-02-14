@@ -132,11 +132,11 @@ public class Main extends Robot {
                 openClaw();
 
             }
-            if(gamepad1.x) {
+            if((gamepad1.x || gamepad2.x) && !pressed) {
                 lift.setPower(0.4);
                 retracting = true;
             }
-            else if(gamepad1.b) {
+            else if((gamepad1.b || gamepad2.b) && !pressed) {
                 retracting = false;
                 encoderMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 encoderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

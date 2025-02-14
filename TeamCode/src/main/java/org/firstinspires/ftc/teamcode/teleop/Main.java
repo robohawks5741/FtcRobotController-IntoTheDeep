@@ -145,12 +145,8 @@ public class Main extends Robot {
                 openClaw();
 
             }
-<<<<<<< Updated upstream
             if((gamepad1.x || gamepad2.x) && !pressed) {
-=======
-            //reset encoder
-            if(gamepad1.x) {
->>>>>>> Stashed changes
+
                 lift.setPower(0.4);
                 retracting = true;
             }

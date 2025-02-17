@@ -110,8 +110,6 @@ public class Main extends Robot {
 
         closeClaw();
         clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
-        rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
-        extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
         armPosition = -2;
         try {
             rotate = new DualMotor(backRotate, frontRotate,
@@ -158,34 +156,26 @@ public class Main extends Robot {
                 //sets to a retracted position based on where the arm currently is
                 if(isDown) {
                     armPosition = -2;
-                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
                 }
                 else {
                     armPosition = 8;
-                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-                    rotateToPosition = BotConstants.ARM_VERTICAL_VOLTS;
                 }
             }
 
 
 
-            if ((gamepad1.dpad_down || gamepad2.dpad_down) && !pressed && armPosition != 0){
+            if ((gamepad1.dpad_down || gamepad2.dpad_down) && !pressed && armPosition != -1){
                 //Rotate to the neutral down pos
                 pressed = true;
                 armPosition = -1;
 
                 resetPid();
-                rotateToPosition = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
-                extendToPosition = BotConstants.LIFT_DOWN_EXTENDED_VOLTS;
                 clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
             } else if((gamepad1.dpad_right || gamepad2.dpad_right) && !pressed && armPosition != -3) {
                 pressed = true;
                 armPosition = -3;
 
                 resetPid();
-                rotateToPosition = BotConstants.ROTATE_SHORT_DOWN_VOLTS;
-                extendToPosition = BotConstants.LIFT_SHORT_DOWN_VOLTS;
                 clawRotate.setPosition(BotConstants.SERVO_DOWN_POS);
             } else if ((gamepad1.right_trigger > 0.1 || gamepad2.right_trigger > 0.1) && !pressed){
                 //Place based on position and rotate to the neutral pos
@@ -194,32 +184,22 @@ public class Main extends Robot {
                 if (armPosition == 3){//Specimen placement position
                     clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_PLACEMENT_POS);
                     resetPid();
-                    rotateToPosition = BotConstants.ROTATE_SPECIMEN_PLACEMENT;
-                    extendToPosition = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
                     armPosition = -4; // Not quite down yk
 
                 } else if (armPosition == -4){//Specimen place to all the way down yk
                     openClaw();
                     resetPid();
-                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
-                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 }
                 else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
                     resetPid();
-                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
-                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 } else if (armPosition == -1 || armPosition == -3) { //Down pos or specimen pickup pos
                     closeClaw();
                     resetPid();
-                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
-                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 } else {
                     resetPid();
-                    rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
-                    extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
 
                 }
@@ -245,8 +225,6 @@ public class Main extends Robot {
                 armPosition = 3;
                 clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_READY_POS);
                 resetPid();
-                rotateToPosition = 0.1;
-                extendToPosition = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
             } else if((gamepad1.dpad_up || gamepad2.dpad_up) && !pressed && armPosition != 4){
                 //Go to low bucket position
                 pressed = true;
@@ -256,8 +234,6 @@ public class Main extends Robot {
 
 
                 resetPid();
-                rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
-                extendToPosition = BotConstants.LIFT_LOW_BUCKET;
             } else if((gamepad1.left_trigger > 0.1 || gamepad2.left_trigger > 0.1) && !pressed && armPosition != 5){
                 //Go to high bucket position
                 pressed = true;
@@ -266,8 +242,6 @@ public class Main extends Robot {
                 clawRotate.setPosition(BotConstants.SERVO_PLACEMENT_POS);
 
                 resetPid();
-                rotateToPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
-                extendToPosition = BotConstants.LIFT_EXTENDED_VOLTS;
             } else if((gamepad1.y || gamepad2.y) && !pressed && armPosition != 6){
                 //Get ready to hang
                 hanging = false;
@@ -276,8 +250,6 @@ public class Main extends Robot {
                 clawRotate.setPosition(BotConstants.SERVO_DOWN_POS);
 
                 resetPid();
-                rotateToPosition = BotConstants.ARM_BACK_VOLTS;
-                extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
 
 
             } else if((gamepad1.a || gamepad2.a) && !pressed && armPosition != 7){
@@ -287,8 +259,6 @@ public class Main extends Robot {
                 clawRotate.setPosition(BotConstants.SERVO_INIT_POS);
 
                 resetPid();
-                extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-
                 rotate.setPower(-1);
 
 

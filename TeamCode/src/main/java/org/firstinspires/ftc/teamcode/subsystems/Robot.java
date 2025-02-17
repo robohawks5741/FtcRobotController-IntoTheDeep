@@ -59,8 +59,6 @@ public class Robot extends LinearOpMode {
     protected DcMotorEx encoderMotor;
     protected double extendedness;
     protected int liftEncoderRotations;
-    public double rotateToPosition;
-    public double extendToPosition;
 
     public int armPosition;
     public boolean stopArm = false;
@@ -243,18 +241,10 @@ public class Robot extends LinearOpMode {
         checkLiftEncoder();
 
         //Checks to see if the arm is pulled in
-        if (liftRealVoltage < BotConstants.LIFT_ROTATABLE_VOLTS) {
-            isIn = true;
-        } else {
-            isIn = false;
-        }
+        isIn = liftRealVoltage < BotConstants.LIFT_ROTATABLE_VOLTS;
 
         //Checks to see if the arm is down or up
-        if(normalizeRotateVoltage(rotateEncoder.getVoltage()) < BotConstants.ARM_UP_EXTENDABLE_VOLTS) {
-            isDown = false;
-        } else {
-            isDown = true;
-        }
+        isDown = !(normalizeRotateVoltage(rotateEncoder.getVoltage()) < BotConstants.ARM_UP_EXTENDABLE_VOLTS);
 
 
         if ((isDown && armPosition > 0 && !isIn) || (!isDown && armPosition < 0 && !isIn)){ //Sees if it needs to pull in
@@ -267,17 +257,68 @@ public class Robot extends LinearOpMode {
             //is up and is staying up
             //Only activates when it is down and the target is the specimen placement, high bucket, low bucket, and hang position
             switch(armPosition) {
-                case 1:
-                    rotateTargetVoltage = 0;
+                case -1:
+                    rotateTargetVoltage = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
                     break;
-
+                case -2:
+                    rotateTargetVoltage = BotConstants.HORIZONTAL_VOLTS;
+                    break;
+                case -3:
+                    rotateTargetVoltage = BotConstants.ROTATE_SHORT_DOWN_VOLTS;
+                    break;
+                case -4:
+                    rotateTargetVoltage = BotConstants.ROTATE_SPECIMEN_PLACEMENT;
+                    break;
+                case 3:
+                    rotateTargetVoltage = BotConstants.ARM_SPECIMEN_PLACEMENT_VOLTS;
+                    break;
+                case 4:
+                case 5:
+                    rotateTargetVoltage = BotConstants.ARM_FRONT_PLACING_VOLTS;
+                    break;
+                case 6:
+                    rotateTargetVoltage = BotConstants.ARM_BACK_VOLTS;
+                    break;
+                case 7:
+                    //this should be irrelevant
+                    break;
+                case 8:
+                    rotateTargetVoltage = BotConstants.ARM_VERTICAL_VOLTS;
+                    break;
+                default:
+                    telemetry.addLine("Invalid arm position");
             }
             if((armPosition < 0 && isDown) || (armPosition > 0) && !isDown){
 
                 //Is going down and is down
                 //Is going up and is up
 
-                liftTargetVoltage = extendToPosition;
+                switch(armPosition) {
+                    case -1:
+                        liftTargetVoltage = BotConstants.LIFT_DOWN_EXTENDED_VOLTS;
+                        break;
+                    case -2:
+                    case 8:
+                    case 6:
+                    case 7:
+                        liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                        break;
+                    case -3:
+                        liftTargetVoltage = BotConstants.LIFT_SHORT_DOWN_VOLTS;
+                        break;
+                    case -4:
+                    case 3:
+                        liftTargetVoltage = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
+                        break;
+                    case 4:
+                        liftTargetVoltage = BotConstants.LIFT_LOW_BUCKET;
+                        break;
+                    case 5:
+                        liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                        break;
+                    default:
+                        telemetry.addLine("Invalid arm position");
+                }
             }
 
         }

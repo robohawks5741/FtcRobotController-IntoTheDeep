@@ -77,7 +77,7 @@ public class AutoLeft extends AutoSuper {
                     BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
                     BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
 
-            resetPid();
+            resetPosition();
 
              backgroundThread = new Thread(() -> {
                 while (!isStopRequested() && isRunning){

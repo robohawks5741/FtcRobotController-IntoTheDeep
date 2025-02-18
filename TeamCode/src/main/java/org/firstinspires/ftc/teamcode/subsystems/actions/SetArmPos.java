@@ -22,7 +22,7 @@ public class SetArmPos implements Action {
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         try {
-            robotInstance.resetPid();
+            robotInstance.resetPosition();
             robotInstance.pressed = true;
             robotInstance.armPosition = apos;
         } catch (Exception e) {

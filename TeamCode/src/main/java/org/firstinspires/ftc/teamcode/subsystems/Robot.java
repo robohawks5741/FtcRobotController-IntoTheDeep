@@ -78,7 +78,8 @@ public class Robot extends LinearOpMode {
     protected double botX;
     protected double botY;
     protected double botZ;
-
+    protected boolean rotatePidIsReset = false;
+    protected boolean extendPidIsReset = false;
     protected int debug = 0;
 
     protected MecanumDrive drive;
@@ -256,6 +257,10 @@ public class Robot extends LinearOpMode {
             //is down, is staying down
             //is up and is staying up
             //Only activates when it is down and the target is the specimen placement, high bucket, low bucket, and hang position
+            if(!rotatePidIsReset) {
+                rotate.resetPID();
+                rotatePidIsReset = true;
+            }
             switch(armPosition) {
                 case -1:
                     rotateTargetVoltage = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
@@ -292,7 +297,10 @@ public class Robot extends LinearOpMode {
 
                 //Is going down and is down
                 //Is going up and is up
-
+                if(!extendPidIsReset) {
+                    lift.resetPID();
+                    extendPidIsReset = true;
+                }
                 switch(armPosition) {
                     case -1:
                         liftTargetVoltage = BotConstants.LIFT_DOWN_EXTENDED_VOLTS;
@@ -404,7 +412,13 @@ public class Robot extends LinearOpMode {
         clawRotate.setPosition(0);
     }
 
-    public void resetPid(){
+    public void resetPosition() {
+        resetPid();
+        rotatePidIsReset = false;
+        extendPidIsReset = false;
+    }
+
+    public void resetPid() {
         lift.resetPID();
         rotate.resetPID();
     }

@@ -15,8 +15,6 @@ public class VoltageSensorTest extends Robot {
     @Override
     public void runOpMode() {
         voltageSensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
-        rotateToPosition = BotConstants.HORIZONTAL_VOLTS;
-        extendToPosition = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
         armPosition = 1;
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.setMsTransmissionInterval(50);

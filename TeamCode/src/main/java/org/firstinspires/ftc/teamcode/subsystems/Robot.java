@@ -59,10 +59,8 @@ public class Robot extends LinearOpMode {
     protected DcMotorEx encoderMotor;
     protected double extendedness;
     protected int liftEncoderRotations;
-    public double rotateToPosition;
-    public double extendToPosition;
 
-    public double armPosition;
+    public int armPosition;
     public boolean stopArm = false;
     protected double armTicksOffset = 0;
 
@@ -80,7 +78,8 @@ public class Robot extends LinearOpMode {
     protected double botX;
     protected double botY;
     protected double botZ;
-
+    protected boolean rotatePidIsReset = false;
+    protected boolean extendPidIsReset = false;
     protected int debug = 0;
 
     protected MecanumDrive drive;
@@ -235,6 +234,7 @@ public class Robot extends LinearOpMode {
         extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)
                 / (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS);
         //solves for target positions in ticks for rotate and lift based on the voltage values
+        //these are useless i believe
         rotatePos = (int)((rotateTargetVoltage - startingRotateVoltage) / BotConstants.VOLTS_PER_TICK);
         //this sign needs to be checked
         liftPos = (int)((liftTargetVoltage - startingLiftVoltage) / BotConstants.VOLTS_PER_TICK);
@@ -242,36 +242,91 @@ public class Robot extends LinearOpMode {
         checkLiftEncoder();
 
         //Checks to see if the arm is pulled in
-        if (liftRealVoltage < BotConstants.LIFT_ROTATABLE_VOLTS) {
-            isIn = true;
-        } else {
-            isIn = false;
-        }
+        isIn = liftRealVoltage < BotConstants.LIFT_ROTATABLE_VOLTS;
 
         //Checks to see if the arm is down or up
-        if(normalizeRotateVoltage(rotateEncoder.getVoltage()) < BotConstants.ARM_UP_EXTENDABLE_VOLTS) {
-            isDown = false;
-        } else {
-            isDown = true;
-        }
+        isDown = !(normalizeRotateVoltage(rotateEncoder.getVoltage()) < BotConstants.ARM_UP_EXTENDABLE_VOLTS);
 
 
-        if (isDown && armPosition > 2 && !isIn || !isDown && armPosition < 3 && !isIn){ //Sees if it needs to pull in
+        if ((isDown && armPosition > 0 && !isIn) || (!isDown && armPosition < 0 && !isIn)){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-        } else if((!isDown && armPosition < 3 && isIn) || (isDown && armPosition > 2 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
+        } else if((!isDown && armPosition < 0 && isIn) || (isDown && armPosition > 0 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
             //Waits until it is pulled in yo rotate it
             //is up, is going down, and is in
             //is down, is going up and is in
             //is down, is staying down
             //is up and is staying up
             //Only activates when it is down and the target is the specimen placement, high bucket, low bucket, and hang position
-            rotateTargetVoltage = rotateToPosition;
-            if((armPosition < 3 && isDown) || (armPosition > 2) && !isDown){
+            if(!rotatePidIsReset) {
+                rotate.resetPID();
+                rotatePidIsReset = true;
+            }
+            switch(armPosition) {
+                case -1:
+                    rotateTargetVoltage = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
+                    break;
+                case -2:
+                    rotateTargetVoltage = BotConstants.HORIZONTAL_VOLTS;
+                    break;
+                case -3:
+                    rotateTargetVoltage = BotConstants.ROTATE_SHORT_DOWN_VOLTS;
+                    break;
+                case -4:
+                    rotateTargetVoltage = BotConstants.ROTATE_SPECIMEN_PLACEMENT;
+                    break;
+                case 3:
+                    rotateTargetVoltage = BotConstants.ARM_SPECIMEN_PLACEMENT_VOLTS;
+                    break;
+                case 4:
+                case 5:
+                    rotateTargetVoltage = BotConstants.ARM_FRONT_PLACING_VOLTS;
+                    break;
+                case 6:
+                    rotateTargetVoltage = BotConstants.ARM_BACK_VOLTS;
+                    break;
+                case 7:
+                    //this should be irrelevant
+                    break;
+                case 8:
+                    rotateTargetVoltage = BotConstants.ARM_VERTICAL_VOLTS;
+                    break;
+                default:
+                    telemetry.addLine("Invalid arm position");
+            }
+            if((armPosition < 0 && isDown) || (armPosition > 0) && !isDown){
 
                 //Is going down and is down
                 //Is going up and is up
-
-                liftTargetVoltage = extendToPosition;
+                if(!extendPidIsReset) {
+                    lift.resetPID();
+                    extendPidIsReset = true;
+                }
+                switch(armPosition) {
+                    case -1:
+                        liftTargetVoltage = BotConstants.LIFT_DOWN_EXTENDED_VOLTS;
+                        break;
+                    case -2:
+                    case 8:
+                    case 6:
+                    case 7:
+                        liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+                        break;
+                    case -3:
+                        liftTargetVoltage = BotConstants.LIFT_SHORT_DOWN_VOLTS;
+                        break;
+                    case -4:
+                    case 3:
+                        liftTargetVoltage = BotConstants.LIFT_SPECIMEN_PLACEMENT_POSITION;
+                        break;
+                    case 4:
+                        liftTargetVoltage = BotConstants.LIFT_LOW_BUCKET;
+                        break;
+                    case 5:
+                        liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                        break;
+                    default:
+                        telemetry.addLine("Invalid arm position");
+                }
             }
 
         }
@@ -357,7 +412,13 @@ public class Robot extends LinearOpMode {
         clawRotate.setPosition(0);
     }
 
-    public void resetPid(){
+    public void resetPosition() {
+        resetPid();
+        rotatePidIsReset = false;
+        extendPidIsReset = false;
+    }
+
+    public void resetPid() {
         lift.resetPID();
         rotate.resetPID();
     }

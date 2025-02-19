@@ -9,12 +9,12 @@ public final class BotConstants {
     public static final double horizontalTicks = 135;
     public static final double verticalTicks = 695;
     public static final double RADS_PER_TICK = Math.PI / 2 / (verticalTicks - horizontalTicks); //=0.002805
-    public static final double RADS_PER_VOLT  = Math.PI * 2 / 3.22;
-    public static final double VOLTS_PER_TICK = RADS_PER_TICK / RADS_PER_VOLT;
-    public static final double HORIZONTAL_VOLTS = 0.858;
-
-
     public static final double MAX_VOLTAGE = 3.227;
+    public static final double RADS_PER_VOLT  = Math.PI * 2 / MAX_VOLTAGE;
+    public static final double VOLTS_PER_TICK = RADS_PER_TICK / RADS_PER_VOLT;
+    public static final double HORIZONTAL_VOLTS = (0.858 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+
+
 
 
 
@@ -31,8 +31,11 @@ public final class BotConstants {
 
     public static final double ARM_VERTICAL_VOLTS = ARM_FRONT_PLACING_VOLTS;
     public static final double ROTATE_SHORT_DOWN_VOLTS = (ARM_BACK_VOLTS + 1.02) % MAX_VOLTAGE;
+    public static double ARM_SPECIMEN_PLACEMENT_VOLTS = (ARM_BACK_VOLTS + 0.1) % MAX_VOLTAGE;
 
     public static double ROTATE_SPECIMEN_PLACEMENT = 0.5;
+
+
 
     //TODO
 

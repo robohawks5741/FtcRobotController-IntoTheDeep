@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 public class Utilities {
     //`adb connect 192.168.43.1:5555`
-    private static final double MAX_MOTOR_CURRENT = 20;
+    private static final double MAX_MOTOR_CURRENT = 20  ;
     public double checkPower(DcMotorEx motor) {
         double power = motor.getPower();
         if(motor.getCurrent(CurrentUnit.AMPS) > MAX_MOTOR_CURRENT) {

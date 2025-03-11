@@ -40,6 +40,7 @@ public class Robot extends LinearOpMode {
     protected AprilTagDetection tagOfInterest = null;
     protected boolean tagFound = false;
 
+    protected final boolean CLAW_CONTINUOUS = false;
     protected DcMotorEx frontRotate, backRotate, frontLift, backLift;
     public DualMotor rotate;
     public DualMotor lift;
@@ -392,7 +393,7 @@ public class Robot extends LinearOpMode {
     protected double getAngle() {
         return -(rotateEncoder.getVoltage() - BotConstants.HORIZONTAL_VOLTS) * BotConstants.RADS_PER_VOLT;
     }
-
+    //TODO: figure out which direction is which for these--runClaw is defined to be in intake direction
     public void runClaw() {
         clawIntake.setPosition(0.5);
     }

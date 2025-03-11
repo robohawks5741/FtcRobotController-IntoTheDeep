@@ -1,10 +1,24 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.BotConstants;
 
+@TeleOp
 public class ServoTest extends LinearOpMode {
     protected Servo clawIntake;
     protected Servo clawRotate;
@@ -15,10 +29,11 @@ public class ServoTest extends LinearOpMode {
         waitForStart();
         while(opModeIsActive()) {
             if(gamepad1.left_bumper){
-                clawIntake.setPosition(BotConstants.SERVO_TEST_POS);
+                clawIntake.setPosition(BotConstants.SERVO_TEST_LEFT);
             } else if(gamepad1.right_bumper){
-                clawIntake.setPosition(0);
+                clawIntake.setPosition(BotConstants.SERVO_TEST_RIGHT);
             }
+
             if(gamepad1.x) {
                 clawRotate.setPosition(BotConstants.SERVO_TEST_POS);
             }

@@ -41,7 +41,12 @@ public class AutoLeft extends AutoSuper {
         isDown = true;
         armPosition = -2;
      //   lift.setPower(0.001);
-        closeClaw();
+        if(CLAW_CONTINUOUS) {
+            stopClaw();
+        }
+        else {
+            closeClaw();
+        }
         clawRotate.setPosition(BotConstants.SERVO_INIT_POS);
         clawIntake.setPosition(BotConstants.CLAW_CLOSED);
 

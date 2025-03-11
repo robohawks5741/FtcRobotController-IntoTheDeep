@@ -54,14 +54,14 @@ public class Main extends Robot {
     *   Right Trigger: Place or pickup in current position and get to neutral position
     *   Left Trigger: Get to High Placement Position
     *   Dpad_Up: Go to low bucket position
-    *   Dpad_Left: Go to Specimin placement position
+    *   Dpad_Left: Go to Specimen placement position
     *   Dpad_Down: Do to neutral down placement position
     *
     *  Gamepad 2:
     *  No Drive
     *  Left Joystick runs out and in the arm
     *
-    *  ToDo:
+    *  TODO:
     *   - Hang pid
     *   - Hang Placement Position
     *   - Specemin placement position
@@ -91,7 +91,6 @@ public class Main extends Robot {
     //8 - up and retracted (for resetting)
 
     //new:
-    //negative numbers will be used for the runout positions
     //-1 - Down Somewhat neutral
     //-2 - parallel to ground and in (neutral pos)
     //-3 - Short sample pickup position
@@ -107,8 +106,12 @@ public class Main extends Robot {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-
-        closeClaw();
+        if(!CLAW_CONTINUOUS) {
+            closeClaw();
+        }
+        else {
+            stopClaw();
+        }
         clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
         armPosition = -2;
         try {
@@ -137,11 +140,19 @@ public class Main extends Robot {
             ));
          //   calculateLiftVoltage();
             if(gamepad1.left_bumper){
-                closeClaw();
-
+                if(CLAW_CONTINUOUS) {
+                    stopClaw();
+                }
+                else {
+                    closeClaw();
+                }
             } else if(gamepad1.right_bumper){
-                openClaw();
-
+                if(CLAW_CONTINUOUS) {
+                    runClawReverse();
+                }
+                else {
+                    openClaw();
+                }
             }
             if((gamepad1.x || gamepad2.x) && !pressed) {
                 pressed = true;
@@ -153,6 +164,9 @@ public class Main extends Robot {
                 retracting = false;
                 encoderMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 encoderMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                if(CLAW_CONTINUOUS) {
+                    stopClaw();
+                }
                 resetPosition();
                 //sets to a retracted position based on where the arm currently is
                 if(isDown) {
@@ -171,13 +185,21 @@ public class Main extends Robot {
                 armPosition = -1;
 
                 resetPosition();
-                clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
+                if(CLAW_CONTINUOUS) {
+                    runClaw();
+                }
+                else {
+                    clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
+                }
             } else if((gamepad1.dpad_right || gamepad2.dpad_right) && !pressed && armPosition != -3) {
                 pressed = true;
                 armPosition = -3;
 
                 resetPosition();
                 clawRotate.setPosition(BotConstants.SERVO_DOWN_POS);
+                if(CLAW_CONTINUOUS) {
+                    runClaw();
+                }
             } else if ((gamepad1.right_trigger > 0.1 || gamepad2.right_trigger > 0.1) && !pressed){
                 //Place based on position and rotate to the neutral pos
 
@@ -186,20 +208,39 @@ public class Main extends Robot {
                     clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_PLACEMENT_POS);
                     resetPosition();
                     armPosition = -4; // Not quite down yk
+                    if(CLAW_CONTINUOUS) {
+                        stopClaw();
+                    }
 
                 } else if (armPosition == -4){//Specimen place to all the way down yk
-                    openClaw();
+                    if(CLAW_CONTINUOUS) {
+                        stopClaw();
+                    }
+                    else {
+                        openClaw();
+                        }
                     resetPosition();
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 }
                 else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
                     resetPosition();
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
+                    if(CLAW_CONTINUOUS) {
+                        stopClaw();
+                    }
                 } else if (armPosition == -1 || armPosition == -3) { //Down pos or specimen pickup pos
-                    closeClaw();
+                    if(CLAW_CONTINUOUS) {
+                        stopClaw();
+                    }
+                    else {
+                        closeClaw();
+                    }
                     resetPosition();
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 } else {
+                    if(CLAW_CONTINUOUS) {
+                        stopClaw();
+                    }
                     resetPosition();
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 }
@@ -222,19 +263,27 @@ public class Main extends Robot {
                 //Go to high specimen placement position
                 pressed = true;
                 armPosition = 3;
+                if(CLAW_CONTINUOUS) {
+                    stopClaw();
+                }
                 clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_READY_POS);
                 resetPosition();
             } else if((gamepad1.dpad_up || gamepad2.dpad_up) && !pressed && armPosition != 4){
                 //Go to low bucket position
                 pressed = true;
                 armPosition = 4;
-
+                if(CLAW_CONTINUOUS) {
+                    stopClaw();
+                }
                 clawRotate.setPosition(BotConstants.SERVO_PLACEMENT_POS);
 
 
                 resetPosition();
             } else if((gamepad1.left_trigger > 0.1 || gamepad2.left_trigger > 0.1) && !pressed && armPosition != 5){
                 //Go to high bucket position
+                if(CLAW_CONTINUOUS) {
+                    stopClaw();
+                }
                 pressed = true;
                 armPosition = 5;
 
@@ -243,6 +292,9 @@ public class Main extends Robot {
                 resetPosition();
             } else if((gamepad1.y || gamepad2.y) && !pressed && armPosition != 6){
                 //Get ready to hang
+                if(CLAW_CONTINUOUS) {
+                    stopClaw();
+                }
                 hanging = false;
                 pressed = true;
                 armPosition = 6;

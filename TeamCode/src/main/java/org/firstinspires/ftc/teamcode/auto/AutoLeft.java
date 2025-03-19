@@ -39,7 +39,8 @@ public class AutoLeft extends AutoSuper {
        super.runOpMode();
         isIn = true;
         isDown = true;
-        armPosition = -2;
+        armPosition = -5;
+        rotateTargetVoltage = BotConstants.ARM_STARTING_VOLTS;
      //   lift.setPower(0.001);
         if(CLAW_CONTINUOUS) {
             stopClaw();
@@ -48,6 +49,7 @@ public class AutoLeft extends AutoSuper {
             closeClaw();
         }
         clawRotate.setPosition(BotConstants.SERVO_INIT_POS);
+        //?
         clawIntake.setPosition(BotConstants.CLAW_CLOSED);
 
         while (!isStarted() && !isStopRequested()){
@@ -69,6 +71,9 @@ public class AutoLeft extends AutoSuper {
 
 
         waitForStart();
+        /*
+         *This was the working, not ideal place to put this
+
             try {
                 rotate = new DualMotor(backRotate, frontRotate,
                         BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
@@ -81,10 +86,11 @@ public class AutoLeft extends AutoSuper {
                     BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
                     BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
                     BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
+         */
 
             resetPosition();
 
-             backgroundThread = new Thread(() -> {
+            backgroundThread = new Thread(() -> {
                 while (!isStopRequested() && isRunning){
                     try {
                         rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
@@ -107,7 +113,7 @@ public class AutoLeft extends AutoSuper {
             });
 
 
-        backgroundThread.start();
+            backgroundThread.start();
 
 
             Actions.runBlocking(new ParallelAction(

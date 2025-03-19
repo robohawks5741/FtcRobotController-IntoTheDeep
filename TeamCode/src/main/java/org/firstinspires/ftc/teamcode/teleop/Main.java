@@ -95,6 +95,7 @@ public class Main extends Robot {
     //-2 - parallel to ground and in (neutral pos)
     //-3 - Short sample pickup position
     //-4 - specimen placed position
+    //-5 - initialized position
     //3 - Specimen placement position
     //4 - Low bucket placement
     //5 - High bucket placement
@@ -201,18 +202,18 @@ public class Main extends Robot {
                     runClaw();
                 }
             } else if ((gamepad1.right_trigger > 0.1 || gamepad2.right_trigger > 0.1) && !pressed){
-                //Place based on position and rotate to the neutral pos
+                //Rotate to the neutral pos after placing
 
 
                 if (armPosition == 3){//Specimen placement position
                     clawRotate.setPosition(BotConstants.SERVO_SPECIMEN_PLACEMENT_POS);
                     resetPosition();
-                    armPosition = -4; // Not quite down yk
+                    armPosition = -4; // Not quite down
                     if(CLAW_CONTINUOUS) {
                         stopClaw();
                     }
 
-                } else if (armPosition == -4){//Specimen place to all the way down yk
+                } else if (armPosition == -4){//Specimen place to all the way down
                     if(CLAW_CONTINUOUS) {
                         stopClaw();
                     }
@@ -303,7 +304,7 @@ public class Main extends Robot {
                 resetPosition();
 
 
-            } else if(((gamepad1.a && !gamepad1.start)|| gamepad2.a) && !pressed && armPosition != 7){
+            } else if(((gamepad1.a && !gamepad1.start)|| gamepad2.a) && !pressed && armPosition == 6){
                 //Pull down on hang
                 pressed = true;
                 hanging = true;

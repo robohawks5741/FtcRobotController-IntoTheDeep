@@ -122,6 +122,22 @@ public class Robot extends LinearOpMode {
         //currently unused
         desiredExtendedness = 1;
 
+        //ideally where this should go, if its able to work
+
+        try {
+            rotate = new DualMotor(backRotate, frontRotate,
+                    BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
+                    BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK,
+                    BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        lift = new DualMotor(backLift,
+                BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
+                BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
+                BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
+
+
         frontRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -139,7 +155,7 @@ public class Robot extends LinearOpMode {
           a great solution to this, because no matter what code you have here, the encoder can never tell
           the difference between initializing at a position and one revolution past that position
          */
-        liftEncoderRotations = 0;
+
 
      //   camera.setPipeline(aprilTagDetectionPipeline);
 
@@ -248,8 +264,11 @@ public class Robot extends LinearOpMode {
         //Checks to see if the arm is down or up
         isDown = !(normalizeRotateVoltage(rotateEncoder.getVoltage()) < BotConstants.ARM_UP_EXTENDABLE_VOLTS);
 
-
-        if ((isDown && armPosition > 0 && !isIn) || (!isDown && armPosition < 0 && !isIn)){ //Sees if it needs to pull in
+        if(armPosition == -5) {
+            liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
+            rotateTargetVoltage = BotConstants.ARM_STARTING_VOLTS;
+        }
+        else if ((isDown && armPosition > 0 && !isIn) || (!isDown && armPosition < 0 && !isIn)){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
         } else if((!isDown && armPosition < 0 && isIn) || (isDown && armPosition > 0 && isIn) || (isDown && armPosition < 3) || (!isDown && armPosition > 2)){
             //Waits until it is pulled in yo rotate it
@@ -451,6 +470,7 @@ public class Robot extends LinearOpMode {
     }
     //TODO: create code for moving claw along ground
 
+    //mod that works for doubles
     protected static double mod(double a, double b) {
         while(a < 0) {
             a += b;

@@ -23,6 +23,9 @@ public final class BotConstants {
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
     public static double ARM_GROUND_VOLTS_EXTENDED = (1.05 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+    //this may need to be tweaked
+    public static double ARM_STARTING_VOLTS = (1.05 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+
     public static double AUTO_ARM_GROUND_VOLTS_EXTENDED = (1.085 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
 
     public static final double ARM_GROUND_VOLTS_RETRACTED = (1.098 + ARM_BACK_VOLTS) % MAX_VOLTAGE;

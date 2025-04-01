@@ -104,8 +104,8 @@ public final class BotConstants {
 
     //Wrist Servo -----------------------------------------------------
     public static double SERVO_TEST_POS = 0;
-    public static double SERVO_TEST_LEFT = 0;
-    public static double SERVO_TEST_RIGHT = 0;
+    public static double SERVO_TEST_LEFT = 0.5;
+    public static double SERVO_TEST_RIGHT = -0.5;
 
     public static final double SERVO_PICKUP_POS = 0;
 

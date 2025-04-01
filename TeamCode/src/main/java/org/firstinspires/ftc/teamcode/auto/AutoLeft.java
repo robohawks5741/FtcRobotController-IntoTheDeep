@@ -36,7 +36,7 @@ public class AutoLeft extends AutoSuper {
     @Override
     public void runOpMode() throws InterruptedException {
 
-       super.runOpMode();
+        super.runOpMode();
         isIn = true;
         isDown = true;
         armPosition = -5;
@@ -191,9 +191,26 @@ public class AutoLeft extends AutoSuper {
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_OPEN))
                             .waitSeconds(0.5)
                             .stopAndAdd(new ServoAction(clawRotate,  BotConstants.SERVO_PARALLEL_POS))
-                            .splineToConstantHeading(new Vector2d(placementX+4, placementY-3), Math.toRadians(-45.0))
+
+                            //Pick up fifth
+                            //spline to correct position
+                            //.waitSeconds(1.5)
+                            //.stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_CLOSED))
+                            //.waitSeconds(0.5)
+                            //.stopAndAdd(new ServoAction(clawRotate,  BotConstants.SERVO_PLACEMENT_POS))
+
+                            //place fifth
+                            //.stopAndAdd(new SetArmPos(this, 5))
+                            //.waitSeconds(1.5)
+                            //.splineToLinearHeading(new Pose2d(placementX+3, placementY-3, Math.toRadians(-45.0)), Math.toRadians(-18.12))
+
+                            //.splineToConstantHeading(new Vector2d(placementX, placementY), Math.toRadians(-45.0))                            // .splineToConstantHeading(new Vector2d(9.11, 24.03), Math.toRadians(-45.0))
+                            //.stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_OPEN))
+                            //.waitSeconds(0.5)
+                            //.stopAndAdd(new ServoAction(clawRotate,  BotConstants.SERVO_PARALLEL_POS))
 
                             //Park
+                            .splineToConstantHeading(new Vector2d(placementX+4, placementY-3), Math.toRadians(-45.0))
                             .stopAndAdd(new SetArmPos(this, -2))
                             .waitSeconds(1.5)
                             .splineToConstantHeading(new Vector2d(2.19, 30.46), Math.toRadians(-45.0))

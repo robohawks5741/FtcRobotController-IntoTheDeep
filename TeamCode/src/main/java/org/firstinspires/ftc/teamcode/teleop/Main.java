@@ -213,7 +213,7 @@ public class Main extends Robot {
                         stopClaw();
                     }
 
-                } else if (armPosition == -4){//Specimen place to all the way down
+                } else if (armPosition == -4) {//Specimen place to all the way down
                     if(CLAW_CONTINUOUS) {
                         stopClaw();
                     }
@@ -223,7 +223,7 @@ public class Main extends Robot {
                     resetPosition();
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                 }
-                else if (armPosition == 5 || armPosition == 4){ //bucket placement pos
+                else if (armPosition == 5 || armPosition    == 4){ //bucket placement pos
                     resetPosition();
                     clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
                     if(CLAW_CONTINUOUS) {

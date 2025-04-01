@@ -265,7 +265,7 @@ public class AprilTagPipeline extends OpenCvPipeline
      * @param tagsizeY the original height of the tag
      * @return the 6DOF pose of the camera relative to the tag
      */
-    Pose poseFromTrapezoid(Point[] points, Mat cameraMatrix, double tagsizeX , double tagsizeY)
+    public static Pose poseFromTrapezoid(Point[] points, Mat cameraMatrix, double tagsizeX, double tagsizeY)
     {
         // The actual 2d points of the tag detected in the image
         MatOfPoint2f points2d = new MatOfPoint2f(points);
@@ -289,21 +289,26 @@ public class AprilTagPipeline extends OpenCvPipeline
      * A simple container to hold both rotation and translation
      * vectors, which together form a 6DOF pose.
      */
-    class Pose
-    {
+    public static class Pose {
         Mat rvec;
         Mat tvec;
 
-        public Pose()
-        {
+        public Pose() {
             rvec = new Mat();
             tvec = new Mat();
         }
 
-        public Pose(Mat rvec, Mat tvec)
-        {
+        public Pose(Mat rvec, Mat tvec) {
             this.rvec = rvec;
             this.tvec = tvec;
+        }
+
+        public Mat getRvec() {
+            return rvec;
+        }
+
+        public Mat getTvec() {
+            return tvec;
         }
     }
 }

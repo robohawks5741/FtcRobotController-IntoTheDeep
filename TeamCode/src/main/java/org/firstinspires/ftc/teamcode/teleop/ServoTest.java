@@ -32,6 +32,8 @@ public class ServoTest extends LinearOpMode {
                 clawIntake.setPosition(BotConstants.SERVO_TEST_LEFT);
             } else if(gamepad1.right_bumper){
                 clawIntake.setPosition(BotConstants.SERVO_TEST_RIGHT);
+            } else if(gamepad1.x) {
+                clawIntake.setPosition(0);
             }
 
             if(gamepad1.x) {

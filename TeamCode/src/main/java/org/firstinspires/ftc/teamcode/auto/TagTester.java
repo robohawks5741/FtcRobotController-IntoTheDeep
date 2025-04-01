@@ -191,7 +191,7 @@ public class TagTester extends LinearOpMode
         + ", z = " + absolutePose.z() + ", angle = " + absolutePose.angle());
     }
     //this is written assuming origin is the center of the field
-    //0 degrees is pointing away from audience, towards blue net zone and red ascent zone
+    //0 degrees is pointing away from audience, towards blue net zone and red observation zone
     TagConstants.Pose pointToPose(AprilTagDetection detection) {
         AprilTagPipeline.Pose D0Fpose = AprilTagPipeline.poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
 
@@ -199,18 +199,22 @@ public class TagTester extends LinearOpMode
         telemetry.addLine("TVec: " + D0Fpose.getTvec().get(0, 0)[0] * FEET_PER_METER + ", "
                 + D0Fpose.getTvec().get(1, 0)[0] * FEET_PER_METER + ", "+ D0Fpose.getTvec().get(2, 0 )[0]* FEET_PER_METER);
         double xInit = detection.pose.x * FEET_PER_METER / FEET_PER_INCH;
-        double yInit = detection.pose.y * FEET_PER_METER / FEET_PER_INCH;
+        //weirdness between what's considered y and z I think
+        double yInit = detection.pose.z * FEET_PER_METER / FEET_PER_INCH;
+        telemetry.addData("xinit", xInit);
+        telemetry.addData("yinit", yInit);
         double yaw = D0Fpose.getRvec().get(2, 0)[0];
         double r = Math.sqrt(Math.pow(xInit, 2) + Math.pow(yInit, 2));
         double headingWithYaw = Math.atan(xInit / yInit);
         //the bot's heading relative to the wall
-        double trueHeading = headingWithYaw + yaw - Math.PI;
+        double trueHeading = headingWithYaw + yaw;
         //reorient with tag position
         //there's very likely to be some sign error/90 degree off angle here
         trueHeading = -trueHeading + Math.toRadians(TagConstants.TagPositions.getA(detection.id));
-        double trueX = -r * Math.sin(trueHeading) + TagConstants.TagPositions.getX(detection.id);
-        double trueY = -r * Math.cos(trueHeading) + TagConstants.TagPositions.getY(detection.id);
-        double z = -detection.pose.z + TagConstants.TagPositions.getZ(detection.id);
+        //not sure about any of this to be honest I'm just trying stuff
+        double trueX = r * Math.cos(trueHeading) + TagConstants.TagPositions.getX(detection.id);
+        double trueY = r * Math.sin(trueHeading) + TagConstants.TagPositions.getY(detection.id);
+        double z = -detection.pose.y * FEET_PER_METER / FEET_PER_INCH + TagConstants.TagPositions.getZ(detection.id);
         return new TagConstants.Pose(trueX, trueY, z, trueHeading);
     }
 }

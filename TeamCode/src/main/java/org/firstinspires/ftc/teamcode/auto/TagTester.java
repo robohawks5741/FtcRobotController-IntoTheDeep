@@ -212,8 +212,17 @@ public class TagTester extends LinearOpMode
         //there's very likely to be some sign error/90 degree off angle here
         trueHeading = -trueHeading + Math.toRadians(TagConstants.TagPositions.getA(detection.id));
         //not sure about any of this to be honest I'm just trying stuff
-        double trueX = r * Math.cos(trueHeading) + TagConstants.TagPositions.getX(detection.id);
-        double trueY = r * Math.sin(trueHeading) + TagConstants.TagPositions.getY(detection.id);
+        //this should work I think--it's disgusting but I don't feel like wading through all this trig to find
+        //one sign error
+        double trueX, trueY;
+        if(detection.id == 12 || detection.id == 15) {
+            trueX = r * Math.cos(trueHeading) + TagConstants.TagPositions.getX(detection.id);
+            trueY = -r * Math.sin(trueHeading) + TagConstants.TagPositions.getY(detection.id);
+        }
+        else {
+            trueX = -r * Math.cos(trueHeading) + TagConstants.TagPositions.getX(detection.id);
+            trueY = r * Math.sin(trueHeading) + TagConstants.TagPositions.getY(detection.id);
+        }
         double z = -detection.pose.y * FEET_PER_METER / FEET_PER_INCH + TagConstants.TagPositions.getZ(detection.id);
         return new TagConstants.Pose(trueX, trueY, z, trueHeading);
     }

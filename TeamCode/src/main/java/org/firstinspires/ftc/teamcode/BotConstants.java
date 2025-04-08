@@ -120,4 +120,9 @@ public final class BotConstants {
     //Claw-
     public static final double CLAW_OPEN = 0.25;
     public static final double CLAW_CLOSED = 0;
+
+    public static final double INCHES_PER_METER = 39.3701;
+
+    public static final double tagsize = 0.1016;
+
 }

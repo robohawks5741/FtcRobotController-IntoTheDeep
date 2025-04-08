@@ -311,4 +311,8 @@ public class AprilTagPipeline extends OpenCvPipeline
             return tvec;
         }
     }
+
+    public Mat getMatrix(){
+        return cameraMatrix;
+    }
 }

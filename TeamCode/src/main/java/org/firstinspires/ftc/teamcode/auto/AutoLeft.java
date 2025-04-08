@@ -115,7 +115,7 @@ public class AutoLeft extends AutoSuper {
 
             backgroundThread.start();
 
-
+            //positions are in inches
             Actions.runBlocking(new ParallelAction(
                     drive.actionBuilder(beginPose)
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_CLOSED))

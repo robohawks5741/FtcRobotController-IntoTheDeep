@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
 import org.opencv.core.Point;
@@ -29,13 +30,13 @@ import java.util.ArrayList;
 public class TagTester extends LinearOpMode
 {
 
-    Mat cameraMatrix;
+    static Mat cameraMatrix;
 
 
     OpenCvCamera camera;
     AprilTagPipeline aprilTagDetectionPipeline;
-    double tagsizeX = 0.1016;
-    double tagsizeY = 0.1016;
+    static double tagsizeX = 0.1016;
+    static double tagsizeY = 0.1016;
     static final double FEET_PER_METER = 3.28084;
     static final double FEET_PER_INCH = 1.0/12;
 
@@ -188,21 +189,16 @@ public class TagTester extends LinearOpMode
         //this pose is in inches
         TagConstants.Pose absolutePose = pointToPose(detection);
         telemetry.addLine("Absolute pose: x = " + absolutePose.x() + ", y = " + absolutePose.y()
-        + ", z = " + absolutePose.z() + ", angle = " + absolutePose.angle());
+        + ", z = " + absolutePose.z() + ", angle = " + Math.toDegrees(absolutePose.angle()));
     }
     //this is written assuming origin is the center of the field
     //0 degrees is pointing away from audience, towards blue net zone and red observation zone
-    TagConstants.Pose pointToPose(AprilTagDetection detection) {
+    public static TagConstants.Pose pointToPose(AprilTagDetection detection) {
         AprilTagPipeline.Pose D0Fpose = AprilTagPipeline.poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
 
-        telemetry.addLine("RVec: " + D0Fpose.getRvec().get(0, 0)[0] + ", "+ D0Fpose.getRvec().get(1, 0)[0] + ", "+ D0Fpose.getRvec().get(2, 0)[0]);
-        telemetry.addLine("TVec: " + D0Fpose.getTvec().get(0, 0)[0] * FEET_PER_METER + ", "
-                + D0Fpose.getTvec().get(1, 0)[0] * FEET_PER_METER + ", "+ D0Fpose.getTvec().get(2, 0 )[0]* FEET_PER_METER);
         double xInit = detection.pose.x * FEET_PER_METER / FEET_PER_INCH;
         //weirdness between what's considered y and z I think
         double yInit = detection.pose.z * FEET_PER_METER / FEET_PER_INCH;
-        telemetry.addData("xinit", xInit);
-        telemetry.addData("yinit", yInit);
         double yaw = D0Fpose.getRvec().get(2, 0)[0];
         double r = Math.sqrt(Math.pow(xInit, 2) + Math.pow(yInit, 2));
         double headingWithYaw = Math.atan(xInit / yInit);
@@ -226,4 +222,8 @@ public class TagTester extends LinearOpMode
         double z = -detection.pose.y * FEET_PER_METER / FEET_PER_INCH + TagConstants.TagPositions.getZ(detection.id);
         return new TagConstants.Pose(trueX, trueY, z, trueHeading);
     }
+
+
+
+
 }

@@ -151,10 +151,16 @@ public class CameraMain extends Robot {
 
 
             if (!currentDetections.isEmpty()){
+                tagOfInterest = currentDetections.get(0);
                 telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
                 tagToTelemetry(tagOfInterest);
+                Pose2d absolutePose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
+                telemetry.addLine("Absolute Pose: x =  " + absolutePose.position.x +
+                        ", y = " + absolutePose.position.y + ", heading = " + absolutePose.heading);
             }
-
+            else {
+                telemetry.addLine("Tag of interest is not in sight");
+            }
 
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(

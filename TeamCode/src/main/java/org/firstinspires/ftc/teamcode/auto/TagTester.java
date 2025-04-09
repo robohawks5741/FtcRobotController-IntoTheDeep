@@ -1,11 +1,17 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Drawing;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
 import org.opencv.core.Point;
@@ -29,6 +35,8 @@ import java.util.ArrayList;
 @ Autonomous(name="Vision Tester")
 public class TagTester extends LinearOpMode
 {
+
+
 
     static Mat cameraMatrix;
 
@@ -59,6 +67,8 @@ public class TagTester extends LinearOpMode
     @Override
     public void runOpMode()
     {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         cameraMatrix = new Mat(3,3,CvType.CV_32FC1);
         cameraMatrix.put(0, 0, fx);
         cameraMatrix.put(0,1,0);
@@ -188,6 +198,16 @@ public class TagTester extends LinearOpMode
         telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
         //this pose is in inches
         TagConstants.Pose absolutePose = pointToPose(detection);
+
+
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(absolutePose.x(), absolutePose.y(), absolutePose.angle()));
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.fieldOverlay().setStroke("#3F51B5");
+        Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
+
+
         telemetry.addLine("Absolute pose: x = " + absolutePose.x() + ", y = " + absolutePose.y()
         + ", z = " + absolutePose.z() + ", angle = " + Math.toDegrees(absolutePose.angle()));
     }
@@ -204,6 +224,10 @@ public class TagTester extends LinearOpMode
         double headingWithYaw = Math.atan(xInit / yInit);
         //the bot's heading relative to the wall
         double trueHeading = headingWithYaw + yaw;
+
+
+
+
         //reorient with tag position
         //there's very likely to be some sign error/90 degree off angle here
         trueHeading = -trueHeading + Math.toRadians(TagConstants.TagPositions.getA(detection.id));

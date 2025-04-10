@@ -115,18 +115,6 @@ public class Main extends Robot {
         }
         clawRotate.setPosition(BotConstants.SERVO_PARALLEL_POS);
         armPosition = -2;
-        try {
-            rotate = new DualMotor(backRotate, frontRotate,
-                    BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        lift = new DualMotor(backLift,
-                BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
-                BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
-                BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
 
         resetPosition();
 
@@ -352,8 +340,15 @@ public class Main extends Robot {
                 telemetry.addData("isIn", isIn);
                 telemetry.addData("isDown", isDown);
                 telemetry.addData("pressed", pressed);
-                telemetry.addData("target", rotateTargetVoltage);
-                telemetry.addData("angle", getAngle());
+                telemetry.addData("target", rotateTargetPosition);
+            try {
+                telemetry.addData("PID Power", rotate.getPIDPower(getAngle(), rotateTargetPosition));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+
+            telemetry.addData("angle", getAngle());
                 telemetry.addData("rotate power", rotatePower);
                 telemetry.addData("lift power", liftPower);
                 telemetry.addData("rotate encoder output", rotateEncoder.getVoltage());

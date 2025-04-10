@@ -19,5 +19,6 @@ dependencies {
     runtimeOnly 'org.tensorflow:tensorflow-lite:2.12.0'
 
 
+
 }
 

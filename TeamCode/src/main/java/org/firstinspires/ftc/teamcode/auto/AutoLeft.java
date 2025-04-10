@@ -40,7 +40,7 @@ public class AutoLeft extends AutoSuper {
         isIn = true;
         isDown = true;
         armPosition = -5;
-        rotateTargetVoltage = BotConstants.ARM_STARTING_VOLTS;
+        rotateTargetPosition = BotConstants.ARM_STARTING_VOLTS;
      //   lift.setPower(0.001);
         if(CLAW_CONTINUOUS) {
             stopClaw();
@@ -53,9 +53,9 @@ public class AutoLeft extends AutoSuper {
         clawIntake.setPosition(BotConstants.CLAW_CLOSED);
 
         while (!isStarted() && !isStopRequested()){
-            telemetry.addData("Arm target", rotateTargetVoltage);
+            telemetry.addData("Arm target", rotateTargetPosition);
             telemetry.addData("Rotate current output", rotateEncoder.getVoltage());
-            telemetry.addData("target", rotateTargetVoltage);
+            telemetry.addData("target", rotateTargetPosition);
             telemetry.addData("armPos", armPosition);
             telemetry.addData("isin", isIn);
             telemetry.addData("lift", liftRealVoltage);
@@ -93,10 +93,10 @@ public class AutoLeft extends AutoSuper {
             backgroundThread = new Thread(() -> {
                 while (!isStopRequested() && isRunning){
                     try {
-                        rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
+                        rotateTargetPosition = normalizeRotateVoltage(rotateTargetPosition);
                         handleArm();
-                        telemetry.addData("target", rotateTargetVoltage);
-                        telemetry.addData("Arm I", rotate.getPid().integralSum);
+                        telemetry.addData("target", rotateTargetPosition);
+                //        telemetry.addData("Arm I", rotate.getPid().integralSum);
                         telemetry.addData("armPos", armPosition);
                         telemetry.addData("isin", isIn);
                         telemetry.addData("lift", liftRealVoltage);

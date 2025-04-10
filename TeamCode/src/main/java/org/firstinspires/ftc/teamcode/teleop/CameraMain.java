@@ -376,7 +376,7 @@ public class CameraMain extends Robot {
                 telemetry.addData("isIn", isIn);
                 telemetry.addData("isDown", isDown);
                 telemetry.addData("pressed", pressed);
-                telemetry.addData("target", rotateTargetVoltage);
+                telemetry.addData("target", rotateTargetPosition);
                 telemetry.addData("angle", getAngle());
                 telemetry.addData("rotate power", rotatePower);
                 telemetry.addData("lift power", liftPower);

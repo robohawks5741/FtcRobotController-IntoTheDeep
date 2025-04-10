@@ -49,7 +49,7 @@ public class Robot extends LinearOpMode {
     protected AnalogInput rotateEncoder, liftEncoder;
     protected int rotatePos;
     protected int liftPos;
-    protected double rotateTargetVoltage;
+    protected double rotateTargetPosition;
     protected double liftTargetVoltage;
     protected double startingRotateVoltage;
     protected double startingLiftVoltage;
@@ -116,7 +116,7 @@ public class Robot extends LinearOpMode {
         liftEncoder = hardwareMap.get(AnalogInput.class, "liftEncoder");
         startingRotateVoltage = normalizeRotateVoltage(rotateEncoder.getVoltage());
         startingLiftVoltage = liftEncoder.getVoltage();
-        rotateTargetVoltage = startingRotateVoltage;
+        rotateTargetPosition = startingRotateVoltage;
         liftTargetVoltage = startingLiftVoltage;
         liftPreviousVoltage = startingLiftVoltage;
         //currently unused
@@ -124,18 +124,21 @@ public class Robot extends LinearOpMode {
 
         //ideally where this should go, if its able to work
 
+
+
+
+        lift = new DualMotor(backLift,
+                BotConstants.liftKp,
+                BotConstants.liftKi,
+                BotConstants.liftKd);
         try {
             rotate = new DualMotor(backRotate, frontRotate,
-                    BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
+                    BotConstants.armUpKp,
+                    BotConstants.armUpKi,
+                    BotConstants.armUpKd);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        lift = new DualMotor(backLift,
-                BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
-                BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
-                BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
 
 
         frontRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -247,12 +250,12 @@ public class Robot extends LinearOpMode {
 
     public void handleArm() throws Exception {
 
-        rotateTargetVoltage = normalizeRotateVoltage(rotateTargetVoltage);
+        rotateTargetPosition = normalizeRotateVoltage(rotateTargetPosition);
         extendedness = (liftRealVoltage - BotConstants.LIFT_RETRACTED_VOLTS)
                 / (BotConstants.LIFT_EXTENDED_VOLTS - BotConstants.LIFT_RETRACTED_VOLTS);
         //solves for target positions in ticks for rotate and lift based on the voltage values
         //these are useless i believe
-        rotatePos = (int)((rotateTargetVoltage - startingRotateVoltage) / BotConstants.VOLTS_PER_TICK);
+        rotatePos = (int)((rotateTargetPosition - startingRotateVoltage) / BotConstants.VOLTS_PER_TICK);
         //this sign needs to be checked
         liftPos = (int)((liftTargetVoltage - startingLiftVoltage) / BotConstants.VOLTS_PER_TICK);
         //checks whether the lift encoder voltage has ticked over one way or the other
@@ -266,7 +269,7 @@ public class Robot extends LinearOpMode {
 
         if(armPosition == -5) {
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
-            rotateTargetVoltage = BotConstants.ARM_STARTING_VOLTS;
+            rotateTargetPosition = BotConstants.ARM_STARTING_VOLTS;
         }
         else if ((isDown && armPosition > 0 && !isIn) || (!isDown && armPosition < 0 && !isIn)){ //Sees if it needs to pull in
             liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
@@ -283,32 +286,32 @@ public class Robot extends LinearOpMode {
             }
             switch(armPosition) {
                 case -1:
-                    rotateTargetVoltage = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
+                    rotateTargetPosition = BotConstants.ARM_GROUND_VOLTS_EXTENDED;
                     break;
                 case -2:
-                    rotateTargetVoltage = BotConstants.HORIZONTAL_VOLTS;
+                    rotateTargetPosition = BotConstants.HORIZONTAL_VOLTS;
                     break;
                 case -3:
-                    rotateTargetVoltage = BotConstants.ROTATE_SHORT_DOWN_VOLTS;
+                    rotateTargetPosition = BotConstants.ROTATE_SHORT_DOWN_VOLTS;
                     break;
                 case -4:
-                    rotateTargetVoltage = BotConstants.ROTATE_SPECIMEN_PLACEMENT;
+                    rotateTargetPosition = BotConstants.ROTATE_SPECIMEN_PLACEMENT;
                     break;
                 case 3:
-                    rotateTargetVoltage = BotConstants.ARM_SPECIMEN_PLACEMENT_VOLTS;
+                    rotateTargetPosition = BotConstants.ARM_SPECIMEN_PLACEMENT_VOLTS;
                     break;
                 case 4:
                 case 5:
-                    rotateTargetVoltage = BotConstants.ARM_FRONT_PLACING_VOLTS;
+                    rotateTargetPosition = BotConstants.ARM_FRONT_PLACING_VOLTS;
                     break;
                 case 6:
-                    rotateTargetVoltage = BotConstants.ARM_BACK_VOLTS;
+                    rotateTargetPosition = BotConstants.ARM_BACK_VOLTS;
                     break;
                 case 7:
                     //this should be irrelevant
                     break;
                 case 8:
-                    rotateTargetVoltage = BotConstants.ARM_VERTICAL_VOLTS;
+                    rotateTargetPosition = BotConstants.ARM_VERTICAL_VOLTS;
                     break;
                 default:
                     telemetry.addLine("Invalid arm position");
@@ -360,17 +363,17 @@ public class Robot extends LinearOpMode {
         }
     }
     protected void updateRotate() throws Exception {
-        calculateLiftVoltage();
-        double pidPower = (-rotate.getPIDPower(rotateTargetVoltage, normalizeRotateVoltage(rotateEncoder.getVoltage())));
+      /*  calculateLiftVoltage();
+        double pidPower = (rotate.getPIDPower(getAngle()));
         double gravity = BotConstants.armBasePower * Math.cos(getAngle());
         double totalPower = pidPower + gravity;
         totalPower = clamp(totalPower, -1, 1);
         double powerScale = .5 + 0.5*extendedness;
-        rotatePower = powerScale*totalPower;
-        rotate.setPower(rotatePower);
+        rotatePower = powerScale*totalPower;*/
+        rotate.setPower(rotate.getPIDPower(rotateEncoder.getVoltage(), rotateTargetPosition));
        /* rotate.setTargetPosition(rotatePos);
         rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        try {
+        try {x  
             //signs of each part of this are based on direction of motor and encoder
             //currently up from ground = positive power, negative encoder voltage
             rotatePower = (-rotate.getPIDPower(rotateTargetVoltage, normalizeRotateVoltage(rotateEncoder.getVoltage()))
@@ -385,8 +388,9 @@ public class Robot extends LinearOpMode {
         lift.setTargetPosition(liftPos);
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         try {
-            liftPower = -(lift.getPIDPower(liftTargetVoltage, liftRealVoltage)
-                    + BotConstants.liftBasePower * Math.sin(getAngle()));
+            liftPower=0;
+          //  liftPower = (lift.getPIDPower(liftTargetVoltage, liftRealVoltage));
+                    //+ BotConstants.liftBasePower * Math.sin(getAngle()));
             lift.setPower(clamp(liftPower, -1, 1));
         } catch(Exception e) {
             throw new RuntimeException(e);

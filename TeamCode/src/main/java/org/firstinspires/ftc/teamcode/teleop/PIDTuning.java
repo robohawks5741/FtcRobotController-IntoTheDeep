@@ -183,9 +183,9 @@ public class PIDTuning extends LinearOpMode {
                 telemetry.addData("target voltage", BotConstants.HORIZONTAL_VOLTS);
                 telemetry.addData("base power", BotConstants.armBasePower *
                                     Math.cos(BotConstants.RADS_PER_VOLT * (target - encoder.getVoltage())));
-                telemetry.addData("error", rotateArm.PID.getError());
-                telemetry.addData("last error", rotateArm.PID.getLastError());
-                telemetry.addData("derivative term", rotateArm.PID.getDerivativeTerm());
+             //   telemetry.addData("error", rotateArm.PID.getError());
+              //  telemetry.addData("last error", rotateArm.PID.getLastError());
+              //  telemetry.addData("derivative term", rotateArm.PID.getDerivativeTerm());
                 telemetry.addData("Friction offset", frictionOffset);
             } catch(Exception e) {
                 throw new RuntimeException(e);

@@ -1,7 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.arcrobotics.ftclib.controller.PIDController;
+
+import org.firstinspires.ftc.teamcode.BotConstants;
+
 
 /**
  * A utility class to contain two <code>DcMotor</code>s and use them together.
@@ -37,6 +42,7 @@ public class DualMotor {
         Ki = 0;
         Kd = 0;
         PID = new PIDController(Kp, Ki, Kd);
+        //PID.setTolerance(0.);
         sameSign = false;
     }
     /**
@@ -60,6 +66,7 @@ public class DualMotor {
         Ki = K_I;
         Kd = K_D;
         PID = new PIDController(Kp, Ki, Kd);
+        PID.setTolerance(0.01);
         sameSign = false;
     }
 
@@ -75,6 +82,7 @@ public class DualMotor {
         Ki = 0;
         Kd = 0;
         PID = new PIDController(Kp, Ki, Kd);
+        PID.setTolerance(BotConstants.armTolerance);
         sameSign = false;
     }
     /**
@@ -91,6 +99,7 @@ public class DualMotor {
         Ki = K_I;
         Kd = K_D;
         PID = new PIDController(Kp, Ki, Kd);
+        PID.setTolerance(BotConstants.armTolerance);
         sameSign = false;
     }
 
@@ -107,6 +116,8 @@ public class DualMotor {
         Ki = 0;
         Kd = 0;
         PID = new PIDController(Kp, Ki, Kd);
+        PID.setTolerance(BotConstants.armTolerance);
+
         sameSign = same;
     }
 
@@ -283,7 +294,7 @@ public class DualMotor {
      */
     public double getPIDPower() throws Exception {
         try {
-            return PID.PIDControl(getTargetPosition(), getCurrentPosition());
+            return PID.calculate(getCurrentPosition(), getTargetPosition());
         }
         catch(Exception e) {
             throw new Exception(noMotorEx);
@@ -294,9 +305,18 @@ public class DualMotor {
         return PID;
     }
 
-    public double getPIDPower(double target, double state) throws Exception {
+    public double getPIDPower(double target, double current) throws Exception {
         try {
-            return PID.PIDControl(target, state);
+            return PID.calculate(current, target);
+        }
+        catch(Exception e) {
+            throw new Exception(noMotorEx);
+        }
+    }
+
+    public double getPIDPower(double current) throws Exception {
+        try {
+            return PID.calculate(current, getTargetPosition());
         }
         catch(Exception e) {
             throw new Exception(noMotorEx);
@@ -310,12 +330,12 @@ public class DualMotor {
         return current;
     }
     public void setKp(double Kp) {
-        PID.setKp(Kp);
+        PID.setP(Kp);
     }
     public void setKi(double Ki) {
-        PID.setKi(Ki);
+        PID.setI(Ki);
     }
     public void setKd(double Kd) {
-        PID.setKd(Kd);
+        PID.setD(Kd);
     }
 }

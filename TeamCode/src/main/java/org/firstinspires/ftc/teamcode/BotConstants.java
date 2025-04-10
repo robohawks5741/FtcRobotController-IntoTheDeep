@@ -42,9 +42,13 @@ public final class BotConstants {
 
     //TODO: retune these
 
-    public static double armUpKp = 0.002;
-    public static double armUpKi = 0.0002;
+    public static double armUpKp = 0.0025;
+
+    public static double armUpKi = 0.0004;
     public static double armUpKd = 0.0002;
+
+    public static double armTolerance = 0.1;
+
     public static double armBasePower = 0.1;
     public static final double extendedIncrementalOutput = 16861;
 
@@ -109,11 +113,11 @@ public final class BotConstants {
 
     public static final double SERVO_PICKUP_POS = 0;
 
-    public static final double SERVO_INIT_POS = 0.8;
-    public static final double SERVO_PLACEMENT_POS = 0.5;
+    public static final double SERVO_INIT_POS = 0.7;
+    public static final double SERVO_PLACEMENT_POS = 0.45;
 
-    public static final double SERVO_PARALLEL_POS = 0.4;
-    public static final double SERVO_DOWN_POS = 1-0.96;
+    public static final double SERVO_PARALLEL_POS = 0.3;
+    public static final double SERVO_DOWN_POS = 0.32;
     public static double SERVO_SPECIMEN_READY_POS = 0.64;
     public static double SERVO_SPECIMEN_PLACEMENT_POS = 0.75;
 

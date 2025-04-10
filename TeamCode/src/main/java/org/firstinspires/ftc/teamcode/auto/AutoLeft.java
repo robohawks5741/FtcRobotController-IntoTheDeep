@@ -71,8 +71,8 @@ public class AutoLeft extends AutoSuper {
 
 
         waitForStart();
-        /*
-         *This was the working, not ideal place to put this
+
+        //this is the working code, not ideal
 
             try {
                 rotate = new DualMotor(backRotate, frontRotate,
@@ -86,7 +86,7 @@ public class AutoLeft extends AutoSuper {
                     BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
                     BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
                     BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
-         */
+
 
             resetPosition();
 

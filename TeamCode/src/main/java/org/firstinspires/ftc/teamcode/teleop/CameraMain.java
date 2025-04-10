@@ -5,9 +5,11 @@ import static org.firstinspires.ftc.teamcode.subsystems.Utilities.pointToPose;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -18,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.BotConstants;
 import org.firstinspires.ftc.teamcode.Drawing;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
@@ -151,11 +154,26 @@ public class CameraMain extends Robot {
 
 
             if (!currentDetections.isEmpty()){
+                tagOfInterest = currentDetections.get(0);
                 telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
                 tagToTelemetry(tagOfInterest);
+                Pose2d absolutePose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
+                telemetry.addLine("Absolute Pose: x =  " + absolutePose.position.x +
+                        ", y = " + absolutePose.position.y + ", heading = " + absolutePose.heading);
             }
-
-
+            else {
+                telemetry.addLine("Tag of interest is not in sight");
+            }
+            if(gamepad1.back) {
+                if(!currentDetections.isEmpty()) {
+                    Pose2d currentPose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
+                    drive = new MecanumDrive(hardwareMap, currentPose);
+                    Actions.runBlocking(new ParallelAction(
+                            drive.actionBuilder(currentPose)
+                                    .splineToConstantHeading(new Vector2d(-50, 0), 0)
+                                    .build()));
+                }
+            }
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
                             -gamepad1.left_stick_y * 0.7,

@@ -418,13 +418,13 @@ public class Robot extends LinearOpMode {
     }
     //TODO: figure out which direction is which for these--runClaw is defined to be in intake direction
     public void runClaw() {
-        clawIntake.setPosition(0.5);
+        clawIntake.setPosition(1);
     }
     public void runClawReverse() {
-        clawIntake.setPosition(-0.5);
+        clawIntake.setPosition(0);
     }
     public void stopClaw() {
-        clawIntake.setPosition(0);
+        clawIntake.setPosition(0.5);
     }
 
     //these constants need to be redetermined

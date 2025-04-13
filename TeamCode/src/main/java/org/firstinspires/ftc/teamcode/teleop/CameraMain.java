@@ -115,16 +115,16 @@ public class CameraMain extends Robot {
         armPosition = -2;
         try {
             rotate = new DualMotor(backRotate, frontRotate,
-                    BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
+                    BotConstants.armUpKp,
+                    BotConstants.armUpKi,
+                    BotConstants.armUpKd);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         lift = new DualMotor(backLift,
-                BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
-                BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
-                BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
+                BotConstants.liftKp,
+                BotConstants.liftKi,
+                BotConstants.liftKd);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);

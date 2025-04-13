@@ -24,8 +24,8 @@ public class AutoLeft extends AutoSuper {
 
     Thread backgroundThread;
 
-    double placementX = 5.58;//9.5
-    double placementY = 25.98;//24.03
+    double placementX = 5.00;//9.5  //Decreasing gets closer
+    double placementY = 26.5;//24.03 //increaing gets closer
 
 
     private volatile boolean isRunning = true;
@@ -76,7 +76,7 @@ public class AutoLeft extends AutoSuper {
 
             try {
                 rotate = new DualMotor(backRotate, frontRotate,
-                        BotConstants.armUpKp,
+                        BotConstants.armUpKp - 0.3,
                         BotConstants.armUpKi,
                         BotConstants.armUpKd);
             } catch (Exception e) {
@@ -174,7 +174,7 @@ public class AutoLeft extends AutoSuper {
 
 
                             //Pickup fourth
-                            .splineToLinearHeading(new Pose2d(10.39, 25.83, Math.toRadians(-18.12)), Math.toRadians(-45.0))
+                            .splineToLinearHeading(new Pose2d(12.37, 23.47, Math.toRadians(-17.16)), Math.toRadians(-45.0))
                             .stopAndAdd(new SetArmPos(this, -1))
                             .waitSeconds(1.5)
                             .stopAndAdd(new ServoAction(clawIntake,  BotConstants.CLAW_CLOSED))

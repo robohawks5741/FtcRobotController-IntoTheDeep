@@ -331,7 +331,6 @@ public class Robot extends LinearOpMode {
                     case -2:
                     case 8:
                     case 6:
-                    case 7:
                         liftTargetVoltage = BotConstants.LIFT_RETRACTED_SIDEWAYS_VOLTS;
                         break;
                     case -3:
@@ -346,6 +345,9 @@ public class Robot extends LinearOpMode {
                         break;
                     case 5:
                         liftTargetVoltage = BotConstants.LIFT_EXTENDED_VOLTS;
+                        break;
+                    case 7:
+                        liftTargetVoltage = BotConstants.LIFT_RETRACTED_HANGING_VOLTS;
                         break;
                     default:
                         telemetry.addLine("Invalid arm position");
@@ -367,7 +369,10 @@ public class Robot extends LinearOpMode {
         calculateLiftVoltage();
         double pidPower = (rotate.getPIDPower(rotateEncoder.getVoltage(), rotateTargetPosition));
         double gravity = BotConstants.armBasePower * Math.cos(getAngle());
-        double totalPower =  pidPower;
+        double totalPower = pidPower;
+        if(armPosition == 6) {
+            totalPower *= 1.2;
+        }
         totalPower = clamp(totalPower, -1, 1);
      //   double powerScale = .5 + 0.5*extendedness;
         rotatePower = totalPower;

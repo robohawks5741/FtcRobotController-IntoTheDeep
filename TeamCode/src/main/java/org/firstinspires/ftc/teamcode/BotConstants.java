@@ -65,7 +65,7 @@ public final class BotConstants {
 
 
     public static double LIFT_RETRACTED_SIDEWAYS_VOLTS = LIFT_MIN_VOLTS + 3.5;
-
+    public static double LIFT_RETRACTED_HANGING_VOLTS = LIFT_MIN_VOLTS + 2.5;
     public static double LIFT_LOW_BUCKET = LIFT_MIN_VOLTS + 2.313;
 
     public static final double LIFT_MAX_VOLTS = LIFT_MIN_VOLTS + 0.173 + 4 * MAX_VOLTAGE;

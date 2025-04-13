@@ -294,6 +294,7 @@ public class Main extends Robot {
 
             } else if(((gamepad1.a && !gamepad1.start)|| gamepad2.a) && !pressed && armPosition == 6){
                 //Pull down on hang
+                armPosition = 7;
                 pressed = true;
                 hanging = true;
                 clawRotate.setPosition(BotConstants.SERVO_INIT_POS);

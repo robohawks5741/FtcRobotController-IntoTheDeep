@@ -175,6 +175,7 @@ public class CameraMain extends Robot {
 
             List<Action> newActions = new ArrayList<>();
             for (Action action : runningActions) {
+                telemetry.addLine("here");
                 action.preview(packet.fieldOverlay());
                 if (action.run(packet)) {
                     newActions.add(action);
@@ -184,7 +185,7 @@ public class CameraMain extends Robot {
 
             dash.sendTelemetryPacket(packet);
             if(gamepad1.back) {
-                if(!currentDetections.isEmpty()) {
+                if(!currentDetections.isEmpty() && runningActions.isEmpty()) {
                     Pose2d currentPose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
                     drive = new MecanumDrive(hardwareMap, currentPose);
                     runningActions.add(new SequentialAction(

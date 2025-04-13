@@ -5,9 +5,13 @@ import static org.firstinspires.ftc.teamcode.subsystems.Utilities.pointToPose;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -31,6 +35,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @TeleOp(name = "#Camera Main")
 public class CameraMain extends Robot {
@@ -144,6 +149,8 @@ public class CameraMain extends Robot {
 
 
         resetPosition();
+        FtcDashboard dash = FtcDashboard.getInstance();
+        List<Action> runningActions = new ArrayList<>();
 
 
         waitForStart(); //-------------------------------------------------------------------------------------------------------
@@ -164,15 +171,28 @@ public class CameraMain extends Robot {
             else {
                 telemetry.addLine("Tag of interest is not in sight");
             }
+            TelemetryPacket packet = new TelemetryPacket();
+
+            List<Action> newActions = new ArrayList<>();
+            for (Action action : runningActions) {
+                action.preview(packet.fieldOverlay());
+                if (action.run(packet)) {
+                    newActions.add(action);
+                }
+            }
+            runningActions = newActions;
+
+            dash.sendTelemetryPacket(packet);
             if(gamepad1.back) {
                 if(!currentDetections.isEmpty()) {
                     Pose2d currentPose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
                     drive = new MecanumDrive(hardwareMap, currentPose);
-                    Actions.runBlocking(new ParallelAction(
-                            drive.actionBuilder(currentPose)
-                                    .splineToConstantHeading(new Vector2d(-50, 0), 0)
-                                    .build()));
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> drive.actionBuilder(currentPose).splineToConstantHeading(new Vector2d(50, 50), 0))
+                    ));
                 }
+            } if(gamepad1.start) {
+                runningActions.clear();
             }
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
@@ -407,7 +427,6 @@ public class CameraMain extends Robot {
                 telemetry.addData("extendedness", extendedness);
                 telemetry.addData("servo position", clawRotate.getPosition());
                 telemetry.update();
-                TelemetryPacket packet = new TelemetryPacket();
                 packet.fieldOverlay().setStroke("#3F51B5");
                 Drawing.drawRobot(packet.fieldOverlay(), drive.pose);
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);

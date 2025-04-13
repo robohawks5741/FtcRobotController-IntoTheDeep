@@ -217,7 +217,7 @@ public class AutoLeft extends AutoSuper {
 
                             .build()
             ));
-         //   lift.setPower(0.001);
+            lift.setPower(0.01);
 
 
         telemetry.addLine("Got to isStopRequested");

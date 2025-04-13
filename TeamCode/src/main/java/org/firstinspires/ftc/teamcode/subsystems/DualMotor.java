@@ -66,7 +66,7 @@ public class DualMotor {
         Ki = K_I;
         Kd = K_D;
         PID = new PIDController(Kp, Ki, Kd);
-        PID.setTolerance(0.01);
+        PID.setTolerance(BotConstants.armTolerance);
         sameSign = false;
     }
 

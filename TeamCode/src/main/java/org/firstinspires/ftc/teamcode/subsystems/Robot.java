@@ -375,7 +375,7 @@ public class Robot extends LinearOpMode {
         }
         totalPower = clamp(totalPower, -1, 1);
      //   double powerScale = .5 + 0.5*extendedness;
-        rotatePower = totalPower;
+        rotatePower = totalPower + gravity;
         rotate.setPower(rotatePower);
        /* rotate.setTargetPosition(rotatePos);
         rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

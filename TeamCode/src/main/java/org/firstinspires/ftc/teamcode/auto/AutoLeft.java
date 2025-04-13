@@ -76,16 +76,16 @@ public class AutoLeft extends AutoSuper {
 
             try {
                 rotate = new DualMotor(backRotate, frontRotate,
-                        BotConstants.armUpKp / BotConstants.VOLTS_PER_TICK,
-                        BotConstants.armUpKi / BotConstants.VOLTS_PER_TICK,
-                        BotConstants.armUpKd / BotConstants.VOLTS_PER_TICK);
+                        BotConstants.armUpKp,
+                        BotConstants.armUpKi,
+                        BotConstants.armUpKd);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             lift = new DualMotor(backLift,
-                    BotConstants.liftKp / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.liftKi / BotConstants.VOLTS_PER_TICK,
-                    BotConstants.liftKd / BotConstants.VOLTS_PER_TICK);
+                    BotConstants.liftKp,
+                    BotConstants.liftKi,
+                    BotConstants.liftKd);
 
 
             resetPosition();

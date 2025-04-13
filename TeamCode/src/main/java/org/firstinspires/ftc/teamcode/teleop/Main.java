@@ -335,7 +335,6 @@ public class Main extends Robot {
                 telemetry.addData("Pose X", drive.pose.position.x);
                 telemetry.addData("Pose Y", drive.pose.position.y);
                 telemetry.addData("tag found?",tagFound);
-                telemetry.addData("debug", debug);
                 telemetry.addData("armPosition", armPosition);
                 telemetry.addData("isIn", isIn);
                 telemetry.addData("isDown", isDown);
@@ -348,7 +347,7 @@ public class Main extends Robot {
             }
 
 
-            telemetry.addData("angle", getAngle());
+            telemetry.addData("angle", (rotateEncoder.getVoltage() * (180/Math.PI)));
                 telemetry.addData("rotate power", rotatePower);
                 telemetry.addData("lift power", liftPower);
                 telemetry.addData("rotate encoder output", rotateEncoder.getVoltage());
@@ -359,6 +358,10 @@ public class Main extends Robot {
                 telemetry.addData("incremental", -encoderMotor.getCurrentPosition());
                 telemetry.addData("extendedness", extendedness);
                 telemetry.addData("servo position", clawRotate.getPosition());
+
+            telemetry.addData("actualD", rotate.getPid().getD());
+            telemetry.addData("i", rotate.getI());
+            telemetry.addData("d", rotate.getD());
                 telemetry.update();
                 TelemetryPacket packet = new TelemetryPacket();
                 packet.fieldOverlay().setStroke("#3F51B5");

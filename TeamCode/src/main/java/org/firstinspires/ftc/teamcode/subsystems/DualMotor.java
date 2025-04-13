@@ -338,4 +338,15 @@ public class DualMotor {
     public void setKd(double Kd) {
         PID.setD(Kd);
     }
+
+    public double getP() {
+        return Kp;
+    }
+
+    public double getI() {
+        return Ki;
+    }
+    public double getD() {
+        return Kd;
+    }
 }

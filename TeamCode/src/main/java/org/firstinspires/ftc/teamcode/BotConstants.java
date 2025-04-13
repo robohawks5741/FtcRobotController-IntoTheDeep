@@ -10,7 +10,7 @@ public final class BotConstants {
     public static final double verticalTicks = 695;
     public static final double RADS_PER_TICK = Math.PI / 2 / (verticalTicks - horizontalTicks); //=0.002805
     public static final double MAX_VOLTAGE = 3.227;
-    public static final double RADS_PER_VOLT  = Math.PI * 2 / MAX_VOLTAGE;
+    public static final double RADS_PER_VOLT  = 1.95;
     public static final double VOLTS_PER_TICK = RADS_PER_TICK / RADS_PER_VOLT;
     public static final double HORIZONTAL_VOLTS = (0.858 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
 
@@ -18,11 +18,11 @@ public final class BotConstants {
 
 
 
-    public static final double ARM_FRONT_PLACING_VOLTS = (0.095 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
+    public static final double ARM_FRONT_PLACING_VOLTS = (0.15 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
-    public static double ARM_GROUND_VOLTS_EXTENDED = (1.05 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+    public static double ARM_GROUND_VOLTS_EXTENDED = (1.12 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
     //this may need to be tweaked
     public static double ARM_STARTING_VOLTS = (1.05 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
 
@@ -42,10 +42,10 @@ public final class BotConstants {
 
     //TODO: retune these
 
-    public static double armUpKp = 0.0025;
+    public static double armUpKp = 0.6;
 
-    public static double armUpKi = 0.0004;
-    public static double armUpKd = 0.0002;
+    public static double armUpKi = 0.0;
+    public static double armUpKd = 0.0;
 
     public static double armTolerance = 0.1;
 
@@ -77,9 +77,9 @@ public final class BotConstants {
     public static final double LIFT_SHORT_DOWN_VOLTS = LIFT_MIN_VOLTS + 0.45 + MAX_VOLTAGE;
     public static final double INCREMENTAL_TO_VOLTS = (LIFT_MAX_VOLTS - LIFT_MIN_VOLTS) / extendedIncrementalOutput;
 
-    public static double liftKp = 0.001;
-    public static double liftKi = 0.00005;
-    public static double liftKd = 0.000025;
+    public static double liftKp = 0.7;
+    public static double liftKi = 0;
+    public static double liftKd = 0;
 
     //public double kp = 0.00025;
     //public double ki = 0.000015;

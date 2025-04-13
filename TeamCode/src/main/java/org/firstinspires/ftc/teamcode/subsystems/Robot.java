@@ -362,18 +362,19 @@ public class Robot extends LinearOpMode {
             updateRotate();
         }
     }
+
     protected void updateRotate() throws Exception {
-      /*  calculateLiftVoltage();
-        double pidPower = (rotate.getPIDPower(getAngle()));
+        calculateLiftVoltage();
+        double pidPower = (rotate.getPIDPower(rotateEncoder.getVoltage(), rotateTargetPosition));
         double gravity = BotConstants.armBasePower * Math.cos(getAngle());
-        double totalPower = pidPower + gravity;
+        double totalPower =  pidPower;
         totalPower = clamp(totalPower, -1, 1);
-        double powerScale = .5 + 0.5*extendedness;
-        rotatePower = powerScale*totalPower;*/
-        rotate.setPower(rotate.getPIDPower(rotateEncoder.getVoltage(), rotateTargetPosition));
+     //   double powerScale = .5 + 0.5*extendedness;
+        rotatePower = totalPower;
+        rotate.setPower(rotatePower);
        /* rotate.setTargetPosition(rotatePos);
         rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        try {x  
+        try {
             //signs of each part of this are based on direction of motor and encoder
             //currently up from ground = positive power, negative encoder voltage
             rotatePower = (-rotate.getPIDPower(rotateTargetVoltage, normalizeRotateVoltage(rotateEncoder.getVoltage()))
@@ -384,12 +385,15 @@ public class Robot extends LinearOpMode {
             throw new RuntimeException(e);
         }*/
     }
+
+
+
     protected void updateLift() {
         lift.setTargetPosition(liftPos);
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         try {
             liftPower=0;
-          //  liftPower = (lift.getPIDPower(liftTargetVoltage, liftRealVoltage));
+            liftPower = (lift.getPIDPower(liftRealVoltage, liftTargetVoltage));
                     //+ BotConstants.liftBasePower * Math.sin(getAngle()));
             lift.setPower(clamp(liftPower, -1, 1));
         } catch(Exception e) {

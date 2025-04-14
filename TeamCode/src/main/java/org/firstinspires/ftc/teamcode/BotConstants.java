@@ -12,17 +12,17 @@ public final class BotConstants {
     public static final double MAX_VOLTAGE = 3.227;
     public static final double RADS_PER_VOLT  = 1.95;
     public static final double VOLTS_PER_TICK = RADS_PER_TICK / RADS_PER_VOLT;
-    public static final double HORIZONTAL_VOLTS = (0.858 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+    public static final double HORIZONTAL_VOLTS = (1.06 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
 
 
 
 
 
-    public static final double ARM_FRONT_PLACING_VOLTS = (0.19 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
+    public static final double ARM_FRONT_PLACING_VOLTS = (0.175 + ARM_BACK_VOLTS) % MAX_VOLTAGE;/*HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_FRONT_PLACING_TICKS - ARM_HORIZONTAL_TICKS);*/
     /*public static final double ARM_GROUND_VOLTS = HORIZONTAL_VOLTS - VOLTS_PER_TICK *
             (ARM_GROUND_TICKS - ARM_HORIZONTAL_TICKS);*/
-    public static double ARM_GROUND_VOLTS_EXTENDED = (1.12 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
+    public static double ARM_GROUND_VOLTS_EXTENDED = (1.135 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
     //this may need to be tweaked
     public static double ARM_STARTING_VOLTS = (1.05 + ARM_BACK_VOLTS) % MAX_VOLTAGE;
 
@@ -77,7 +77,7 @@ public final class BotConstants {
     public static final double LIFT_SHORT_DOWN_VOLTS = LIFT_MIN_VOLTS + 0.45 + MAX_VOLTAGE;
     public static final double INCREMENTAL_TO_VOLTS = (LIFT_MAX_VOLTS - LIFT_MIN_VOLTS) / extendedIncrementalOutput;
 
-    public static double liftKp = 0.7;
+    public static double liftKp = 1;
     public static double liftKi = 0;
     public static double liftKd = 0;
 
@@ -117,7 +117,7 @@ public final class BotConstants {
     public static final double SERVO_PLACEMENT_POS = 0.45;
 
     public static final double SERVO_PARALLEL_POS = 0.3;
-    public static final double SERVO_DOWN_POS = 0.32;
+    public static final double SERVO_DOWN_POS = 0.1;
     public static double SERVO_SPECIMEN_READY_POS = 0.64;
     public static double SERVO_SPECIMEN_PLACEMENT_POS = 0.75;
 

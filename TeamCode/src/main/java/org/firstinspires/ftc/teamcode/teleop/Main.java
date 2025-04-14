@@ -130,7 +130,7 @@ public class Main extends Robot {
          //   calculateLiftVoltage();
             if(gamepad1.left_bumper){
                 if(CLAW_CONTINUOUS) {
-                    stopClaw();
+                    runClaw();
                 }
                 else {
                     closeClaw();
@@ -142,6 +142,8 @@ public class Main extends Robot {
                 else {
                     openClaw();
                 }
+            } else if (!(armPosition == -1) && CLAW_CONTINUOUS){
+                stopClaw();
             }
             if((gamepad1.x || gamepad2.x) && !pressed) {
                 pressed = true;

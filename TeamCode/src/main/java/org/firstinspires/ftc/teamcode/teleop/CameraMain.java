@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.subsystems.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.subsystems.DualMotor;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.TagConstants;
+import org.firstinspires.ftc.teamcode.subsystems.actions.ServoAction;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -103,8 +104,13 @@ public class CameraMain extends Robot {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        OpenCvCamera camera;
+
         super.runOpMode();
+        OpenCvCamera camera;
+        //filler for before starting position is set up
+        boolean tagFound = false;
+        boolean tagSeen = false;
+        Pose2d absolutePose = new Pose2d(new Vector2d(0, 0), 0);
         if(!CLAW_CONTINUOUS) {
             closeClaw();
         }
@@ -163,45 +169,64 @@ public class CameraMain extends Robot {
             if (!currentDetections.isEmpty()){
                 tagOfInterest = currentDetections.get(0);
                 telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
+                tagFound = true;
+                tagSeen = true;
                 tagToTelemetry(tagOfInterest);
-                Pose2d absolutePose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
+
                 telemetry.addLine("Absolute Pose: x =  " + absolutePose.position.x +
                         ", y = " + absolutePose.position.y + ", heading = " + absolutePose.heading);
+                telemetry.addLine("Absolute Pose relative to 16 corner: x =  " + (72 + absolutePose.position.x) +
+                        ", y = " + 72 + absolutePose.position.y + ", heading = " + absolutePose.heading);
             }
             else {
                 telemetry.addLine("Tag of interest is not in sight");
+                if(tagSeen) {
+                    absolutePose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
+                    tagSeen = false;
+                }
+                telemetry.addLine("Tag last seen at:");
+                telemetry.addLine("Absolute Pose: x =  " + absolutePose.position.x +
+                        ", y = " + absolutePose.position.y + ", heading = " + absolutePose.heading);
+                telemetry.addLine("Absolute Pose relative to 16 corner: x =  " + (72 + absolutePose.position.x) +
+                        ", y = " + 72 + absolutePose.position.y + ", heading = " + absolutePose.heading);
             }
             TelemetryPacket packet = new TelemetryPacket();
 
             List<Action> newActions = new ArrayList<>();
             for (Action action : runningActions) {
-                telemetry.addLine("here");
                 action.preview(packet.fieldOverlay());
                 if (action.run(packet)) {
                     newActions.add(action);
                 }
             }
             runningActions = newActions;
-
+            drive.updatePoseEstimate();
             dash.sendTelemetryPacket(packet);
             if(gamepad1.back) {
-                if(!currentDetections.isEmpty() && runningActions.isEmpty()) {
-                    Pose2d currentPose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
-                    drive = new MecanumDrive(hardwareMap, currentPose);
-                    runningActions.add(new SequentialAction(
-                            new InstantAction(() -> drive.actionBuilder(currentPose).splineToConstantHeading(new Vector2d(50, 50), 0))
-                    ));
+                if(runningActions.isEmpty() && tagFound) {
+                    if(!currentDetections.isEmpty()) {
+                        Pose2d currentPose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
+                        telemetry.addData("Current pose: ", currentPose);
+                        drive = new MecanumDrive(hardwareMap, currentPose);
+                    }
+                    telemetry.addData("Current pose: ", drive.pose);
+                    //tag 16 corner is at -72 -72
+                    //currently 0 degree heading is towards -x, idk don't ask
+                    runningActions.add(
+                            drive.actionBuilder(drive.pose)
+                                    .splineToLinearHeading(new Pose2d(new Vector2d(-62, -62), Math.toRadians(45)), Math.toRadians(45)).build()
+                    );
                 }
             } if(gamepad1.start) {
                 runningActions.clear();
             }
-            drive.setDrivePowers(new PoseVelocity2d(
+            /*drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
                             -gamepad1.left_stick_y * 0.7,
                             -gamepad1.left_stick_x * 0.7
                     ),
                     -gamepad1.right_stick_x * 0.55
-            ));
+            ));*/
          //   calculateLiftVoltage();
             if(gamepad1.left_bumper){
                 if(CLAW_CONTINUOUS) {
@@ -433,6 +458,9 @@ public class CameraMain extends Robot {
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }
 
+        if(isStopRequested()) {
+            camera.stopStreaming();
+        }
 
        // executor.shutdownNow();
         }

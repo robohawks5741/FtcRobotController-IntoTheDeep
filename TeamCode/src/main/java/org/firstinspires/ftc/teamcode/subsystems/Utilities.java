@@ -36,9 +36,9 @@ public class Utilities {
     }
 
 
-    /*public double checkPower(DualMotor motor) {
-        if()
-    }*/
+    //this is written assuming origin is the center of the field
+    //math is done with 0 degrees is pointing away from audience, towards blue net zone and red observation zone
+    //and then adjusted for roadrunner axes
 
     public static Pose2d pointToPose(AprilTagDetection detection, Mat matrix) {
         AprilTagPipeline.Pose D0Fpose = AprilTagPipeline.poseFromTrapezoid(detection.corners, matrix, tagsize, tagsize);
@@ -67,6 +67,6 @@ public class Utilities {
             trueY = r * Math.sin(trueHeading) + TagConstants.TagPositions.getY(detection.id);
         }
         double z = -detection.pose.y * INCHES_PER_METER + TagConstants.TagPositions.getZ(detection.id);
-        return new Pose2d(trueX, trueY, trueHeading);
+        return new Pose2d(trueX, trueY, trueHeading + Math.PI);
     }
 }

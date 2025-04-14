@@ -40,7 +40,7 @@ public class Robot extends LinearOpMode {
     protected AprilTagDetection tagOfInterest = null;
     protected boolean tagFound = false;
 
-    protected final boolean CLAW_CONTINUOUS = false;
+    protected final boolean CLAW_CONTINUOUS = true;
     protected DcMotorEx frontRotate, backRotate, frontLift, backLift;
     public DualMotor rotate;
     public DualMotor lift;

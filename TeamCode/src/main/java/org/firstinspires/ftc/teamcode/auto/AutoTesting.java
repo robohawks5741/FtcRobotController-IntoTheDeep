@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import static org.firstinspires.ftc.teamcode.subsystems.Utilities.pointToPose;
+
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -86,8 +88,8 @@ public class AutoTesting extends AutoSuper {
                 if(!currentDetections.isEmpty()) {
                     pressed = true;
                     tagOfInterest = currentDetections.get(0);
-                    TagConstants.Pose currentPose = TagTester.pointToPose(tagOfInterest);
-                    beginPose = new Pose2d(currentPose.x(), currentPose.y(), currentPose.angle());
+                    Pose2d currentPose = pointToPose(tagOfInterest, aprilTagDetectionPipeline.getMatrix());
+                    beginPose = currentPose;
                     Actions.runBlocking(new ParallelAction(
                             drive.actionBuilder(beginPose)
                                     .splineToConstantHeading(new Vector2d(-50, 0), 0)

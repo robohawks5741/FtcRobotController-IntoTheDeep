@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import static org.firstinspires.ftc.teamcode.subsystems.Utilities.pointToPose;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -197,10 +199,10 @@ public class TagTester extends LinearOpMode
         telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
         telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
         //this pose is in inches
-        TagConstants.Pose absolutePose = pointToPose(detection);
+        Pose2d absolutePose = pointToPose(detection, aprilTagDetectionPipeline.getMatrix());
 
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(absolutePose.x(), absolutePose.y(), absolutePose.angle()));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, absolutePose);
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.fieldOverlay().setStroke("#3F51B5");
@@ -208,44 +210,10 @@ public class TagTester extends LinearOpMode
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
 
 
-        telemetry.addLine("Absolute pose: x = " + absolutePose.x() + ", y = " + absolutePose.y()
-        + ", z = " + absolutePose.z() + ", angle = " + Math.toDegrees(absolutePose.angle()));
+        telemetry.addLine("Absolute pose: x = " + absolutePose.position.x + ", y = " + absolutePose.position.y
+        + ", angle = " + Math.toDegrees(absolutePose.heading.real));
     }
-    //this is written assuming origin is the center of the field
-    //0 degrees is pointing away from audience, towards blue net zone and red observation zone
-    public static TagConstants.Pose pointToPose(AprilTagDetection detection) {
-        AprilTagPipeline.Pose D0Fpose = AprilTagPipeline.poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
 
-        double xInit = detection.pose.x * FEET_PER_METER / FEET_PER_INCH;
-        //weirdness between what's considered y and z I think
-        double yInit = detection.pose.z * FEET_PER_METER / FEET_PER_INCH;
-        double yaw = D0Fpose.getRvec().get(2, 0)[0];
-        double r = Math.sqrt(Math.pow(xInit, 2) + Math.pow(yInit, 2));
-        double headingWithYaw = Math.atan(xInit / yInit);
-        //the bot's heading relative to the wall
-        double trueHeading = headingWithYaw + yaw;
-
-
-
-
-        //reorient with tag position
-        //there's very likely to be some sign error/90 degree off angle here
-        trueHeading = -trueHeading + Math.toRadians(TagConstants.TagPositions.getA(detection.id));
-        //not sure about any of this to be honest I'm just trying stuff
-        //this should work I think--it's disgusting but I don't feel like wading through all this trig to find
-        //one sign error
-        double trueX, trueY;
-        if(detection.id == 12 || detection.id == 15) {
-            trueX = r * Math.cos(trueHeading) + TagConstants.TagPositions.getX(detection.id);
-            trueY = -r * Math.sin(trueHeading) + TagConstants.TagPositions.getY(detection.id);
-        }
-        else {
-            trueX = -r * Math.cos(trueHeading) + TagConstants.TagPositions.getX(detection.id);
-            trueY = r * Math.sin(trueHeading) + TagConstants.TagPositions.getY(detection.id);
-        }
-        double z = -detection.pose.y * FEET_PER_METER / FEET_PER_INCH + TagConstants.TagPositions.getZ(detection.id);
-        return new TagConstants.Pose(trueX, trueY, z, trueHeading);
-    }
 
 
 
